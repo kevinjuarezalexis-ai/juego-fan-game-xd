@@ -63,8 +63,10 @@ FB.Conductor = class Conductor {
         resolve(ok);
       };
       a.addEventListener('canplaythrough', () => finish(true), { once: true });
+      a.addEventListener('canplay', () => finish(true), { once: true });
       a.addEventListener('error', () => finish(false), { once: true });
-      const to = setTimeout(() => finish(a.readyState >= 1), 5000);
+      // desde internet (GitHub Pages) el mp3 tarda: se espera hasta 60 s antes de rendirse
+      const to = setTimeout(() => finish(a.readyState >= 1), 60000);
       a.src = src;
       a.load();
     });
