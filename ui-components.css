@@ -1,0 +1,372 @@
+/* UniGames — ui-components.css
+   Componentes compartidos por los juegos 2D (modal, botones, sliders, filas,
+   tarjetas, calidad gráfica). Un juego nuevo usa estas clases en vez de
+   redefinirlas. Se carga siempre. */
+
+/* Tokens de los componentes (radios, tiempos). Usan las variables de styles.css. */
+:root {
+  --game-radius: 12px;
+  --game-radius-sm: 8px;
+  --game-transition: 0.2s ease;
+  --game-panel-bg: rgba(10, 15, 20, 0.88);
+  --game-row-bg: rgba(255, 255, 255, 0.06);
+  --game-row-border: rgba(255, 255, 255, 0.15);
+}
+
+/* .modal-game: cartel que cubre el contenedor del juego, centrado y con blur. */
+.modal-game {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--game-panel-bg);
+  backdrop-filter: blur(2px);
+  overflow-y: auto;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.modal-game.hidden {
+  display: none;
+}
+
+.modal-game-box {
+  width: 100%;
+  max-width: 420px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  text-align: center;
+}
+
+.modal-game-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(12px, 2.2vw, 18px);
+  color: var(--yellow);
+  text-shadow: 0 0 12px rgba(245, 197, 24, 0.5);
+}
+
+.modal-game-sub {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+@media (max-width: 480px) {
+  .modal-game {
+    padding: 0.5rem;
+  }
+  .modal-game-box {
+    gap: 0.4rem;
+  }
+  .modal-game-sub {
+    font-size: 0.7rem;
+    line-height: 1.4;
+  }
+}
+
+/* Botones de juego (para fondos oscuros de canvas), con scale suave en hover. */
+.btn-game-primary {
+  background: var(--yellow, #f5c518);
+  color: var(--blue-dark, #0f1e3d);
+  font-weight: 900;
+  font-size: 0.95rem;
+  font-family: 'Nunito', sans-serif;
+  border: none;
+  border-radius: var(--game-radius-sm);
+  padding: 0.7rem 1.6rem;
+  cursor: pointer;
+  transition: transform var(--game-transition), filter var(--game-transition), box-shadow var(--game-transition);
+}
+
+.btn-game-primary:hover {
+  transform: scale(1.05);
+  filter: brightness(1.05);
+  box-shadow: 0 6px 20px rgba(245, 197, 24, 0.35);
+}
+
+.btn-game-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-game-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+  box-shadow: none;
+}
+
+.btn-game-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  font-family: 'Nunito', sans-serif;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--game-radius-sm);
+  padding: 0.6rem 1.4rem;
+  cursor: pointer;
+  transition: transform var(--game-transition), background var(--game-transition), border-color var(--game-transition);
+}
+
+.btn-game-secondary:hover {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.btn-game-secondary:active {
+  transform: scale(0.97);
+}
+
+/* Botón cuadrado chico del HUD (pausa, etc.). */
+.game-icon-btn {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  border-radius: var(--game-radius-sm);
+  width: 2rem;
+  height: 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  flex: 0 0 auto;
+  transition: transform var(--game-transition), background var(--game-transition);
+}
+
+.game-icon-btn:hover {
+  transform: scale(1.08);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* .game-info-row: fila de lista chica (cómo jugar, mejoras, recompensas). */
+.game-info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: var(--game-row-bg);
+  border: 1px solid var(--game-row-border);
+  border-radius: var(--game-radius);
+  padding: 0.55rem 0.8rem;
+  text-align: left;
+  transition: border-color var(--game-transition), background var(--game-transition);
+}
+
+.game-info-row:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+/* Slider de ajustes. .trampas-slider-row queda como alias de .game-slider-row. */
+.game-slider-row,
+.trampas-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(250, 204, 21, 0.25);
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+}
+
+.game-slider-row label,
+.trampas-slider-row label {
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.game-slider-row input[type="range"],
+.trampas-slider-row input[type="range"] {
+  flex: 1;
+  accent-color: #facc15;
+  cursor: pointer;
+}
+
+.game-slider-value,
+.trampas-slider-value {
+  flex: 0 0 auto;
+  min-width: 2.8rem;
+  text-align: right;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  color: #facc15;
+}
+
+.game-settings-content,
+.trampas-settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  width: 100%;
+  max-width: 380px;
+}
+
+@media (max-width: 480px) {
+  .game-slider-row label,
+  .trampas-slider-row label {
+    font-size: 0.75rem;
+    white-space: normal;
+  }
+
+  .game-settings-content,
+  .trampas-settings-content {
+    gap: 0.5rem;
+    max-width: 100%;
+  }
+
+  .game-slider-row,
+  .trampas-slider-row {
+    gap: 0.4rem;
+    padding: 0.4rem 0.55rem;
+    border-radius: 8px;
+  }
+
+  .game-slider-value,
+  .trampas-slider-value {
+    min-width: 2.2rem;
+    font-size: 0.55rem;
+  }
+}
+
+/* Selector de calidad (Bajo / Medio / Alto): lo arma Engine2D.Quality.createRow(). */
+.game-quality-options {
+  flex: 1;
+  display: flex;
+  gap: 0.3rem;
+  justify-content: flex-end;
+}
+
+.game-quality-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--game-radius-sm);
+  padding: 0.35rem 0.5rem;
+  cursor: pointer;
+  transition: background var(--game-transition), color var(--game-transition), border-color var(--game-transition);
+}
+
+.game-quality-btn:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+/* El activo va en amarillo lleno — mismo lenguaje que .btn-game-primary,
+   para que se lea de una cuál está puesto sin tener que buscar. */
+.game-quality-btn.active {
+  background: var(--yellow, #f5c518);
+  color: var(--blue-dark, #0f1e3d);
+  border-color: var(--yellow, #f5c518);
+}
+
+/* Sin scale en hover acá a propósito: son tres botones pegados y el
+   scale los hace pisarse entre sí. */
+@media (max-width: 480px) {
+  .game-quality-row {
+    flex-wrap: wrap;
+  }
+  .game-quality-options {
+    flex-basis: 100%;
+    justify-content: stretch;
+  }
+  .game-quality-btn {
+    font-size: 0.68rem;
+    padding: 0.3rem 0.35rem;
+  }
+}
+
+/* Pantalla completa: .game-fullscreen-btn / .game-fullscreen-row. */
+.game-fullscreen-btn,
+
+.runner-fullscreen-btn,
+
+.rpg-fullscreen-btn {
+  flex: 0 0 auto;
+  background: #facc15;
+  color: #0f1e3d;
+  font-weight: 800;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  transition: transform var(--game-transition), filter var(--game-transition);
+}
+
+.game-fullscreen-btn:hover,
+
+.runner-fullscreen-btn:hover,
+
+.rpg-fullscreen-btn:hover {
+  transform: scale(1.05);
+  filter: brightness(1.05);
+}
+
+.game-fullscreen-row,
+.trampas-fullscreen-row,
+.runner-fullscreen-row,
+.rpg-fullscreen-row {
+  justify-content: space-between;
+}
+
+/* iOS Safari no soporta la Fullscreen API en elementos: ahí se oculta el botón. */
+.game-fullscreen-row.unsupported,
+.runner-fullscreen-row.unsupported,
+.trampas-fullscreen-row.unsupported,
+.rpg-fullscreen-row.unsupported {
+  display: none;
+}
+/* Calidad baja (.q-low en <html>, la pone app2.js): se apagan blur y sombras caras. */
+.q-low .modal-game {
+  backdrop-filter: none;
+  background: rgba(10, 15, 20, 0.96);
+}
+
+.q-low [class*="-overlay"],
+.q-low [class*="-panel"],
+.q-low [class*="-menu"] {
+  backdrop-filter: none;
+}
+
+.q-low .btn-game-primary,
+
+.q-low .btn-game-secondary,
+
+.q-low .game-icon-btn,
+
+.q-low .game-info-row,
+
+.q-low .game-fullscreen-btn {
+  transition: none;
+}
+
+.q-low .btn-game-primary:hover,
+
+.q-low .btn-game-secondary:hover,
+
+.q-low .game-icon-btn:hover,
+
+.q-low .game-fullscreen-btn:hover {
+  transform: none;
+}
+
+/* Sombras de color grandes: cada una es un blur aparte al componer. */
+.q-low .btn-game-primary:hover {
+  box-shadow: none;
+}
+
+.q-low .modal-game-title {
+  text-shadow: none;
+}
+canvas { image-rendering: pixelated; }

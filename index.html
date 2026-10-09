@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fiesta de la Buena Vecindad</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="ui-components.css" />
+    <link rel="stylesheet" href="css/fiesta.css" />
+  </head>
+  <body>
+    <div id="wrap">
+      <div id="stage-box">
+        <canvas id="game"></canvas>
+
+        <!-- Menú principal -->
+        <div class="modal-game" id="m-menu">
+          <div class="modal-game-box">
+            <div class="fiesta-sub">FAN GAME · EL CHAVO DEL 8</div>
+            <div class="modal-game-title" id="menu-title">Fiesta de la Buena Vecindad</div>
+            <button class="btn-game-primary" id="btn-jugar">Jugar</button>
+            <button class="btn-game-secondary" id="btn-partes">Elegir parte</button>
+            <div class="fiesta-controls">
+              <b>Flechas / WASD</b> mover · flechas de ritmo<br />
+              <b>1 2 3</b> o <b>Z</b> elegir respuesta<br />
+              <b>X</b> bloquear · <b>Z</b> disparar<br />
+              <b>Esc</b> pausa
+            </div>
+            <div id="menu-status">Cargando…</div>
+          </div>
+        </div>
+
+        <!-- Elegir parte (práctica) -->
+        <div class="modal-game hidden" id="m-partes">
+          <div class="modal-game-box">
+            <div class="modal-game-title">Elegir parte</div>
+            <div class="fiesta-list" id="partes-list"></div>
+            <button class="btn-game-secondary" id="btn-partes-volver">Volver</button>
+          </div>
+        </div>
+
+        <!-- Pausa -->
+        <div class="modal-game hidden" id="m-pause">
+          <div class="modal-game-box">
+            <div class="modal-game-title">Pausa</div>
+            <button class="btn-game-primary" id="btn-continuar">Continuar</button>
+            <button class="btn-game-secondary" id="btn-reiniciar">Reiniciar parte</button>
+            <button class="btn-game-secondary" id="btn-salir">Salir al menú</button>
+          </div>
+        </div>
+
+        <!-- Game over -->
+        <div class="modal-game hidden" id="m-gameover">
+          <div class="modal-game-box">
+            <div class="modal-game-title">Perdiste</div>
+            <div class="modal-game-sub" id="go-parte"></div>
+            <button class="btn-game-primary" id="btn-reintentar">Reintentar</button>
+            <button class="btn-game-secondary" id="btn-go-menu">Menú</button>
+          </div>
+        </div>
+
+        <!-- Final -->
+        <div class="modal-game hidden" id="m-ending">
+          <div class="modal-game-box">
+            <div class="modal-game-title">Fin de la fiesta</div>
+            <div class="modal-game-sub" id="fin-stats"></div>
+            <button class="btn-game-primary" id="btn-fin-menu">Menú</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="engine2d.js"></script>
+    <script src="src/config/characters.js"></script>
+    <script src="src/config/song.js"></script>
+    <script src="src/core/conductor.js"></script>
+    <script src="src/core/camera.js"></script>
+    <script src="src/core/stage.js"></script>
+    <script src="src/mechanics/base.js"></script>
+    <script src="src/core/intro.js"></script>
+    <script src="src/mechanics/bulletbox.js"></script>
+    <script src="src/mechanics/rhythm.js"></script>
+    <script src="src/mechanics/choice.js"></script>
+    <script src="src/mechanics/blockshoot.js"></script>
+    <script src="src/mechanics/rescue.js"></script>
+    <script src="src/game.js"></script>
+    <script src="src/fxlab.js"></script>
+  </body>
+</html>
