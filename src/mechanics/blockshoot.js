@@ -63,7 +63,7 @@ FB.MECHANICS.blockshoot = class BlockShoot extends FB.Mechanic {
         this.stunUntil = time + (this.p.stunBeats || 2) * this.cond.crochet;
         this.popup('¡BLOQUEADO!', '#7dd8ff');
         const pp = this.game.stage.posOf('jirafales');
-        Engine2D.Particles.sparks(pp.x - 70, pp.y, { amount: 18, colors: ['#bfe9ff', '#ffffff'] });
+        Engine2D.Particles.sparks(pp.x + 70 * (this.game.stage.posOf(this.boss).x >= pp.x ? 1 : -1), pp.y, { amount: 18, colors: ['#bfe9ff', '#ffffff'] });
         this.game.stage.shake(4, 0.12);
       } else {
         this.blockLock = 0.35;
@@ -180,12 +180,15 @@ FB.MECHANICS.blockshoot = class BlockShoot extends FB.Mechanic {
       ctx.stroke();
     }
 
-    // escudo al bloquear
+    // hacia dónde mira Jirafales (el jefe puede estar a cualquier lado)
+    const dir = bp.x >= pp.x ? 1 : -1;
+    // escudo al bloquear (del lado del jefe)
     if (this.blockPose > 0) {
       ctx.strokeStyle = this.blockLock > 0 ? 'rgba(150,150,150,0.7)' : 'rgba(140,220,255,0.95)';
       ctx.lineWidth = 8;
       ctx.beginPath();
-      ctx.arc(cx + 20, cy, 110, Math.PI * 0.7, Math.PI * 1.3);
+      if (dir > 0) ctx.arc(cx - 20, cy, 110, -Math.PI * 0.3, Math.PI * 0.3);
+      else ctx.arc(cx + 20, cy, 110, Math.PI * 0.7, Math.PI * 1.3);
       ctx.stroke();
     }
 
@@ -193,13 +196,14 @@ FB.MECHANICS.blockshoot = class BlockShoot extends FB.Mechanic {
     if (this.tracer > 0) {
       const jd = FB.CHARACTERS.jirafales;
       const mz = jd.muzzle || { x: -0.3, y: 0.6 };
-      const mx = pp.x + mz.x * jd.height;
+      // muzzle.x está medido con el dibujo mirando a la izquierda: se espeja si mira al jefe a la derecha
+      const mx = pp.x + Math.abs(mz.x) * jd.height * dir;
       const my = this.game.stage.floorY - mz.y * jd.height;
       ctx.strokeStyle = 'rgba(255,230,140,' + this.tracer * 8 + ')';
       ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.moveTo(mx, my);
-      ctx.lineTo(bp.x + 20, bp.y);
+      ctx.lineTo(bp.x - 20 * dir, bp.y);
       ctx.stroke();
       ctx.fillStyle = '#fff3b0';
       ctx.beginPath();
