@@ -7,7 +7,8 @@
 //   questions: [{ t, time, speaker, prompt, options: [{ text, ok, reply }] }]
 //     ok: true (cura) | false (daña) | 'neutral' (nada)
 //   healOk, wrongDamage, timeoutDamage
-//   panelY        altura del cuadro (default 395)
+//   panelY        altura del cuadro (default 14 = arriba)
+//   stripY        altura de la franja (default 8 = arriba)
 //   numbersOnly   solo 1/2/3 o click (para usar mientras esquivás con las flechas)
 //   replyTime     segundos que se ve la respuesta (default 2.2)
 //   onResult(r)   avisa 'good' | 'bad' | 'neutral' | 'timeout' (lo usa la mecánica rescate)
@@ -19,7 +20,7 @@ FB.MECHANICS.choice = class Choice extends FB.Mechanic {
     this.active = null;
     this.sel = 0;
     this.feedback = null; // { speaker, text, color, until }
-    this.panel = { x: 250, y: p.panelY ?? 395, w: 780, h: 250 };
+    this.panel = { x: p.panelX ?? 150, y: p.panelY ?? 14, w: 780, h: 250 }; // arriba a la izquierda: no tapa a Jirafales
     this.optRects = [];
   }
 
@@ -81,13 +82,13 @@ FB.MECHANICS.choice = class Choice extends FB.Mechanic {
     else if (a === 'opt3' && n > 2) this.resolve(2);
   }
 
-  // franja baja: la pregunta en una línea y las 3 opciones lado a lado.
-  // Sólo tapa los pies de los personajes (para usar junto con la caja de combate).
+  // franja de arriba: la pregunta en una línea y las 3 opciones lado a lado
+  // (para usar junto con la caja de combate, que baja un poco).
   drawStrip(ctx, time) {
     const W = this.game.W;
     const x = 40;
     const w = W - 80;
-    const y = 604;
+    const y = this.p.stripY ?? 8;
     const h = 88;
     if (this.active) {
       const q = this.active;
@@ -171,7 +172,7 @@ FB.MECHANICS.choice = class Choice extends FB.Mechanic {
       const appear = Math.min(1, (time - q.t) / 0.25);
       ctx.save();
       ctx.globalAlpha = appear;
-      ctx.translate(0, (1 - appear) * 30);
+      ctx.translate(0, -(1 - appear) * 30);
       // panel
       ctx.fillStyle = 'rgba(8,8,12,0.92)';
       ctx.beginPath();

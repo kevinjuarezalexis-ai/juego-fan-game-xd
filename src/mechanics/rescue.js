@@ -3,7 +3,7 @@
 // ══════════════════════════════════════
 // Preguntas con 3 opciones (como 'choice') + barra de "Liberación" sobre el
 // personaje. Si `dodge` tiene config, además hay caja de combate: esquivás con
-// las flechas y respondés con 1/2/3 o click (la pregunta va arriba).
+// las flechas y respondés con 1/2/3 o click (la pregunta va arriba, la caja debajo).
 // params:
 //   target       id del personaje (ej. 'florinda')
 //   questions    igual que en 'choice'
@@ -19,7 +19,10 @@ FB.MECHANICS.rescue = class Rescue extends FB.Mechanic {
     this.shownMeter = this.meter;
     this.flash = 0;
     const dodge = !!p.dodge;
-    this.box = dodge ? new FB.MECHANICS.bulletbox(game, p.dodge, t0, t1) : null;
+    // las opciones van arriba, así que la caja baja un poco (debajo de la franja)
+    const box = { ...((p.dodge && p.dodge.box) || {}) };
+    if (box.y === undefined) box.y = 108;
+    this.box = dodge ? new FB.MECHANICS.bulletbox(game, { ...p.dodge, box }, t0, t1) : null;
     this.choice = new FB.MECHANICS.choice(
       game,
       {
@@ -79,7 +82,7 @@ FB.MECHANICS.rescue = class Rescue extends FB.Mechanic {
     const f = this.fade(time);
     const w = 150;
     const x = pos.x - w / 2;
-    const y = Math.max(this.box ? 256 : 40, pos.top - 34);
+    const y = Math.max(this.box ? 312 : 280, pos.top - 34);
     ctx.save();
     ctx.globalAlpha = f;
     ctx.fillStyle = 'rgba(0,0,0,0.75)';

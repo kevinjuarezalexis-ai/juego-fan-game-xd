@@ -185,9 +185,9 @@ FB.Game = class Game {
 
   // escenario + cámara de un segmento
   applySegment(seg, instant = false, withStage = true) {
-    if (withStage) this.stage.apply(seg.stage || {});
+    if (withStage) this.stage.apply(instant ? seg.stage || {} : this._holdForWalks(seg));
     const st = seg.stage || {};
-    if (st.bumpEvery !== undefined) this.camera.setBump(st.bumpEvery, st.bumpAmount ?? 0.03);
+    if (st.bumpEvery !== undefined) this.camera.setBump(st.bumpEvery, st.bumpAmount ?? 0.045);
     const cam = seg.camera;
     if (cam) {
       const d = instant ? 0 : cam.dur ?? 0.6;
@@ -196,6 +196,21 @@ FB.Game = class Game {
       if (cam.filter !== undefined) this.camera.setFilter(cam.filter, instant ? 0 : 0.3, { keep: cam.keep });
       if (cam.tilt !== undefined) this.camera.tilt(cam.tilt, d, cam.ease);
     }
+  }
+
+  // Si un personaje tiene un 'walk' que arranca en los próximos 3 s, se queda
+  // donde arranca la caminata (si no, se deslizaba a la x del segmento y
+  // después se teletransportaba de vuelta al empezar a caminar).
+  _holdForWalks(seg) {
+    const st = seg.stage || {};
+    if (!st.opponents) return st;
+    const walks = this.song.events.filter((e) => e.type === 'walk' && e.from !== undefined && e.t >= seg.t && e.t <= seg.t + 3);
+    if (!walks.length) return st;
+    const opponents = st.opponents.map((o) => {
+      const w = walks.find((e) => (e.char || 'jirafales') === o.id);
+      return w ? { ...o, x: w.from } : o;
+    });
+    return { ...st, opponents };
   }
 
   get parte() {

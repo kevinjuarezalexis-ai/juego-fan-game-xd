@@ -42,8 +42,8 @@ const RATERO = (() => {
 const BACKROW = (ids) =>
   ids.map((id, i) => P(id, 'sano', [1110, 1180, 1250, 1075, 1145, 1215][i], { back: true, face: 'left' }));
 
-// back: true = capa de atrás (más chico y oscuro, con distancia). Para los ya salvados.
-const ATRAS_IZQ = [P('quico', 'sano', 140, { back: true, face: 'right' }), P('florinda', 'sano', 255, { back: true, face: 'right' })];
+// back: true = capa de atrás (más chico y oscuro, con distancia). Para los ya salvados (atrás de Jirafales, a la derecha).
+const ATRAS = [P('florinda', 'sano', 1140, { back: true, face: 'left' }), P('quico', 'sano', 1235, { back: true, face: 'left' })];
 
 // Respuestas: ok true = buena (sube la barra), false = mala (daño), 'neutral' = nada
 const opt = (text, ok, reply) => ({ text, ok, reply });
@@ -386,29 +386,29 @@ FB.SONG = {
         },
       },
     },
-    // 2:00 Quico curado: Jirafales y Florinda van con Quico (izquierda)
+    // 2:00 Quico curado: Jirafales y Florinda van con Quico, después vuelven a su lugar
     {
       t: 120,
-      stage: { opponents: [P('quico', 'sano', 110), P('florinda', 'sano', 250)], tension: 0.25, bumpEvery: 0 },
+      stage: { opponents: [P('quico', 'sano', 300), P('florinda', 'sano', 1150, { face: 'left' })], tension: 0.25, bumpEvery: 0 },
       mechanic: { type: 'none' },
     },
 
     // ── Parte 3 (2:10): aparece el Chavo a la derecha (los salvados, atrás de Jirafales) ──
     {
       t: 130,
-      stage: { opponents: [...ATRAS_IZQ, P('chavo', 'normal', 1080, { face: 'left' })], tension: 0.35 },
+      stage: { opponents: [...ATRAS, P('chavo', 'normal', 320, { face: 'right' })], tension: 0.35 },
       mechanic: { type: 'none' },
     },
     // la pregunta del Chavo
     {
       t: 148,
-      stage: { opponents: [...ATRAS_IZQ, P('chavo', 'normal', 1080, { face: 'left' })] },
+      stage: { opponents: [...ATRAS, P('chavo', 'normal', 320, { face: 'right' })] },
       mechanic: { type: 'choice', replyTime: 2, questions: Q.chavo },
     },
     // 2:35.76 su verdadera forma → combate DIFÍCIL hasta 2:46
     {
       t: 155.76,
-      stage: { opponents: [...ATRAS_IZQ, P('chavo', 'revelado', 1080, { face: 'left' })], tension: 0.9, bumpEvery: 2 },
+      stage: { opponents: [...ATRAS, P('chavo', 'revelado', 320, { face: 'right' })], tension: 0.9, bumpEvery: 2 },
       mechanic: {
         type: 'bulletbox',
         damage: 14,
@@ -423,14 +423,14 @@ FB.SONG = {
     // 2:46 el Chavo se desvanece y se va la caja
     {
       t: 166,
-      stage: { opponents: [...ATRAS_IZQ], tension: 0.6, bumpEvery: 0 },
+      stage: { opponents: [...ATRAS], tension: 0.6, bumpEvery: 0 },
       mechanic: { type: 'none' },
     },
 
     // ── Parte 4 (2:47): la Chilindrina → 3:00 Don Ramón ──
     {
       t: 167,
-      stage: { opponents: [...ATRAS_IZQ, P('chilindrina', 'corrupto', 860, { face: 'left' })], tension: 0.6 },
+      stage: { opponents: [...ATRAS, P('chilindrina', 'corrupto', 440, { face: 'right' })], tension: 0.6 },
       mechanic: { type: 'none' },
     },
     // 2:59.3 → 4:00 hablarle a Don Ramón mientras esquivás sus ataques
@@ -438,9 +438,9 @@ FB.SONG = {
       t: 179.3,
       stage: {
         opponents: [
-          ...ATRAS_IZQ,
-          P('chilindrina', 'corrupto', 860, { face: 'left' }),
-          P('ramon', 'corrupto', 1100, { face: 'left' }),
+          ...ATRAS,
+          P('chilindrina', 'corrupto', 440, { face: 'right' }),
+          P('ramon', 'corrupto', 200, { face: 'right' }),
         ],
         tension: 0.6,
         bumpEvery: 4,
@@ -464,9 +464,9 @@ FB.SONG = {
       t: 240,
       stage: {
         opponents: [
-          ...ATRAS_IZQ,
-          P('chilindrina', 'corrupto', 860, { face: 'left' }),
-          P('ramon', 'sano', 1100, { face: 'left' }),
+          ...ATRAS,
+          P('chilindrina', 'corrupto', 440, { face: 'right' }),
+          P('ramon', 'sano', 200, { face: 'right' }),
         ],
         tension: 0.4,
         bumpEvery: 0,
@@ -527,10 +527,11 @@ FB.SONG = {
       t: 304,
       stage: {
         opponents: [
-          P('quico', 'sano', 130, { face: 'right' }),
-          P('chilindrina', 'sano', 270, { face: 'right' }),
-          P('florinda', 'sano', 420, { face: 'right' }),
-          P('ramon', 'sano', 580, { face: 'right' }),
+          // x = donde están ahora; los eventos 'walk' los llevan a su lugar (sin teletransportarse)
+          P('chilindrina', 'curada', 560, { face: 'right' }),
+          P('ramon', 'sano', 880, { face: 'left' }),
+          P('florinda', 'sano', 1140, { face: 'left' }),
+          P('quico', 'sano', 1235, { face: 'left' }),
         ],
         tension: 0.15,
         bumpEvery: 0,
@@ -543,11 +544,11 @@ FB.SONG = {
       t: 322,
       stage: {
         opponents: [
-          P('quico', 'sano', 130, { face: 'right' }),
-          P('chilindrina', 'sano', 270, { face: 'right' }),
-          P('florinda', 'sano', 420, { face: 'right' }),
-          P('ramon', 'sano', 580, { face: 'right' }),
-          P('chavo', 'triste', 1080, { face: 'left' }),
+          P('chilindrina', 'sano', 700, { face: 'left' }),
+          P('ramon', 'sano', 840, { face: 'left' }),
+          P('florinda', 'sano', 1140, { face: 'left' }),
+          P('quico', 'sano', 1235, { face: 'left' }),
+          P('chavo', 'triste', 300, { face: 'right' }),
         ],
         tension: 0.1,
       },
@@ -560,10 +561,10 @@ FB.SONG = {
       t: 356,
       stage: {
         opponents: [
-          P('quico', 'sano', 130, { face: 'right' }),
-          P('chilindrina', 'sano', 270, { face: 'right' }),
-          P('florinda', 'sano', 420, { face: 'right' }),
-          P('ramon', 'sano', 580, { face: 'right' }),
+          P('chilindrina', 'sano', 700, { face: 'left' }),
+          P('ramon', 'sano', 840, { face: 'left' }),
+          P('florinda', 'sano', 1140, { face: 'left' }),
+          P('quico', 'sano', 1235, { face: 'left' }),
         ],
       },
       mechanic: { type: 'none' },
@@ -844,19 +845,26 @@ FB.SONG = {
     { t: 123, type: 'setState', char: 'florinda', state: 'hablando' },
     { t: 117, type: 'liberate', char: 'quico', dur: 3 },
     { t: 120.5, type: 'face', char: 'florinda', dir: 'left' },
-    { t: 121, type: 'walk', char: 'florinda', from: 1150, to: 250, dur: 3.5, end: 'hablando' },
-    { t: 124.6, type: 'face', char: 'florinda', dir: 'right' },
-    { t: 122, type: 'walk', char: 'jirafales', from: 1010, to: 400, dur: 3.5, end: 'normal' },
-    { t: 125.6, type: 'face', char: 'jirafales', dir: 'right' },
+    { t: 121, type: 'walk', char: 'florinda', from: 1150, to: 460, dur: 3, end: 'hablando' },
+    { t: 122, type: 'walk', char: 'jirafales', from: 1010, to: 640, dur: 2.5, end: 'normal' },
     { t: 126, type: 'setState', char: 'florinda', state: 'sano' },
+    // vuelven a su lugar: Jirafales a la derecha y los salvados atrás de él
+    { t: 127, type: 'face', char: 'jirafales', dir: 'right' },
+    { t: 127, type: 'face', char: 'florinda', dir: 'right' },
+    { t: 127, type: 'face', char: 'quico', dir: 'right' },
+    { t: 127, type: 'walk', char: 'jirafales', from: 640, to: 1010, dur: 2.4, end: 'normal' },
+    { t: 127, type: 'walk', char: 'florinda', from: 460, to: 1140, dur: 2.6, end: 'sano' },
+    { t: 127, type: 'walk', char: 'quico', from: 300, to: 1235, dur: 2.8, end: 'sano' },
+    { t: 129.5, type: 'face', char: 'jirafales', dir: 'left' },
 
-    // ── 2:10 el Chavo ──
-    { t: 130, type: 'focus', on: 'chavo', zoom: 1.2, dur: 1.2 },
-    { t: 133, type: 'walk', char: 'jirafales', from: 400, to: 760, dur: 2.5, end: 'hablando' },
-    { t: 133, type: 'focus', on: 'center', zoom: 1.05, dur: 2.5 },
-    // 2:10 → 2:36 la tensión sube: viñeta roja, zoom lento y los "¡RATERO!" de fondo
+    // ── 2:10 el Chavo: zoom fuerte a él y de a poco se abre hasta ver sólo al Prof y al Chavo ──
+    { t: 130, type: 'pan', x: -320, y: 125, dur: 0.5, ease: 'out' },
+    { t: 130, type: 'zoom', to: 2, dur: 0.5, ease: 'out' },
+    { t: 131.5, type: 'pan', x: -70, y: 55, dur: 9, ease: 'inOut' },
+    { t: 131.5, type: 'zoom', to: 1.55, dur: 9, ease: 'inOut' },
+    { t: 133, type: 'walk', char: 'jirafales', from: 1010, to: 830, dur: 2.5, end: 'hablando' },
+    // 2:10 → 2:36 la tensión sube: viñeta roja y los "¡RATERO!" de fondo
     { t: 131, type: 'tension', to: 0.85, dur: 24.5 },
-    { t: 136, type: 'zoom', to: 1.18, dur: 20, ease: 'in' },
     { t: 150, type: 'bump', every: 2, amount: 0.025 },
     ...RATERO,
     { t: 142, type: 'setState', char: 'jirafales', state: 'normal' },
@@ -867,7 +875,7 @@ FB.SONG = {
     { t: 155.76, type: 'shake', power: 18, dur: 0.8 },
     { t: 155.76, type: 'filter', mode: 'bn', dur: 0, keep: ['chavo'] },
     { t: 155.76, type: 'setState', char: 'jirafales', state: 'asustado' },
-    { t: 155.76, type: 'walk', char: 'jirafales', from: 760, to: 400, dur: 0.6, end: 'asustado' },
+    { t: 155.76, type: 'walk', char: 'jirafales', from: 830, to: 1010, dur: 0.6, end: 'asustado' },
     { t: 155.76, type: 'focus', on: 'chavo', zoom: 1.35, dur: 0.25, ease: 'out' },
     { t: 160, type: 'focus', on: 'center', zoom: 1, dur: 1.2 },
     { t: 165, type: 'filter', mode: 'oscuro', amount: 0.6, dur: 1 },
@@ -899,20 +907,10 @@ FB.SONG = {
     { t: 245, type: 'setState', char: 'ramon', state: 'sano' },
 
     // ── 4:22 jugás con Don Ramón ──
-    { t: 258, type: 'walk', char: 'ramon', from: 1100, to: 880, dur: 2, end: 'sano' },
+    { t: 257.5, type: 'walk', char: 'ramon', from: 200, to: 880, dur: 4, end: 'sano' },
     { t: 261.9, type: 'swapPlayer', char: 'ramon' },
-    { t: 262.2, type: 'face', char: 'jirafales', dir: 'right' },
-    { t: 262.2, type: 'face', char: 'florinda', dir: 'right' },
-    { t: 262.2, type: 'face', char: 'quico', dir: 'right' },
-    { t: 262.2, type: 'face', char: 'chilindrina', dir: 'left' },
-    { t: 264.3, type: 'face', char: 'chilindrina', dir: 'right' },
-    { t: 265.3, type: 'face', char: 'jirafales', dir: 'left' },
-    { t: 265.8, type: 'face', char: 'florinda', dir: 'left' },
-    { t: 266.3, type: 'face', char: 'quico', dir: 'left' },
-    { t: 262.2, type: 'walk', char: 'jirafales', from: 400, to: 1030, dur: 3, end: 'normal' },
-    { t: 262.2, type: 'walk', char: 'florinda', from: 255, to: 1140, dur: 3.5, end: 'sano' },
-    { t: 262.2, type: 'walk', char: 'quico', from: 140, to: 1235, dur: 4, end: 'sano' },
-    { t: 262.2, type: 'walk', char: 'chilindrina', from: 860, to: 560, dur: 2, end: 'corrupto' },
+    { t: 262.2, type: 'walk', char: 'jirafales', from: 1010, to: 1030, dur: 0.6, end: 'normal' },
+    { t: 262.2, type: 'walk', char: 'chilindrina', from: 440, to: 560, dur: 1.5, end: 'corrupto' },
     { t: 262, type: 'face', char: 'ramon', dir: 'left' },
     { t: 262, type: 'focus', on: 'ramon', zoom: 1.2, dur: 1 },
     { t: 262, type: 'tension', to: 0.15, dur: 2 }, // se calma la música (intro del Chapulín)
@@ -928,20 +926,11 @@ FB.SONG = {
     { t: 304, type: 'flash', dur: 0.4 },
     { t: 304, type: 'flashSprite', char: 'chilindrina', dur: 0.6, shake: 4 },
     { t: 304, type: 'setState', char: 'chilindrina', state: 'curada' },
-    { t: 304.5, type: 'face', char: 'chilindrina', dir: 'left' },
-    { t: 304.5, type: 'face', char: 'ramon', dir: 'left' },
-    { t: 304.5, type: 'face', char: 'quico', dir: 'left' },
-    { t: 304.5, type: 'face', char: 'florinda', dir: 'left' },
-    { t: 307.1, type: 'face', char: 'chilindrina', dir: 'right' },
-    { t: 307.1, type: 'face', char: 'ramon', dir: 'right' },
-    { t: 308.1, type: 'face', char: 'florinda', dir: 'right' },
-    { t: 308.6, type: 'face', char: 'quico', dir: 'right' },
-    { t: 304.5, type: 'walk', char: 'chilindrina', from: 560, to: 270, dur: 2.5, end: 'sano' },
-    { t: 304.5, type: 'walk', char: 'ramon', from: 880, to: 580, dur: 2.5, end: 'sano' },
-    { t: 304.5, type: 'walk', char: 'quico', from: 1235, to: 130, dur: 4, end: 'sano' },
-    { t: 304.5, type: 'walk', char: 'florinda', from: 1140, to: 420, dur: 3.5, end: 'sano' },
-    { t: 305, type: 'walk', char: 'jirafales', from: 1030, to: 760, dur: 2, end: 'normal' },
-    { t: 307.1, type: 'face', char: 'jirafales', dir: 'right' },
+    { t: 304.5, type: 'face', char: 'chilindrina', dir: 'right' },
+    { t: 307.1, type: 'face', char: 'chilindrina', dir: 'left' },
+    { t: 304.5, type: 'walk', char: 'chilindrina', from: 560, to: 700, dur: 2.5, end: 'sano' },
+    { t: 304.5, type: 'walk', char: 'ramon', from: 880, to: 840, dur: 1, end: 'sano' },
+    { t: 305, type: 'walk', char: 'jirafales', from: 1030, to: 1010, dur: 0.6, end: 'normal' },
 
     // ── 5:07 "Qué bonita vecindad": recuerdo en sepia, Don Ramón cuenta cuando llegó el Chavo, se recupera vida ──
     { t: 307, type: 'filter', mode: 'sepia', dur: 1.5 },
@@ -965,7 +954,7 @@ FB.SONG = {
     { t: 360, type: 'zoom', to: 1.12, dur: 14, ease: 'in' },
     // 6:14 escena del capítulo animado (tinta)
     { t: 373.8, type: 'swapPlayer', char: 'ramon' },
-    { t: 373.85, type: 'walk', char: 'ramon', from: 580, to: 1010, dur: 0.05, end: 'sano' },
+    { t: 373.85, type: 'walk', char: 'ramon', from: 840, to: 1010, dur: 0.05, end: 'sano' },
     { t: 373.9, type: 'face', char: 'ramon', dir: 'left' },
     { t: 374, type: 'flash', dur: 0.3 },
     { t: 374, type: 'ink', on: true, dur: 0.15 },

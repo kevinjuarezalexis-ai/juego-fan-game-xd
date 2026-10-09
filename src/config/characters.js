@@ -37,7 +37,7 @@ FB.CHARACTERS = {
   quico: {
     nombre: 'Quico',
     color: '#3b6fb6',
-    height: 290,
+    height: 250,
     // quico_sheet.png: 6 poses en fila (0..5), los pies alineados abajo
     sprites: {
       corrupto: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 6, frame: 0 },

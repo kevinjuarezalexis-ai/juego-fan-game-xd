@@ -44,7 +44,7 @@ FB.Camera = class Camera {
     this.sepia = 0;
     // zoom rítmico
     this.bumpEvery = 0;
-    this.bumpAmount = 0.03;
+    this.bumpAmount = 0.045;
     this.bumpZoom = 0;
     // temblor
     this.shakeT = 0;
@@ -68,7 +68,7 @@ FB.Camera = class Camera {
     this.tween('zoom', z, dur, ease);
   }
 
-  setBump(every = 4, amount = 0.03) {
+  setBump(every = 4, amount = 0.045) {
     this.bumpEvery = every;
     this.bumpAmount = amount;
   }
@@ -152,7 +152,7 @@ FB.Camera = class Camera {
       this[key] = tw.from + (tw.to - tw.from) * tw.ease(k);
       if (k >= 1) delete this.tweens[key];
     }
-    this.bumpZoom += (0 - this.bumpZoom) * Math.min(1, dt * 7);
+    this.bumpZoom += (0 - this.bumpZoom) * Math.min(1, dt * 4);
     this.shakeT = Math.max(0, this.shakeT - dt);
   }
 
