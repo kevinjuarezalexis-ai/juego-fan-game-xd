@@ -759,7 +759,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const jugar = UI.el('btn-jugar');
   jugar.disabled = true;
   game
-    .load((f) => (status.textContent = (f >= 0.99 ? 'Cargando la música… ' : 'Cargando… ') + Math.round(f * 100) + '%'))
+    .load((f) => (status.textContent = 'Cargando… ' + Math.round(f * 100) + '%' + (f > 0.85 ? ' (la música puede tardar un poco)' : '')))
     .then(() => {
       jugar.disabled = false;
       status.textContent = game.conductor.hasAudio
