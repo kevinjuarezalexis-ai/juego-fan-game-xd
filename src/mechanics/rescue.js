@@ -98,7 +98,7 @@ FB.MECHANICS.rescue = class Rescue extends FB.Mechanic {
     if (this.box) {
       ctx.globalAlpha = f * 0.75;
       ctx.font = '11px "Press Start 2P", monospace';
-      if (!this.choice.busy) ctx.fillText('flechas: esquivar · 1 2 3 o click: responder', this.game.W / 2, 660);
+      if (!this.choice.busy) ctx.fillText('flechas o WASD: esquivar · 1 2 3 o click: responder', this.game.W / 2, 660);
     }
     ctx.restore();
   }

@@ -4,7 +4,7 @@ Fan game de terror estilo FNF basado en un AU de El Chavo del Ocho. Jugás como 
 Proyecto no oficial, sin fines de lucro.
 
 ## Cómo jugar
-1. Poné la canción en `src/assets/music/fiesta.mp3` (no está en el repo).
+1. La canción ya viene en `src/assets/music/fiesta.mp3`.
 2. Abrí la carpeta con un servidor local, ej: `python -m http.server` y entrá a `http://localhost:8000`.
 
 Más detalles (controles, `?debug`, `?t=`, `?fx`) en `LEEME.md`.
