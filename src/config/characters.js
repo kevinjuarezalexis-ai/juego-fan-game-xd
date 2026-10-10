@@ -118,9 +118,12 @@ FB.CHARACTERS = {
     nombre: 'Ñoño',
     color: '#8a6d2f',
     height: 280,
+    // nono_sheet.png: 0 corrupto, 1 corrupto mientras lo salvan, 2 sano (curado), 3 sano con miedo
     sprites: {
-      corrupto: 'src/assets/personaje/nono_corrupto.png',
-      sano: 'src/assets/personaje/nono_sano.png',
+      corrupto: { src: 'src/assets/personaje/nono/nono_sheet.png', cols: 4, frame: 0 },
+      salvando: { src: 'src/assets/personaje/nono/nono_sheet.png', cols: 4, frame: 1 },
+      sano: { src: 'src/assets/personaje/nono/nono_sheet.png', cols: 4, frame: 2 },
+      asustado: { src: 'src/assets/personaje/nono/nono_sheet.png', cols: 4, frame: 3 },
     },
   },
   barriga: {

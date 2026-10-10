@@ -668,6 +668,8 @@ FB.SONG = {
         type: 'rescue',
         target: 'nono',
         questions: Q.nono,
+        hopePose: 'salvando', // cuando la barra de liberación pasa el 60%: la pose de "lo están salvando"
+        hopeAt: 0.6,
         dodge: {
           damage: 10,
           patterns: [
@@ -1030,7 +1032,7 @@ FB.SONG = {
     { t: 533, type: 'bump', amount: 0.08 },
     { t: 527, type: 'walk', char: 'jirafales', from: 290, to: 400, dur: 0.6, end: 'escopeta' },
     { t: 527, type: 'walk', char: 'barriga', from: 400, to: 155, dur: 0.8, end: 'sano' },
-    { t: 527, type: 'walk', char: 'nono', from: 960, to: 65, dur: 1.6, end: 'sano' },
+    { t: 527, type: 'walk', char: 'nono', from: 960, to: 65, dur: 1.6, end: 'asustado' }, // atrás del grupo, con miedo
     { t: 527, type: 'walk', char: 'quico', from: 260, to: 110, dur: 0.8, end: 'sano' },
     // 9:32 clímax: últimos segundos para ganar
     { t: 572, type: 'flash', dur: 0.4 },
