@@ -994,7 +994,7 @@ FB.SONG = {
     { t: 411, type: 'text', text: '¡AAAAAY!', size: 48, x: 760, y: 260, color: '#ff5050', dur: 1.6 },
     // Quico grita "¡ÑOÑOOO!" (7:35, 7:58, 8:21 en la música)
     ...[455, 478, 501].flatMap((t) => [
-      { t, type: 'pose', char: 'quico', state: 'grito', dur: 1.2 },
+      { t, type: 'pose', char: 'quico', state: 'hablando', dur: 1.2 }, // sano: grita con su pose de hablar (la de 'grito' es la corrupta)
       { t, type: 'text', text: '¡ÑOÑOOO!', size: 34, x: 260, y: 270, color: '#4aa3ff', dur: 1.5 },
       { t, type: 'bump', amount: 0.05 },
     ]),
