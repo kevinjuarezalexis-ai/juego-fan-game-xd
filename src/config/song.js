@@ -333,8 +333,8 @@ FB.SONG = {
     { n: 3, nombre: 'El Chavo', t: 130 },
     { n: 4, nombre: 'La Chilindrina y Don Ramón', t: 167 },
     { n: 5, nombre: 'Monchito al rescate', t: 262 },
-    { n: 6, nombre: 'La verdad del Chavo', t: 322 },
-    { n: 7, nombre: 'Ñoño', t: 374 },
+    { n: 6, nombre: 'La verdad del Chavo', t: 322.91 },
+    { n: 7, nombre: 'Ñoño', t: 375.92 },
     { n: 8, nombre: 'El Sr. Barriga', t: 411 },
     { n: 9, nombre: 'Rescatar a Ñoño', t: 456 },
     { n: 10, nombre: 'La última fiesta', t: 527 },
@@ -536,7 +536,7 @@ FB.SONG = {
 
     // ── Parte 6 (5:22): el Chavo sano cuenta lo que pasó ──
     {
-      t: 322,
+      t: 322.91,
       stage: {
         opponents: [
           P('quico', 'sano', 100, { face: 'right' }),
@@ -553,7 +553,7 @@ FB.SONG = {
     // ═══════════════ SEGUNDA MITAD ═══════════════
     // 5:56 el Chavo falso se va (tensión subiendo hasta 6:14)
     {
-      t: 356,
+      t: 358.7,
       stage: {
         opponents: [
           P('quico', 'sano', 100, { face: 'right' }),
@@ -567,12 +567,12 @@ FB.SONG = {
 
     // ── Parte 7 (6:14): escena del capítulo animado, en tinta (fondo blanco, siluetas negras). Jugás con Don Ramón ──
     {
-      t: 374,
+      t: 375.92,
       stage: {
         opponents: [
           // el recuerdo: sólo el Chavo y Ñoño (los demás vuelven en 6:36)
           P('chavo', 'normal', 860, { face: 'left' }),
-          P('nono', 'sano', 460, { face: 'right' }),
+          P('nono', 'sano', 570, { face: 'right' }),
         ],
         tension: 0,
         bumpEvery: 0,
@@ -935,51 +935,51 @@ FB.SONG = {
     { t: 303.1, type: 'walk', char: 'jirafales', from: 110, to: 370, dur: 1.5, end: 'normal' },
 
     // ── 5:07 "Qué bonita vecindad": recuerdo en sepia, Don Ramón cuenta cuando llegó el Chavo, se recupera vida ──
-    { t: 307, type: 'filter', mode: 'sepia', dur: 1.5 },
-    { t: 307, type: 'zoom', to: 1.08, dur: 14, ease: 'inOut' },
-    { t: 307, type: 'tension', to: 0, dur: 1.5 },
-    { t: 307.5, type: 'regen', amount: 7, dur: 14 },
-    { t: 307.5, type: 'text', text: '+ VIDA', size: 22, x: 640, y: 660, color: '#7dff9a', dur: 2 },
-    { t: 307.5, type: 'setState', char: 'ramon', state: 'hablando' },
-    { t: 321.2, type: 'setState', char: 'ramon', state: 'sano' },
-    { t: 321.3, type: 'filter', mode: 'none', dur: 0.6 },
-    { t: 321.3, type: 'zoom', to: 1, dur: 0.6 },
+    { t: 305.67, type: 'filter', mode: 'sepia', dur: 1.5 },
+    { t: 305.67, type: 'zoom', to: 1.08, dur: 16.5, ease: 'inOut' },
+    { t: 305.67, type: 'tension', to: 0, dur: 1.5 },
+    { t: 306.27, type: 'regen', amount: 7, dur: 16.5 },
+    { t: 306.27, type: 'text', text: '+ VIDA', size: 22, x: 640, y: 660, color: '#7dff9a', dur: 2 },
+    { t: 306.27, type: 'setState', char: 'ramon', state: 'hablando' },
+    { t: 322.78, type: 'setState', char: 'ramon', state: 'sano' },
+    { t: 322.9, type: 'filter', mode: 'none', dur: 0.6 },
+    { t: 322.9, type: 'zoom', to: 1, dur: 0.6 },
 
     // ── 5:22 el Chavo sano ──
-    { t: 322, type: 'flashSprite', char: 'chavo', dur: 0.5, shake: 2 },
-    { t: 322, type: 'focus', on: 'chavo', zoom: 1.25, dur: 1.5 },
-    { t: 340, type: 'focus', on: 'center', zoom: 1.05, dur: 2 },
+    { t: 322.91, type: 'flashSprite', char: 'chavo', dur: 0.5, shake: 2 },
+    { t: 322.91, type: 'focus', on: 'chavo', zoom: 1.25, dur: 1.5 },
+    { t: 341.85, type: 'focus', on: 'center', zoom: 1.05, dur: 2 },
 
     // ═══════════════ SEGUNDA MITAD (tiempos aprox. salvo los que pasaste) ═══════════════
     // 5:47 termina la historia: se muestra corrupto ("Fue por su culpa...")
-    { t: 347.4, type: 'flashSprite', char: 'chavo', dur: 0.4, shake: 8 },
-    { t: 347.4, type: 'setState', char: 'chavo', state: 'corrupto' },
-    { t: 347.4, type: 'shake', power: 8, dur: 0.4 },
-    { t: 347.4, type: 'tension', to: 0.5, dur: 1 },
-    { t: 353, type: 'silhouette', char: 'chavo', on: true, dur: 2.5 },
-    { t: 356, type: 'tension', to: 0.6, dur: 17 },
-    { t: 360, type: 'zoom', to: 1.12, dur: 14, ease: 'in' },
+    { t: 349.63, type: 'flashSprite', char: 'chavo', dur: 0.4, shake: 8 },
+    { t: 349.63, type: 'setState', char: 'chavo', state: 'corrupto' },
+    { t: 349.63, type: 'shake', power: 8, dur: 0.4 },
+    { t: 349.63, type: 'tension', to: 0.5, dur: 1 },
+    { t: 355.52, type: 'silhouette', char: 'chavo', on: true, dur: 2.5 },
+    { t: 358.7, type: 'tension', to: 0.6, dur: 17 },
+    { t: 362.53, type: 'zoom', to: 1.12, dur: 14, ease: 'in' },
     // 6:14 escena del capítulo animado (tinta)
-    { t: 373.8, type: 'swapPlayer', char: 'ramon' },
-    { t: 373.85, type: 'walk', char: 'ramon', from: 520, to: 400, dur: 0.05, end: 'sano' },
-    { t: 373.9, type: 'face', char: 'ramon', dir: 'right' },
-    { t: 374, type: 'flash', dur: 0.3 },
-    { t: 374, type: 'ink', on: true, dur: 0.15 },
-    { t: 374, type: 'zoom', to: 1, dur: 0 },
-    { t: 374, type: 'prop', id: 'barril', kind: 'barrel', x: 640 },
-    { t: 374, type: 'prop', id: 'globos', kind: 'balloons', x: 640 },
-    { t: 381, type: 'walk', char: 'nono', from: 460, to: 640, dur: 1, end: 'sano' },
-    { t: 382.2, type: 'pose', char: 'nono', state: 'sano', dur: 0.1 },
+    { t: 375.73, type: 'swapPlayer', char: 'ramon' },
+    { t: 375.78, type: 'walk', char: 'ramon', from: 520, to: 400, dur: 0.05, end: 'sano' },
+    { t: 375.82, type: 'face', char: 'ramon', dir: 'right' },
+    { t: 375.92, type: 'flash', dur: 0.3 },
+    { t: 375.92, type: 'ink', on: true, dur: 0.15 },
+    { t: 375.92, type: 'zoom', to: 1, dur: 0 },
+    { t: 375.92, type: 'prop', id: 'barril', kind: 'barrel', x: 640 },
+    { t: 375.92, type: 'prop', id: 'globos', kind: 'balloons', x: 640 },
+    { t: 382.31, type: 'walk', char: 'nono', from: 570, to: 640, dur: 1, end: 'sano' },
+    { t: 383.4, type: 'pose', char: 'nono', state: 'sano', dur: 0.1 },
     // 6:23.5 se rompe el barril: Ñoño queda atrapado y se van los globos
-    { t: 383.5, type: 'prop', id: 'barril', kind: 'barrel', x: 640, front: true },
-    { t: 383.5, type: 'shake', power: 8, dur: 0.4 },
-    { t: 384, type: 'propMove', id: 'globos', x: 300, y: -700, dur: 5, fade: true },
+    { t: 384.59, type: 'prop', id: 'barril', kind: 'barrel', x: 640, front: true },
+    { t: 384.59, type: 'shake', power: 8, dur: 0.4 },
+    { t: 385.05, type: 'propMove', id: 'globos', x: 300, y: -700, dur: 5, fade: true },
     // 6:33.5 el Chavo patea el barril: cae en picada
-    { t: 393.5, type: 'pose', char: 'chavo', state: 'normal', dur: 0.4 },
-    { t: 393.5, type: 'shake', power: 12, dur: 0.5 },
-    { t: 393.5, type: 'propMove', id: 'barril', x: 980, y: 620, dur: 1.3, rot: 2.2 },
-    { t: 393.5, type: 'fall', char: 'nono', dur: 1.3 },
-    { t: 394.5, type: 'text', text: '¡ÑOÑOOOO!', size: 42, x: 380, y: 220, color: '#000', dur: 1.8 },
+    { t: 393.72, type: 'pose', char: 'chavo', state: 'normal', dur: 0.4 },
+    { t: 393.72, type: 'shake', power: 12, dur: 0.5 },
+    { t: 393.72, type: 'propMove', id: 'barril', x: 980, y: 620, dur: 1.3, rot: 2.2 },
+    { t: 393.72, type: 'fall', char: 'nono', dur: 1.3 },
+    { t: 394.63, type: 'text', text: '¡ÑOÑOOOO!', size: 42, x: 380, y: 220, color: '#000', dur: 1.8 },
     // 6:36 Quico se une al combate
     { t: 396, type: 'flashSprite', char: 'quico', dur: 0.3, shake: 4 },
     // 6:39 vuelve el color, Ñoño corrompido
@@ -1095,28 +1095,28 @@ FB.SONG = {
     [266.5, 'Don Ramón', 'No te preocupes...', 2.8],
     [269.5, 'Don Ramón', '¡MONCHITO TE VA A SALVAR!', 4],
     // 5:04 los 5 juntos
-    [303.1, 'La Chilindrina', '¿Papá...? ¡PAPÁ!', 3],
-    [308, 'Don Ramón', '¡Chilindrina! Fíjate, fíjate, fíjate que ya pasó todo...', 4],
+    [303.1, 'La Chilindrina', '¿Papá...? ¡PAPÁ!', 2.3],
+    [305.4, 'Don Ramón', '¡Chilindrina! Fíjate, fíjate, fíjate que ya pasó todo...', 2.7],
     // 5:07 recuerdo: cuando llegó el Chavo (textos provisorios)
-    [307.6, 'Don Ramón', '¿Se acuerdan cuando llegó el Chavo a la vecindad?', 4],
-    [312, 'Don Ramón', 'Llegó solito, con su barril... y nadie sabía de dónde venía.', 4.5],
-    [316.8, 'Don Ramón', 'Siempre con hambre... pero nunca le faltó una sonrisa.', 4.4],
+    [306.39, 'Don Ramón', '¿Se acuerdan cuando llegó el Chavo a la vecindad?', 4],
+    [311.69, 'Don Ramón', 'Llegó solito, con su barril... y nadie sabía de dónde venía.', 4.5],
+    [317.48, 'Don Ramón', 'Siempre con hambre... pero nunca le faltó una sonrisa.', 4.4],
     // 5:22 el Chavo cuenta la verdad (textos provisorios)
-    [323, 'El Chavo', 'Ese día todos dijeron que yo me había robado las cosas...', 5],
-    [328.5, 'El Chavo', 'Nadie me creyó. Me fui a la iglesia a rezar, para que se supiera la verdad.', 6],
-    [335, 'El Chavo', 'Cuando salí... no vi el coche. Y ya no pude volver a la vecindad.', 6],
-    [341.5, 'El Chavo', 'Me quedé ahí, solito... y algo se metió en mí.', 5.5],
-    [347.5, 'El Chavo', 'Fue por su culpa. Por no creerme.', 5],
-    [353, 'El Chavo', '...ahora les toca a ustedes.', 3],
+    [323.96, 'El Chavo', 'Ese día todos dijeron que yo me había robado las cosas...', 5],
+    [329.75, 'El Chavo', 'Nadie me creyó. Me fui a la iglesia a rezar, para que se supiera la verdad.', 6],
+    [336.59, 'El Chavo', 'Cuando salí... no vi el coche. Y ya no pude volver a la vecindad.', 6],
+    [343.42, 'El Chavo', 'Me quedé ahí, solito... y algo se metió en mí.', 5.5],
+    [349.74, 'El Chavo', 'Fue por su culpa. Por no creerme.', 5],
+    [355.52, 'El Chavo', '...ahora les toca a ustedes.', 3],
     // 6:14 escena del capítulo animado
-    [374.5, 'Ñoño', '¿Qué estás haciendo, eh?', 3],
-    [377.5, 'El Chavo', 'Hay que treparse al bote para bajar los globos.', 3.4],
-    [381, 'Ñoño', '¡Sale y vale!', 1.3],
-    [382.3, 'El Chavo', 'No, Ñoño, tú no lo—', 1.4],
-    [385, 'Ñoño', '¡Ay, mi cuerpecito! ¡Ay, mi cuerpecito!', 3.3],
-    [388.5, 'El Chavo', '¡Por tu culpa se nos fueron los globos!', 3],
-    [391.6, 'Ñoño', 'No, Chavo... ¡NO!', 1.8],
-    [394.5, 'Quico', '¡ÑOÑOOOO!', 2],
+    [376.38, 'Ñoño', '¿Qué estás haciendo, eh?', 3],
+    [379.11, 'El Chavo', 'Hay que treparse al bote para bajar los globos.', 3.4],
+    [382.31, 'Ñoño', '¡Sale y vale!', 1.3],
+    [383.5, 'El Chavo', 'No, Ñoño, tú no lo—', 1.4],
+    [385.96, 'Ñoño', '¡Ay, mi cuerpecito! ¡Ay, mi cuerpecito!', 3.3],
+    [389.15, 'El Chavo', '¡Por tu culpa se nos fueron los globos!', 3],
+    [391.98, 'Ñoño', 'No, Chavo... ¡NO!', 1.8],
+    [394.63, 'Quico', '¡ÑOÑOOOO!', 2],
     // 8:22 Ñoño libre
     [502.5, 'Ñoño', '¿Papá...? ¡PAPÁ!', 2.5],
     [505.5, 'Sr. Barriga', '¡Ñoño! ¡Hijo mío!', 3],
