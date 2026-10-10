@@ -93,15 +93,16 @@ FB.CHARACTERS = {
     nombre: 'Don Ramón',
     color: '#4b4b6b',
     height: 320,
-    // ramon_sheet.png: 6 poses (0 corrupto, 1 sano, 2 hablando, 3 baile izq, 4 baile der, 5 baile enter)
+    // ramon_sheet.png: 7 poses (0 corrupto, 1 sano, 2 hablando, 3 baile izq, 4 baile der, 5 baile enter, 6 corrupto hablando)
     sprites: {
-      corrupto: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 6, frame: 0 },
-      sano: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 6, frame: 1 },
-      asustado: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 6, frame: 1 },
-      hablando: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 6, frame: 2 },
-      baile_izq: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 6, frame: 3 },
-      baile_der: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 6, frame: 4 },
-      baile_enter: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 6, frame: 5 },
+      corrupto: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 0 },
+      sano: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 1 },
+      asustado: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 1 },
+      hablando: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 2 },
+      baile_izq: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 3 },
+      baile_der: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 4 },
+      baile_enter: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 5 },
+      corrupto_hablando: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 6 },
     },
   },
   nono: {

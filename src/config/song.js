@@ -891,6 +891,7 @@ FB.SONG = {
     { t: 182.56, type: 'bump', amount: 0.06 },
     { t: 182.56, type: 'tension', to: 0.7, dur: 0.5 },
     { t: 179.3, type: 'flashSprite', char: 'ramon', dur: 0.4, shake: 10 },
+    { t: 179.45, type: 'pose', char: 'ramon', state: 'corrupto_hablando', dur: 3.2 }, // "Esta calavera significa PE-LI-GRO"
     { t: 179.3, type: 'shake', power: 12, dur: 0.5 },
     { t: 182.6, type: 'setState', char: 'jirafales', state: 'normal' },
     { t: 237, type: 'liberate', char: 'ramon', dur: 3 },

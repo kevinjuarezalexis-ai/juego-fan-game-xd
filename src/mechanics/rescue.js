@@ -54,6 +54,8 @@ FB.MECHANICS.rescue = class Rescue extends FB.Mechanic {
     this.flash = Math.max(0, this.flash - dt);
     if (this.box) this.box.update(dt, time);
     this.choice.update(dt, time);
+    // mientras te habla (pregunta en pantalla) usa su pose de "corrupto hablando" si la tiene
+    if (this.choice.active) this.game.stage.pose(this.p.target, 'corrupto_hablando', 0.15);
   }
 
   onBeat(b, time) {
