@@ -35,21 +35,18 @@ const RATERO = (() => {
       dur: 1.3,
     });
   }
-  // cortes de cámara (uno por "¡RATERO!" hasta 2:23): zoom y ángulo distintos sobre el Chavo
-  const persp = [
-    [320, 120, 1.9, -3], [300, 40, 1.6, 4], [360, 160, 2.3, -1], [280, 70, 1.7, -5],
-    [300, 10, 1.75, 3], [380, 110, 2.1, 5], [250, 140, 1.85, -4], [330, 60, 1.8, 2],
-  ];
+  // cada "¡RATERO!" hasta 2:23: golpe de zoom centrado en el Chavo (siempre se ve entero), alternando cerca/lejos
+  const zs = [1.85, 1.75, 1.95, 1.8, 2.0, 1.85, 1.95, 1.8]; // ≥1.75: el Profe queda fuera de cuadro
   out.filter((e) => e.t < 143).forEach((e, j) => {
-    const [x, y, z, deg] = persp[j % persp.length];
-    out.push({ t: e.t, type: 'pan', x, y, dur: 0.12, ease: 'out' });
-    out.push({ t: e.t, type: 'zoom', to: z, dur: 0.12, ease: 'out' });
-    out.push({ t: e.t, type: 'tilt', deg, dur: 0.12 });
+    out.push({ t: e.t, type: 'pan', x: 320, y: 115, dur: 0.12, ease: 'out' });
+    out.push({ t: e.t, type: 'zoom', to: zs[j % zs.length], dur: 0.12, ease: 'out' });
     out.push({ t: e.t, type: 'shake', power: 4, dur: 0.2 });
   });
   const ult = out.filter((e) => e.type === 'text').slice(-3);
   ult.forEach((e, j) => {
-    out.push({ t: e.t, type: 'focus', on: 'chavo', zoom: 1.7 + j * 0.15, dur: 0.15, ease: 'out' });
+    // cada vez más cerca, con el cuerpo entero a la vista (centrado en el cuerpo, no en el piso)
+    out.push({ t: e.t, type: 'pan', x: 320, y: 120, dur: 0.15, ease: 'out' });
+    out.push({ t: e.t, type: 'zoom', to: 1.95 + j * 0.15, dur: 0.15, ease: 'out' });
     out.push({ t: e.t, type: 'flash', dur: 0.18, alpha: 0.6 });
   });
   return out;
@@ -347,7 +344,7 @@ FB.SONG = {
     { n: 0, nombre: 'Prólogo', t: 0 },
     { n: 1, nombre: 'Doña Florinda', t: 37.3 },
     { n: 2, nombre: 'Quico', t: 90 },
-    { n: 3, nombre: 'El Chavo', t: 130 },
+    { n: 3, nombre: 'El Chavo', t: 129.62 },
     { n: 4, nombre: 'La Chilindrina y Don Ramón', t: 167 },
     { n: 5, nombre: 'Monchito al rescate', t: 262 },
     { n: 6, nombre: 'La verdad del Chavo', t: 322.91 },
@@ -413,7 +410,7 @@ FB.SONG = {
 
     // ── Parte 3 (2:10): aparece el Chavo a la derecha (los salvados, atrás de Jirafales) ──
     {
-      t: 130,
+      t: 129.62, // 2:09.62 empieza la parte del Chavo (marca del usuario)
       stage: { opponents: [...ATRAS, P('chavo', 'espalda', 960, { face: 'left' })], tension: 0.35 }, // de espaldas: no se le ve la cara
       mechanic: { type: 'none' },
     },
@@ -431,8 +428,8 @@ FB.SONG = {
         tension: 0.9,
         // el drop: zoom + temblor fuerte en cada beat, giro alternado y destellos rojos
         bumpEvery: 1,
-        bumpAmount: 0.07,
-        bumpStyle: { shake: 13, tilt: 2.6, flash: '#ff1010', flashAlpha: 0.22 },
+        bumpAmount: 0.09,
+        bumpStyle: { shake: 13, tilt: 2.6, sway: 14, flash: '#ff1010', flashAlpha: 0.22 },
       },
       mechanic: {
         type: 'bulletbox',
@@ -846,9 +843,9 @@ FB.SONG = {
     { t: 37.3, type: 'flashSprite', char: 'florinda', dur: 0.4, shake: 8 },
     { t: 37.3, type: 'shake', power: 10, dur: 0.4 },
     { t: 39, type: 'setState', char: 'jirafales', state: 'normal' },
-    { t: 37.35, type: 'bump', every: 1, amount: 0.045, shake: 5, tilt: 1.2 }, // zoom seguido (cada beat)
+    { t: 37.35, type: 'bump', every: 1, amount: 0.059, shake: 4, tilt: 1.2, sway: 10 }, // zoom seguido (cada beat)
     { t: 63.76, type: 'bump', every: 4 }, // 1er grito de Quico: vuelve al ritmo normal
-    { t: 77.26, type: 'bump', every: 1, amount: 0.045, shake: 5, tilt: 1.2 }, // 2do grito: seguido otra vez
+    { t: 77.26, type: 'bump', every: 1, amount: 0.059, shake: 4, tilt: 1.2, sway: 10 }, // 2do grito: seguido otra vez
     // 1:03.8 y 1:17.3 gritos de Quico durante la pelea
     ...[63.76, 77.26].flatMap((t) => [
       { t, type: 'pose', char: 'quico', state: 'grito', dur: 1.6 },
@@ -888,8 +885,8 @@ FB.SONG = {
     { t: 128.3, type: 'face', char: 'quico', dir: 'right' },
 
     // ── 2:10 el Chavo: zoom fuerte a él y de a poco se abre hasta ver sólo al Prof y al Chavo ──
-    { t: 130, type: 'pan', x: 320, y: 125, dur: 0.5, ease: 'out' },
-    { t: 130, type: 'zoom', to: 2, dur: 0.5, ease: 'out' },
+    { t: 129.62, type: 'pan', x: 320, y: 110, dur: 0.5, ease: 'out' },
+    { t: 129.62, type: 'zoom', to: 1.8, dur: 0.5, ease: 'out' },
     // 2:23 la cámara se acomoda: el Prof y el Chavo (y se puede hablar con él); temblores chiquitos hasta el drop
     { t: 143.3, type: 'pan', x: 140, y: 55, dur: 0.9, ease: 'inOut' },
     { t: 143.3, type: 'zoom', to: 1.55, dur: 0.9, ease: 'inOut' },

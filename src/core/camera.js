@@ -32,7 +32,7 @@ FB.EASE = {
 
 FB.Camera = class Camera {
   // estilo por defecto del zoom rítmico: temblor fuerte + giro leve alternado
-  static BUMP_STYLE = { shake: 7, tilt: 1.6, flash: null, flashAlpha: 0.2 };
+  static BUMP_STYLE = { shake: 7, tilt: 1.6, sway: 0, flash: null, flashAlpha: 0.2 };
 
   constructor(game) {
     this.game = game;
@@ -49,10 +49,11 @@ FB.Camera = class Camera {
     this.sepia = 0;
     // zoom rítmico
     this.bumpEvery = 0;
-    this.bumpAmount = 0.06;
+    this.bumpAmount = 0.066; // +10%
     this.bumpZoom = 0;
     this.bumpStyle = { ...FB.Camera.BUMP_STYLE };
     this.tiltKick = 0; // giro del golpe rítmico (se va solo)
+    this.swayKick = 0; // vaivén izquierda/derecha del golpe rítmico (px)
     this.bumpSide = 1;
     // temblor
     this.shakeT = 0;
@@ -76,7 +77,7 @@ FB.Camera = class Camera {
     this.tween('zoom', z, dur, ease);
   }
 
-  setBump(every = 4, amount = 0.06, style) {
+  setBump(every = 4, amount = 0.066, style) {
     this.bumpEvery = every;
     this.bumpAmount = amount;
     const clean = {};
@@ -153,10 +154,9 @@ FB.Camera = class Camera {
     this.bump();
     // estilo "terremoto": temblor corto + giro alternado + destello opcional
     if (st.shake) this.shake(st.shake, 0.2);
-    if (st.tilt) {
-      this.tiltKick = (this.bumpSide * st.tilt * Math.PI) / 180;
-      this.bumpSide *= -1;
-    }
+    if (st.tilt) this.tiltKick = (this.bumpSide * st.tilt * Math.PI) / 180;
+    if (st.sway) this.swayKick = this.bumpSide * st.sway;
+    this.bumpSide *= -1;
     if (st.flash) this.game.stage.flash(0.16, st.flash, st.flashAlpha ?? 0.2);
   }
 
@@ -174,6 +174,7 @@ FB.Camera = class Camera {
     }
     this.bumpZoom += (0 - this.bumpZoom) * Math.min(1, dt * 4);
     this.tiltKick += (0 - this.tiltKick) * Math.min(1, dt * 5);
+    this.swayKick += (0 - this.swayKick) * Math.min(1, dt * 5);
     this.shakeT = Math.max(0, this.shakeT - dt);
   }
 
@@ -209,7 +210,7 @@ FB.Camera = class Camera {
     const z = this.totalZoom;
     const c = this.center;
     const s = this.shakeOffset;
-    ctx.translate(this.W / 2 + s.x, this.H / 2 + s.y);
+    ctx.translate(this.W / 2 + s.x + this.swayKick, this.H / 2 + s.y);
     if (this.angle || this.tiltKick) ctx.rotate(this.angle + this.tiltKick);
     ctx.scale(z, z);
     ctx.translate(-c.x, -c.y);
@@ -260,7 +261,7 @@ FB.Camera = class Camera {
         return true;
       case 'bump':
         if (ev.every !== undefined)
-          this.setBump(ev.every, ev.amount ?? this.bumpAmount, { shake: ev.shake, tilt: ev.tilt, flash: ev.flash, flashAlpha: ev.flashAlpha });
+          this.setBump(ev.every, ev.amount ?? 0.066, { shake: ev.shake, tilt: ev.tilt, sway: ev.sway, flash: ev.flash, flashAlpha: ev.flashAlpha });
         else if (!instant) this.bump(ev.amount);
         return true;
       case 'focus':

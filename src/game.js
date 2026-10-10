@@ -189,7 +189,7 @@ FB.Game = class Game {
   applySegment(seg, instant = false, withStage = true) {
     if (withStage) this.stage.apply(instant ? seg.stage || {} : this._holdForWalks(seg));
     const st = seg.stage || {};
-    if (st.bumpEvery !== undefined) this.camera.setBump(st.bumpEvery, st.bumpAmount ?? 0.06, st.bumpStyle);
+    if (st.bumpEvery !== undefined) this.camera.setBump(st.bumpEvery, st.bumpAmount ?? 0.066, st.bumpStyle);
     const cam = seg.camera;
     if (cam) {
       const d = instant ? 0 : cam.dur ?? 0.6;

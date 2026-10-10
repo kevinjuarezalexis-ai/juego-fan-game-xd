@@ -550,7 +550,7 @@ FB.Stage = class Stage {
       // facing = hacia dónde mira el dibujo original; face = hacia dónde queremos
       const nat = def.facing || 'right';
       const want = a.face || (a === this.player ? 'left' : 'right');
-      if ((nat !== want) !== !!def.flip) ctx.scale(-1, 1);
+      if ((nat !== want) !== !!def.flip !== !!(spr && spr.mirror)) ctx.scale(-1, 1);
       ctx.drawImage(img, idx * fw, 0, fw, img.height, -w / 2, -h, w, h);
     } else {
       this._drawPlaceholder(ctx, def, a.tempState || a.state, t);

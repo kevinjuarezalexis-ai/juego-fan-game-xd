@@ -69,7 +69,7 @@ FB.CHARACTERS = {
     // chavo_sheet.png: 0 espalda, 1 revelado, 2 corrupto, 3 forma final, 4 recibe daño,
     //                  5 hablando (historia), 6 triste (historia), 7 alma
     sprites: {
-      espalda: { src: 'src/assets/personaje/chavo/chavo_sheet.png', cols: 8, frame: 0 },
+      espalda: { src: 'src/assets/personaje/chavo/chavo_sheet.png', cols: 8, frame: 0, mirror: true }, // invertido
       revelado: { src: 'src/assets/personaje/chavo/chavo_sheet.png', cols: 8, frame: 1 },
       corrupto: { src: 'src/assets/personaje/chavo/chavo_sheet.png', cols: 8, frame: 2 },
       final: { src: 'src/assets/personaje/chavo/chavo_sheet.png', cols: 8, frame: 3 },
