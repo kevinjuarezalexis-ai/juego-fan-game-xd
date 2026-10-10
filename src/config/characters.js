@@ -21,17 +21,22 @@ FB.CHARACTERS = {
     height: 400,
     facing: 'left', // el dibujo original mira a la izquierda (el juego lo espeja si hace falta)
     flip: false,
-    // jirafales_sheet.png: 7 poses en fila (0..6), pies alineados abajo
-    // muzzle = punta de la escopeta en la pose 'disparar' (fracción de la altura)
-    muzzle: { x: -0.442, y: 0.835 },
+    // jirafales_sheet.png: 11 poses (fondo gris): 0 normal, 1 caminando, 2 miedo, 3 enojado, 4 gritando,
+    //   5 hablando, 6 escopeta, 7 disparando, 8 bloqueando, 9 daño con escopeta, 10 daño
+    // muzzle = punta del caño en la pose 'disparar' (fracción de la altura; x medido mirando a la izquierda)
+    muzzle: { x: -0.342, y: 0.842 },
     sprites: {
-      camina: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 7, frame: 0 },
-      normal: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 7, frame: 1 },
-      asustado: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 7, frame: 2 },
-      enojado: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 7, frame: 3 },
-      escopeta: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 7, frame: 4 },
-      disparar: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 7, frame: 5 },
-      hablando: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 7, frame: 6 },
+      normal: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 11, frame: 0 },
+      camina: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 11, frame: 1 },
+      asustado: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 11, frame: 2 },
+      enojado: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 11, frame: 3 },
+      grito: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 11, frame: 4 },
+      hablando: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 11, frame: 5 },
+      escopeta: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 11, frame: 6 },
+      disparar: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 11, frame: 7 },
+      bloquear: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 11, frame: 8 },
+      dano_escopeta: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 11, frame: 9 },
+      dano: { src: 'src/assets/personaje/jirafales/jirafales_sheet.png', cols: 11, frame: 10 },
     },
   },
   quico: {

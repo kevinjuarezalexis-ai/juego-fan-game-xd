@@ -118,8 +118,12 @@ FB.Stage = class Stage {
 
   hurtPlayer() {
     this.player.hit = 0.45;
-    // cara de susto un momento (si no está con la escopeta)
-    if (!['escopeta', 'disparar'].includes(this.player.state)) this.pose(this.player.id, 'asustado', 0.5);
+    // pose de daño: con la escopeta → 'dano_escopeta'; si no → 'dano' (o 'asustado' si no la tiene)
+    const def = FB.CHARACTERS[this.player.id] || {};
+    const sp = def.sprites || {};
+    const armed = ['escopeta', 'disparar', 'bloquear'].includes(this.player.state);
+    const p = armed ? (sp.dano_escopeta ? 'dano_escopeta' : null) : sp.dano ? 'dano' : 'asustado';
+    if (p) this.pose(this.player.id, p, 0.5);
   }
 
   hit(id) {

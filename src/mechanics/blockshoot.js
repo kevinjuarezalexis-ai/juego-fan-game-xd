@@ -56,6 +56,7 @@ FB.MECHANICS.blockshoot = class BlockShoot extends FB.Mechanic {
     if (a === 'block') {
       if (this.blockLock > 0) return;
       this.blockPose = 0.25;
+      this.game.stage.pose('jirafales', 'bloquear', 0.3);
       const atk = this.attacks.find((k) => !k.done && Math.abs(k.hitAt - time) <= this.blockWindow);
       if (atk) {
         atk.done = true;

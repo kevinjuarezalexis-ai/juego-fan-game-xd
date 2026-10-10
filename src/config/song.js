@@ -827,6 +827,8 @@ FB.SONG = {
       [36.55, 'quico', 'grito', '¡DE NADAAA!', 1.2],
     ].flatMap(([t, char, state, grito, dur]) => [
       { t, type: 'setState', char, state },
+      // Jirafales: pose de gritar mientras grita (y vuelve a 'enojado' entre gritos)
+      ...(char === 'jirafales' ? [{ t, type: 'pose', char, state: 'grito', dur }] : []),
       // con el zoom al que grita, queda en el centro: el texto va arriba de su cabeza
       // posición en pantalla con el zoom puesto (Jirafales queda corrido a la derecha por el borde)
       { t, type: 'text', text: grito, size: 46, x: char === 'quico' ? 470 : 860, y: 120, color: char === 'quico' ? '#4aa3ff' : '#ffd23f', dur },
