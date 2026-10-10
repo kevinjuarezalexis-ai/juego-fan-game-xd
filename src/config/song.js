@@ -37,8 +37,8 @@ const RATERO = (() => {
   }
   // cortes de cámara (uno por "¡RATERO!" hasta 2:23): zoom y ángulo distintos sobre el Chavo
   const persp = [
-    [320, 120, 1.9, -3], [230, 40, 1.45, 4], [360, 160, 2.3, -1], [180, 70, 1.6, -5],
-    [300, 10, 1.75, 3], [380, 110, 2.1, 5], [250, 140, 1.85, -4], [340, 60, 1.55, 2],
+    [320, 120, 1.9, -3], [300, 40, 1.6, 4], [360, 160, 2.3, -1], [280, 70, 1.7, -5],
+    [300, 10, 1.75, 3], [380, 110, 2.1, 5], [250, 140, 1.85, -4], [330, 60, 1.8, 2],
   ];
   out.filter((e) => e.t < 143).forEach((e, j) => {
     const [x, y, z, deg] = persp[j % persp.length];
@@ -46,6 +46,11 @@ const RATERO = (() => {
     out.push({ t: e.t, type: 'zoom', to: z, dur: 0.12, ease: 'out' });
     out.push({ t: e.t, type: 'tilt', deg, dur: 0.12 });
     out.push({ t: e.t, type: 'shake', power: 4, dur: 0.2 });
+  });
+  const ult = out.filter((e) => e.type === 'text').slice(-3);
+  ult.forEach((e, j) => {
+    out.push({ t: e.t, type: 'focus', on: 'chavo', zoom: 1.7 + j * 0.15, dur: 0.15, ease: 'out' });
+    out.push({ t: e.t, type: 'flash', dur: 0.18, alpha: 0.6 });
   });
   return out;
 })();
@@ -815,16 +820,19 @@ FB.SONG = {
     { t: 25.5, type: 'focus', on: 'center', zoom: 1, dur: 1.5 },
     // 0:30.8 → 0:37 se gritan (tiempos marcados con M)
     ...[
-      [30.83, 'jirafales', 'enojado'],
-      [31.68, 'quico', 'responde'],
-      [32.5, 'jirafales', 'enojado'],
-      [33.42, 'quico', 'responde'],
-      [34.16, 'jirafales', 'enojado'],
-      [34.88, 'quico', 'responde'],
-      [35.77, 'jirafales', 'enojado'],
-      [36.55, 'quico', 'grito'],
-    ].flatMap(([t, char, state]) => [
+      [30.83, 'jirafales', 'enojado', '¡QUICO!', 0.85],
+      [31.68, 'quico', 'responde', '¡¿QUÉEE?!', 0.82],
+      [32.5, 'jirafales', 'enojado', '¡¿ESTÁ TU MADRE?!', 0.92],
+      [33.42, 'quico', 'responde', '¡¿DE PARTE DE QUIÉN?!', 0.74],
+      [34.16, 'jirafales', 'enojado', '¡DE PARTE MÍA!', 0.72],
+      [34.88, 'quico', 'responde', '¡SÍ ESTÁAA!', 0.89],
+      [35.77, 'jirafales', 'enojado', '¡GRAAACIAS!', 0.78],
+      [36.55, 'quico', 'grito', '¡DE NADAAA!', 1.2],
+    ].flatMap(([t, char, state, grito, dur]) => [
       { t, type: 'setState', char, state },
+      // con el zoom al que grita, queda en el centro: el texto va arriba de su cabeza
+      // posición en pantalla con el zoom puesto (Jirafales queda corrido a la derecha por el borde)
+      { t, type: 'text', text: grito, size: 46, x: char === 'quico' ? 470 : 860, y: 120, color: char === 'quico' ? '#4aa3ff' : '#ffd23f', dur },
       { t, type: 'focus', on: char, zoom: 1.45, dur: 0.12, ease: 'out' },
       { t, type: 'shake', power: 6, dur: 0.25 },
     ]),
@@ -838,6 +846,9 @@ FB.SONG = {
     { t: 37.3, type: 'flashSprite', char: 'florinda', dur: 0.4, shake: 8 },
     { t: 37.3, type: 'shake', power: 10, dur: 0.4 },
     { t: 39, type: 'setState', char: 'jirafales', state: 'normal' },
+    { t: 37.35, type: 'bump', every: 1, amount: 0.045, shake: 5, tilt: 1.2 }, // zoom seguido (cada beat)
+    { t: 63.76, type: 'bump', every: 4 }, // 1er grito de Quico: vuelve al ritmo normal
+    { t: 77.26, type: 'bump', every: 1, amount: 0.045, shake: 5, tilt: 1.2 }, // 2do grito: seguido otra vez
     // 1:03.8 y 1:17.3 gritos de Quico durante la pelea
     ...[63.76, 77.26].flatMap((t) => [
       { t, type: 'pose', char: 'quico', state: 'grito', dur: 1.6 },
@@ -884,7 +895,7 @@ FB.SONG = {
     { t: 143.3, type: 'zoom', to: 1.55, dur: 0.9, ease: 'inOut' },
     { t: 143.3, type: 'tilt', deg: 0, dur: 0.9 },
     ...Array.from({ length: 7 }, (_, i) => ({ t: +(144.2 + i * 1.644).toFixed(2), type: 'shake', power: 3, dur: 0.35 })),
-    { t: 133, type: 'walk', char: 'jirafales', from: 400, to: 600, dur: 2.5, end: 'hablando' },
+    { t: 143.3, type: 'walk', char: 'jirafales', from: 400, to: 600, dur: 1.2, end: 'hablando' }, // entra a cuadro cuando se puede hablar
     // 2:10 → 2:36 la tensión sube: viñeta roja y los "¡RATERO!" de fondo
     { t: 131, type: 'tension', to: 0.85, dur: 24.5 },
     { t: 150, type: 'bump', every: 2, amount: 0.025, shake: 3, tilt: 0.8 },
@@ -1089,15 +1100,7 @@ FB.SONG = {
     [9.5, 'Prof. Jirafales', '¿Q-quién anda ahí?', 1.5],
     [13, 'Prof. Jirafales', 'Pero... ¿qué te pasó, Quico? ¿Quién te hizo esto?', 5],
     [19, 'Quico', '...', 2],
-    // 0:30.8 → 0:37 se gritan (como en el capítulo)
-    [30.83, 'Prof. Jirafales', '¡QUICO!', 0.85],
-    [31.68, 'Quico', '¡¿QUÉEE?!', 0.82],
-    [32.5, 'Prof. Jirafales', '¡¿ESTÁ TU MADRE?!', 0.92],
-    [33.42, 'Quico', '¡¿DE PARTE DE QUIÉN?!', 0.74],
-    [34.16, 'Prof. Jirafales', '¡DE PARTE MÍA!', 0.72],
-    [34.88, 'Quico', '¡SÍ ESTÁAA!', 0.89],
-    [35.77, 'Prof. Jirafales', '¡GRAAACIAS!', 0.78],
-    [36.55, 'Quico', '¡DE NADAAA!', 1.2],
+    // 0:30.8 → 0:37 se gritan: van como textos sueltos (eventos 'text'), sin cuadro, para no tapar
     // 1:30 Florinda
     [90.2, 'Doña Florinda', '¿Profesor Jirafales? ¿Qué... qué me pasó?', 3.6],
     // 2:00 Quico
