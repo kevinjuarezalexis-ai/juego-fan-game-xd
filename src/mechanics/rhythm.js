@@ -56,22 +56,24 @@ FB.MECHANICS.rhythm = class Rhythm extends FB.Mechanic {
     if (p.pattern) {
       const every = p.every || 1;
       const cycle = p.pattern.length * every + (p.rest ?? 1);
-      // startAt: segundo exacto del primer paso (se alinea al beat más cercano)
+      // startAt: segundo EXACTO del primer paso (sin redondear al beat: se respeta la marca tal cual)
       const first = p.startAt !== undefined ? Math.round(c.beatAt(p.startAt)) : startBeat;
+      const shift = p.startAt !== undefined ? p.startAt - c.timeOfBeat(first) : 0;
+      const T = (b) => c.timeOfBeat(b) + shift;
       let reps = 0;
       for (let base = first; ; base += cycle) {
         if (p.reps && reps >= p.reps) break;
         const demo = reps < (p.demoReps || 0);
-        if (!demo && this.repiteAt === undefined) this.repiteAt = c.timeOfBeat(base - (p.rest ?? 1) - 0.5);
-        if (demo && this.demoFrom === undefined) this.demoFrom = c.timeOfBeat(base - 2);
+        if (!demo && this.repiteAt === undefined) this.repiteAt = T(base - (p.rest ?? 1) - 0.5);
+        if (demo && this.demoFrom === undefined) this.demoFrom = T(base - 2);
         reps++;
         let done = false;
         p.pattern.forEach((act, i) => {
-          const tt = c.timeOfBeat(base + i * every);
+          const tt = T(base + i * every);
           if (tt >= t1 - 0.5) return (done = true);
           this.notes.push({ time: tt, lane: this.lanes.indexOf(act), demo });
         });
-        if (done || c.timeOfBeat(base + cycle) >= t1 - 0.5) break;
+        if (done || T(base + cycle) >= t1 - 0.5) break;
       }
       this.total = this.notes.filter((n) => !n.demo).length;
     } else if (p.chart) {

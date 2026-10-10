@@ -505,7 +505,7 @@ FB.SONG = {
         pattern: ['left', 'left', 'right', 'right', 'left', 'right', 'confirm'],
         every: 1,
         rest: 1, // 7 pasos + 1 de pausa = 8 tiempos por repetición
-        startAt: 276.19, // primer paso (marca del usuario); cada repetición dura 8 tiempos (~3.3 s), termina en 5:02.58
+        startAt: 276.35, // momento exacto de la 1ª tecla (←), marca del usuario; cada repetición dura 8 tiempos (~3.3 s)
         reps: 8,
         demoReps: 1, // la 1ª la baila la Chilindrina sola → "¡REPITE!"
         demoDancer: 'chilindrina',
