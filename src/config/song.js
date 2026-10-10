@@ -505,7 +505,7 @@ FB.SONG = {
         pattern: ['left', 'left', 'right', 'right', 'left', 'right', 'confirm'],
         every: 1,
         rest: 1, // 7 pasos + 1 de pausa = 8 tiempos por repetición
-        startAt: 274.09, // primer paso, en el golpe de la música
+        startAt: 276.19, // primer paso (marca del usuario); cada repetición dura 8 tiempos (~3.3 s), termina en 5:02.58
         reps: 8,
         demoReps: 1, // la 1ª la baila la Chilindrina sola → "¡REPITE!"
         demoDancer: 'chilindrina',
@@ -520,7 +520,7 @@ FB.SONG = {
     },
     // 5:04 Chilindrina libre: se juntan los 5 (vuelve Jirafales como jugador)
     {
-      t: 304,
+      t: 302.6, // 5:02.58 termina el baile: la Chilindrina se cura
       stage: {
         opponents: [
           P('quico', 'sano', 100, { face: 'right' }),
@@ -920,19 +920,19 @@ FB.SONG = {
     { t: 274, type: 'focus', on: 'center', zoom: 1, dur: 1.5 },
 
     // ── 5:04 Chilindrina libre, se juntan los 5 ──
-    { t: 301, type: 'liberate', char: 'chilindrina', dur: 3 },
-    { t: 303.9, type: 'swapPlayer', char: 'jirafales' },
-    { t: 304, type: 'flash', dur: 0.4 },
-    { t: 304, type: 'flashSprite', char: 'chilindrina', dur: 0.6, shake: 4 },
-    { t: 304, type: 'setState', char: 'chilindrina', state: 'curada' },
-    { t: 304.5, type: 'face', char: 'chilindrina', dir: 'left' }, // corre hacia su papá
-    { t: 307.1, type: 'face', char: 'chilindrina', dir: 'right' },
-    { t: 304.5, type: 'walk', char: 'chilindrina', from: 720, to: 650, dur: 2.5, end: 'sano' },
-    { t: 304.5, type: 'walk', char: 'ramon', from: 400, to: 520, dur: 1.2, end: 'sano' },
-    { t: 304.5, type: 'walk', char: 'florinda', from: 290, to: 230, dur: 1, end: 'sano' },
-    { t: 304.5, type: 'walk', char: 'quico', from: 200, to: 100, dur: 1, end: 'sano' },
-    { t: 304.5, type: 'face', char: 'jirafales', dir: 'right' },
-    { t: 304.5, type: 'walk', char: 'jirafales', from: 110, to: 370, dur: 1.5, end: 'normal' },
+    { t: 299.6, type: 'liberate', char: 'chilindrina', dur: 3 },
+    { t: 302.5, type: 'swapPlayer', char: 'jirafales' },
+    { t: 302.6, type: 'flash', dur: 0.4 },
+    { t: 302.6, type: 'flashSprite', char: 'chilindrina', dur: 0.6, shake: 4 },
+    { t: 302.6, type: 'setState', char: 'chilindrina', state: 'curada' },
+    { t: 303.1, type: 'face', char: 'chilindrina', dir: 'left' }, // corre hacia su papá
+    { t: 305.7, type: 'face', char: 'chilindrina', dir: 'right' },
+    { t: 303.1, type: 'walk', char: 'chilindrina', from: 720, to: 650, dur: 2.5, end: 'sano' },
+    { t: 303.1, type: 'walk', char: 'ramon', from: 400, to: 520, dur: 1.2, end: 'sano' },
+    { t: 303.1, type: 'walk', char: 'florinda', from: 290, to: 230, dur: 1, end: 'sano' },
+    { t: 303.1, type: 'walk', char: 'quico', from: 200, to: 100, dur: 1, end: 'sano' },
+    { t: 303.1, type: 'face', char: 'jirafales', dir: 'right' },
+    { t: 303.1, type: 'walk', char: 'jirafales', from: 110, to: 370, dur: 1.5, end: 'normal' },
 
     // ── 5:07 "Qué bonita vecindad": recuerdo en sepia, Don Ramón cuenta cuando llegó el Chavo, se recupera vida ──
     { t: 307, type: 'filter', mode: 'sepia', dur: 1.5 },
@@ -1094,7 +1094,7 @@ FB.SONG = {
     [266.5, 'Don Ramón', 'No te preocupes...', 2.8],
     [269.5, 'Don Ramón', '¡MONCHITO TE VA A SALVAR!', 4],
     // 5:04 los 5 juntos
-    [304.5, 'La Chilindrina', '¿Papá...? ¡PAPÁ!', 3],
+    [303.1, 'La Chilindrina', '¿Papá...? ¡PAPÁ!', 3],
     [308, 'Don Ramón', '¡Chilindrina! Fíjate, fíjate, fíjate que ya pasó todo...', 4],
     // 5:07 recuerdo: cuando llegó el Chavo (textos provisorios)
     [307.6, 'Don Ramón', '¿Se acuerdan cuando llegó el Chavo a la vecindad?', 4],
