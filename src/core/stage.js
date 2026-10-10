@@ -459,8 +459,10 @@ FB.Stage = class Stage {
     if (back) ctx.scale(0.84, 0.84); // más lejos = más chico
     if (a.lean) ctx.rotate(a.lean * 0.12);
     if (fallRot) ctx.rotate(fallRot);
+    // el sprite 'alma' ya viene fantasmal: menos transparencia y sin tinte celeste
+    const ownGhost = a.ghost && (a.tempState || a.state) === 'alma';
     if (a.ghost) {
-      ctx.globalAlpha *= 0.6 + Math.sin(t * 2) * 0.12;
+      ctx.globalAlpha *= (ownGhost ? 0.85 : 0.6) + Math.sin(t * 2) * 0.12;
       ctx.translate(0, -18 + Math.sin(t * 1.6) * 8); // flota
     } else {
       // sombra
@@ -487,7 +489,7 @@ FB.Stage = class Stage {
         bx.fillStyle = 'rgba(0,0,0,' + Math.min(1, black) + ')';
         bx.fillRect(0, 0, B.w, B.h);
       }
-      if (a.ghost) {
+      if (a.ghost && !ownGhost) {
         bx.fillStyle = 'rgba(150,210,255,0.55)';
         bx.fillRect(0, 0, B.w, B.h);
       }

@@ -62,14 +62,23 @@ FB.CHARACTERS = {
   chavo: {
     nombre: 'El Chavo',
     color: '#5c6b3a',
-    height: 250,
+    height: 275, // la celda incluye las antenas de la forma final: el Chavo normal queda ~250
+    facing: 'left', // los dibujos miran a la izquierda
+    // cuando habla en un diálogo con tiempo y está en esta pose, usa la otra
+    talkPose: { triste: 'hablando' },
+    // chavo_sheet.png: 0 espalda, 1 revelado, 2 corrupto, 3 forma final, 4 recibe daño,
+    //                  5 hablando (historia), 6 triste (historia), 7 alma
     sprites: {
-      normal: 'src/assets/personaje/chavo_normal.png',
-      espalda: 'src/assets/personaje/chavo_espalda.png',
-      revelado: 'src/assets/personaje/chavo_revelado.png',
-      triste: 'src/assets/personaje/chavo_triste.png',
-      final: 'src/assets/personaje/chavo_final.png',
-      derrotado: 'src/assets/personaje/chavo_derrotado.png',
+      espalda: { src: 'src/assets/personaje/chavo/chavo_sheet.png', cols: 8, frame: 0 },
+      revelado: { src: 'src/assets/personaje/chavo/chavo_sheet.png', cols: 8, frame: 1 },
+      corrupto: { src: 'src/assets/personaje/chavo/chavo_sheet.png', cols: 8, frame: 2 },
+      final: { src: 'src/assets/personaje/chavo/chavo_sheet.png', cols: 8, frame: 3 },
+      dano: { src: 'src/assets/personaje/chavo/chavo_sheet.png', cols: 8, frame: 4 },
+      derrotado: { src: 'src/assets/personaje/chavo/chavo_sheet.png', cols: 8, frame: 4 },
+      hablando: { src: 'src/assets/personaje/chavo/chavo_sheet.png', cols: 8, frame: 5 },
+      triste: { src: 'src/assets/personaje/chavo/chavo_sheet.png', cols: 8, frame: 6 },
+      alma: { src: 'src/assets/personaje/chavo/chavo_sheet.png', cols: 8, frame: 7 },
+      normal: { src: 'src/assets/personaje/chavo/chavo_sheet.png', cols: 8, frame: 7 }, // recuerdo en tinta (silueta)
     },
   },
   chilindrina: {

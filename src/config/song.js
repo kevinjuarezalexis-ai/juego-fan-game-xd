@@ -397,13 +397,13 @@ FB.SONG = {
     // ── Parte 3 (2:10): aparece el Chavo a la derecha (los salvados, atrás de Jirafales) ──
     {
       t: 130,
-      stage: { opponents: [...ATRAS, P('chavo', 'normal', 960, { face: 'left' })], tension: 0.35 },
+      stage: { opponents: [...ATRAS, P('chavo', 'espalda', 960, { face: 'left' })], tension: 0.35 }, // de espaldas: no se le ve la cara
       mechanic: { type: 'none' },
     },
     // la pregunta del Chavo
     {
       t: 148,
-      stage: { opponents: [...ATRAS, P('chavo', 'normal', 960, { face: 'left' })] },
+      stage: { opponents: [...ATRAS, P('chavo', 'espalda', 960, { face: 'left' })] },
       mechanic: { type: 'choice', replyTime: 2, questions: Q.chavo },
     },
     // 2:35.76 su verdadera forma → combate DIFÍCIL hasta 2:46
@@ -481,7 +481,7 @@ FB.SONG = {
         opponents: [
           ...BACKROW(['florinda', 'quico', 'jirafales']),
           P('chilindrina', 'corrupto', 720, { face: 'left' }),
-          P('chavo', 'normal', 330, { ghost: true, back: true, face: 'right' }), // su alma lo ayuda
+          P('chavo', 'alma', 330, { ghost: true, back: true, face: 'right' }), // su alma lo ayuda
         ],
         tension: 0.2,
         bumpEvery: 4,
@@ -495,7 +495,7 @@ FB.SONG = {
         opponents: [
           ...BACKROW(['florinda', 'quico', 'jirafales']),
           P('chilindrina', 'corrupto', 720, { face: 'left' }),
-          P('chavo', 'normal', 330, { ghost: true, back: true, face: 'right' }),
+          P('chavo', 'alma', 330, { ghost: true, back: true, face: 'right' }),
         ],
         bumpEvery: 2,
       },
@@ -707,7 +707,7 @@ FB.SONG = {
         bg: 'patio',
         opponents: [
           ...BACKROW(['florinda', 'chilindrina', 'quico', 'ramon', 'barriga', 'nono']),
-          P('chavo', 'final', 960, { face: 'left' }),
+          P('chavo', 'corrupto', 960, { face: 'left' }), // empieza como corrupto y se transforma (evento 533)
         ],
         player: 'escopeta',
         tension: 1,
@@ -949,6 +949,11 @@ FB.SONG = {
     { t: 340, type: 'focus', on: 'center', zoom: 1.05, dur: 2 },
 
     // ═══════════════ SEGUNDA MITAD (tiempos aprox. salvo los que pasaste) ═══════════════
+    // 5:47 termina la historia: se muestra corrupto ("Fue por su culpa...")
+    { t: 347.4, type: 'flashSprite', char: 'chavo', dur: 0.4, shake: 8 },
+    { t: 347.4, type: 'setState', char: 'chavo', state: 'corrupto' },
+    { t: 347.4, type: 'shake', power: 8, dur: 0.4 },
+    { t: 347.4, type: 'tension', to: 0.5, dur: 1 },
     { t: 353, type: 'silhouette', char: 'chavo', on: true, dur: 2.5 },
     { t: 356, type: 'tension', to: 0.6, dur: 17 },
     { t: 360, type: 'zoom', to: 1.12, dur: 14, ease: 'in' },
@@ -1017,6 +1022,12 @@ FB.SONG = {
     { t: 527, type: 'flashSprite', char: 'chavo', dur: 0.5, shake: 12 },
     { t: 527, type: 'shake', power: 16, dur: 0.7 },
     { t: 527, type: 'filter', mode: 'oscuro', amount: 0.45, dur: 0.5 },
+    // 8:53 su forma verdadera
+    { t: 533, type: 'flash', dur: 0.5 },
+    { t: 533, type: 'flashSprite', char: 'chavo', dur: 0.6, shake: 14 },
+    { t: 533, type: 'setState', char: 'chavo', state: 'final' },
+    { t: 533, type: 'shake', power: 14, dur: 0.6 },
+    { t: 533, type: 'bump', amount: 0.08 },
     { t: 527, type: 'walk', char: 'jirafales', from: 290, to: 400, dur: 0.6, end: 'escopeta' },
     { t: 527, type: 'walk', char: 'barriga', from: 400, to: 155, dur: 0.8, end: 'sano' },
     { t: 527, type: 'walk', char: 'nono', from: 960, to: 65, dur: 1.6, end: 'sano' },
@@ -1034,6 +1045,9 @@ FB.SONG = {
     { t: 620, type: 'bump', every: 0 },
     { t: 620.5, type: 'filter', mode: 'none', dur: 2 },
     { t: 621, type: 'setState', char: 'jirafales', state: 'normal' },
+    // queda su alma, libre
+    { t: 621.6, type: 'flash', dur: 0.6 },
+    { t: 621.6, type: 'setState', char: 'chavo', state: 'alma' },
   ],
 
   // Diálogos con tiempo de la canción: [t, quién, texto, duración]

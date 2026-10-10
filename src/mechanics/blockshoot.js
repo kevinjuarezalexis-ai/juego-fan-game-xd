@@ -81,6 +81,7 @@ FB.MECHANICS.blockshoot = class BlockShoot extends FB.Mechanic {
       const floor = this.p.minHpUntil && time < this.p.minHpUntil ? this.maxHp * 0.04 : 0;
       this.hp = Math.max(floor, this.hp - dmg);
       this.game.stage.hit(this.boss);
+      if (stunned) this.game.stage.pose(this.boss, 'dano', 0.4); // sprite de recibir daño
       this.popup(stunned ? '¡CRÍTICO!' : 'lo esquiva...', stunned ? '#ffd23f' : '#aaaaaa', true);
       const bp = this.game.stage.posOf(this.boss);
       Engine2D.Particles.burst(bp.x, bp.y, { amount: stunned ? 20 : 6, colors: ['#ff2020', '#600000'], speed: 220 });

@@ -455,6 +455,7 @@ FB.Game = class Game {
     c.update();
     const time = c.time;
     this.syncTimeline(time);
+    this.applyTalkPose(time);
 
     const beat = Math.floor(c.beatAt(time));
     if (beat > this.lastBeat) {
@@ -532,6 +533,19 @@ FB.Game = class Game {
   }
 
   // song.dialogue: [t, quién, texto, duración] → cuadro de diálogo con tiempo
+  // talkPose (characters.js): mientras un personaje habla en un diálogo con tiempo, usa su pose de hablar
+  applyTalkPose(time) {
+    for (const x of this.song.dialogue || []) {
+      if (time < x[0] || time >= x[0] + (x[3] || 3)) continue;
+      for (const id in FB.CHARACTERS) {
+        const def = FB.CHARACTERS[id];
+        if (!def.talkPose || def.nombre !== x[1]) continue;
+        const a = this.stage.actorOf(id);
+        if (a && def.talkPose[a.state]) this.stage.pose(id, def.talkPose[a.state], 0.12);
+      }
+    }
+  }
+
   drawTimedDialogue(ctx, time) {
     const list = this.song.dialogue || [];
     let d = null;
