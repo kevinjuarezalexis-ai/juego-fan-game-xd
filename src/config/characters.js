@@ -118,6 +118,7 @@ FB.CHARACTERS = {
     nombre: 'Ñoño',
     color: '#8a6d2f',
     height: 280,
+    facing: 'left', // invertido: así mira hacia los vecinos sanos
     // nono_sheet.png: 0 corrupto, 1 corrupto mientras lo salvan, 2 sano (curado), 3 sano con miedo
     sprites: {
       corrupto: { src: 'src/assets/personaje/nono/nono_sheet.png', cols: 4, frame: 0 },
@@ -130,7 +131,7 @@ FB.CHARACTERS = {
     nombre: 'Sr. Barriga',
     color: '#3d5c4f',
     height: 330,
-    facing: 'right',
+    facing: 'left', // invertido: así mira hacia los vecinos sanos
     // cuando habla en un diálogo con tiempo, usa la pose de hablar
     talkPose: { sano: 'hablando', curado: 'hablando' },
     // barriga_sheet.png: 0 corrupto, 1 recién curado (preocupado), 2 sano idle, 3 hablando

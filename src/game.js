@@ -42,6 +42,8 @@ FB.Game = class Game {
 
     const params = new URLSearchParams(location.search);
     this.debug = params.has('debug');
+    this._debugParam = this.debug;
+    this.testMode = false; // modo prueba: inmortal + tiempo en pantalla + marcar
     this.startAt = parseFloat(params.get('t')) || 0;
     this.marks = [];
 
@@ -230,6 +232,7 @@ FB.Game = class Game {
     this.stopVideo();
     this.state = 'paused';
     this.conductor.pause();
+    if (FB.Mobile) FB.Mobile.onPause(this);
     UI.show('pause');
   }
 
@@ -249,6 +252,8 @@ FB.Game = class Game {
     this.camera = new FB.Camera(this);
     this.stage = new FB.Stage(this);
     this.state = 'menu';
+    this.testMode = false;
+    this.debug = this._debugParam;
     UI.show('menu');
   }
 
@@ -270,7 +275,8 @@ FB.Game = class Game {
 
   hurt(n) {
     if (this.state !== 'playing') return;
-    this.hp = Math.max(0, this.hp - n);
+    // modo prueba: inmortal (se ve el golpe pero no baja la vida)
+    if (!this.testMode) this.hp = Math.max(0, this.hp - n);
     this.stats.hits++;
     this.stage.hurtPlayer();
     this.stage.shake(6, 0.18);
@@ -666,7 +672,7 @@ FB.Game = class Game {
       'beat ' + c.beat.toFixed(2) + '  bpm ' + c.bpm,
       'parte ' + this.parte.n + '  seg ' + this.segIdx + ' [' + ((seg && seg.mechanic && seg.mechanic.type) || '-') + ']',
       'hp ' + Math.round(this.hp) + (c.hasAudio ? '' : '  (SIN MÚSICA: reloj interno)'),
-      'M = marcar tiempo',
+      this.testMode ? 'MODO PRUEBA (inmortal) · M o MARCAR' : 'M = marcar tiempo',
     ];
     ctx.save();
     ctx.font = '13px monospace';
@@ -708,7 +714,7 @@ const UI = {
   el: (id) => document.getElementById(id),
 
   show(name) {
-    for (const id of ['menu', 'pause', 'gameover', 'ending', 'partes']) {
+    for (const id of ['menu', 'pause', 'gameover', 'ending', 'partes', 'ajustes']) {
       const m = this.el('m-' + id);
       if (m) m.classList.toggle('hidden', id !== name);
     }
@@ -719,9 +725,18 @@ const UI = {
     const g = game;
     this.el('btn-jugar').onclick = () => {
       Engine2D.Audio.unlock();
+      g.testMode = false;
       g.start(g.startAt);
     };
-    this.el('btn-partes').onclick = () => this.show('partes');
+    // "Elegir parte" normal y "Modo prueba" usan la misma lista de partes
+    const openPartes = (test) => {
+      this.partesTest = test;
+      this.el('partes-title').textContent = test ? 'Modo prueba' : 'Elegir parte';
+      this.el('partes-test').classList.toggle('hidden', !test);
+      this.show('partes');
+    };
+    this.el('btn-partes').onclick = () => openPartes(false);
+    this.el('btn-test').onclick = () => openPartes(true);
     this.el('btn-partes-volver').onclick = () => this.show('menu');
     const list = this.el('partes-list');
     list.innerHTML = '';
@@ -731,7 +746,9 @@ const UI = {
       b.textContent = (p.n ? 'Parte ' + p.n + ' · ' : '') + p.nombre;
       b.onclick = () => {
         Engine2D.Audio.unlock();
-        g.start(p.t, { skipIntro: true });
+        g.testMode = !!this.partesTest;
+        g.debug = g.testMode || g._debugParam;
+        g.start(p.t, { skipIntro: !g.testMode || p.t > 0 });
       };
       list.appendChild(b);
     }
@@ -769,6 +786,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const game = new FB.Game(document.getElementById('game'));
   window.game = game; // para la consola
   UI.init(game);
+  if (FB.Mobile) FB.Mobile.init(game);
   const status = UI.el('menu-status');
   const jugar = UI.el('btn-jugar');
   jugar.disabled = true;

@@ -93,3 +93,147 @@ body {
 #fin-stats {
   white-space: pre-line;
 }
+
+/* ── botón de ajustes ── */
+#btn-ajustes {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 30;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+.aj-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  font-size: 0.9rem;
+}
+.aj-row input {
+  flex: 1;
+  accent-color: var(--yellow);
+}
+#aj-msg {
+  font-size: 0.75rem;
+  min-height: 1em;
+}
+
+/* ── controles táctiles ── */
+#touch {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#touch > * {
+  pointer-events: auto;
+}
+#touch .hidden {
+  display: none !important;
+}
+.t-btn {
+  touch-action: none;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+  border-radius: 14px;
+  min-width: 64px;
+  height: 64px;
+  padding: 0 12px;
+  -webkit-tap-highlight-color: transparent;
+}
+.t-btn.on {
+  background: rgba(255, 210, 63, 0.55);
+  border-color: var(--yellow);
+}
+.t-wide {
+  min-width: 110px;
+  font-size: 12px;
+}
+.t-small {
+  height: 40px;
+  min-width: 40px;
+  font-size: 11px;
+  border-radius: 10px;
+}
+#t-pause {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+}
+.t-mark {
+  position: absolute;
+  top: 8px;
+  left: 60px;
+  border-color: var(--yellow);
+  color: var(--yellow);
+}
+.t-stick {
+  position: absolute;
+  left: max(16px, env(safe-area-inset-left));
+  bottom: 16px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  touch-action: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.t-knob {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 30, 30, 0.7);
+  border: 2px solid #fff;
+  pointer-events: none;
+}
+.t-lanes,
+.t-fight {
+  position: absolute;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: 16px;
+  display: flex;
+  gap: 12px;
+}
+.t-lanes {
+  left: max(16px, env(safe-area-inset-left));
+  justify-content: space-between;
+}
+.t-shoot {
+  border-color: #ff8080;
+}
+.t-lanes {
+  justify-content: flex-start;
+}
+.t-lanes .t-wide {
+  margin-left: auto; /* ◀ ▶ a la izquierda, ENTER a la derecha */
+}
+
+/* menús con scroll en pantallas bajas (celu acostado) */
+.modal-game-box {
+  max-height: 94%;
+  overflow-y: auto;
+}
+.t-mark {
+  top: 56px;
+  left: 8px;
+}
+
+.hidden {
+  display: none !important;
+}

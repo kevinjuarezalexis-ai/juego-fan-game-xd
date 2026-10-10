@@ -20,12 +20,13 @@
             <div class="fiesta-sub">FAN GAME · EL CHAVO DEL 8</div>
             <div class="modal-game-title" id="menu-title">Fiesta de la Buena Vecindad</div>
             <button class="btn-game-primary" id="btn-jugar">Jugar</button>
+            <button class="btn-game-secondary" id="btn-test">Modo prueba</button>
             <button class="btn-game-secondary" id="btn-partes">Elegir parte</button>
             <div class="fiesta-controls">
               <b>Flechas / WASD</b> mover · flechas de ritmo<br />
               <b>1 2 3</b> o <b>Z</b> elegir respuesta<br />
               <b>X</b> bloquear · <b>Z</b> disparar<br />
-              <b>Esc</b> pausa
+              <b>Esc</b> pausa · en el celu: controles en pantalla
             </div>
             <div id="menu-status">Cargando…</div>
           </div>
@@ -34,7 +35,8 @@
         <!-- Elegir parte (práctica) -->
         <div class="modal-game hidden" id="m-partes">
           <div class="modal-game-box">
-            <div class="modal-game-title">Elegir parte</div>
+            <div class="modal-game-title" id="partes-title">Elegir parte</div>
+            <div class="modal-game-sub hidden" id="partes-test">Modo prueba: sos inmortal, ves el tiempo y podés marcar segundos (botón MARCAR o tecla M).</div>
             <div class="fiesta-list" id="partes-list"></div>
             <button class="btn-game-secondary" id="btn-partes-volver">Volver</button>
           </div>
@@ -46,7 +48,20 @@
             <div class="modal-game-title">Pausa</div>
             <button class="btn-game-primary" id="btn-continuar">Continuar</button>
             <button class="btn-game-secondary" id="btn-reiniciar">Reiniciar parte</button>
+            <button class="btn-game-secondary" id="btn-pausa-ajustes">Ajustes</button>
+            <button class="btn-game-secondary hidden" id="btn-copiar-marcas">Copiar marcas</button>
             <button class="btn-game-secondary" id="btn-salir">Salir al menú</button>
+          </div>
+        </div>
+
+        <!-- Ajustes -->
+        <div class="modal-game hidden" id="m-ajustes">
+          <div class="modal-game-box">
+            <div class="modal-game-title">Ajustes</div>
+            <label class="aj-row">Volumen <input type="range" id="aj-vol" min="0" max="100" step="1" /> <span id="aj-vol-n"></span></label>
+            <button class="btn-game-secondary" id="aj-fs">Pantalla completa</button>
+            <div class="modal-game-sub" id="aj-msg"></div>
+            <button class="btn-game-primary" id="aj-cerrar">Listo</button>
           </div>
         </div>
 
@@ -68,6 +83,20 @@
             <button class="btn-game-primary" id="btn-fin-menu">Menú</button>
           </div>
         </div>
+        <!-- botón de ajustes (siempre visible) -->
+        <button id="btn-ajustes" aria-label="Ajustes">⚙</button>
+      </div>
+
+      <!-- Controles táctiles (sólo en celular; aparecen según la mecánica) -->
+      <div id="touch">
+        <button class="t-btn t-small hidden" id="t-pause" aria-label="Pausa">❚❚</button>
+        <button class="t-btn t-small t-mark hidden" id="t-mark">MARCAR</button>
+        <div class="t-stick hidden" id="t-stick"><div class="t-knob" id="t-knob"></div></div>
+        <div class="t-lanes hidden" id="t-lanes"></div>
+        <div class="t-fight hidden" id="t-fight">
+          <button class="t-btn t-wide" id="t-block">BLOQUEAR</button>
+          <button class="t-btn t-wide t-shoot" id="t-shoot">DISPARAR</button>
+        </div>
       </div>
     </div>
 
@@ -85,6 +114,7 @@
     <script src="src/mechanics/blockshoot.js"></script>
     <script src="src/mechanics/rescue.js"></script>
     <script src="src/game.js"></script>
+    <script src="src/mobile.js"></script>
     <script src="src/fxlab.js"></script>
   </body>
 </html>
