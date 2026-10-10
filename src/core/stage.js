@@ -126,9 +126,12 @@ FB.Stage = class Stage {
     if (this.actors[id]) this.actors[id].hit = 0.3;
   }
 
-  flash(dur = 0.35) {
+  // destello de pantalla (blanco por defecto; color y opacidad opcionales)
+  flash(dur = 0.35, color = '#ffffff', alpha = 1) {
     this.flashT = dur;
     this._flashDur = dur;
+    this._flashColor = color;
+    this._flashAlpha = alpha;
   }
 
   // temblor de pantalla (lo maneja la cámara)
@@ -671,8 +674,11 @@ FB.Stage = class Stage {
       }
     }
     if (this.flashT > 0) {
-      ctx.fillStyle = 'rgba(255,255,255,' + this.flashT / this._flashDur + ')';
+      ctx.save();
+      ctx.globalAlpha = (this.flashT / this._flashDur) * (this._flashAlpha ?? 1);
+      ctx.fillStyle = this._flashColor || '#ffffff';
       ctx.fillRect(0, 0, this.W, this.H);
+      ctx.restore();
     }
   }
 };

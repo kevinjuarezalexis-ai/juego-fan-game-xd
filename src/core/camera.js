@@ -4,7 +4,9 @@
 // Todo se puede disparar desde song.js (events) o a mano: game.camera.xxx()
 //
 //   zoomTo(z, dur, ease)         zoom suave (1 = normal, 1.3 = cerca)
-//   setBump(every, amount)       zoom rítmico: cada `every` beats salta `amount` (0 = apagado)
+//   setBump(every, amount, style) zoom rítmico: cada `every` beats salta `amount` (0 = apagado)
+//                                style = { shake, tilt, flash, flashAlpha }: en cada golpe tiembla,
+//                                gira la cámara alternando izquierda/derecha (grados) y opcional destello de color
 //   bump(amount)                 un golpe de zoom suelto
 //   focus(target, dur, ease)     mueve la cámara: 'left' | 'right' | 'center' | id de personaje
 //   panTo(x, y, dur, ease)       mueve la cámara a mano (px desde el centro)
@@ -29,6 +31,9 @@ FB.EASE = {
 };
 
 FB.Camera = class Camera {
+  // estilo por defecto del zoom rítmico: temblor fuerte + giro leve alternado
+  static BUMP_STYLE = { shake: 7, tilt: 1.6, flash: null, flashAlpha: 0.2 };
+
   constructor(game) {
     this.game = game;
     this.W = game.W;
@@ -44,8 +49,11 @@ FB.Camera = class Camera {
     this.sepia = 0;
     // zoom rítmico
     this.bumpEvery = 0;
-    this.bumpAmount = 0.045;
+    this.bumpAmount = 0.06;
     this.bumpZoom = 0;
+    this.bumpStyle = { ...FB.Camera.BUMP_STYLE };
+    this.tiltKick = 0; // giro del golpe rítmico (se va solo)
+    this.bumpSide = 1;
     // temblor
     this.shakeT = 0;
     this.shakeDur = 0;
@@ -68,9 +76,12 @@ FB.Camera = class Camera {
     this.tween('zoom', z, dur, ease);
   }
 
-  setBump(every = 4, amount = 0.045) {
+  setBump(every = 4, amount = 0.06, style) {
     this.bumpEvery = every;
     this.bumpAmount = amount;
+    const clean = {};
+    for (const k in style || {}) if (style[k] !== undefined) clean[k] = style[k];
+    this.bumpStyle = { ...FB.Camera.BUMP_STYLE, ...clean };
   }
 
   bump(amount = this.bumpAmount) {
@@ -137,7 +148,16 @@ FB.Camera = class Camera {
   }
 
   onBeat(b) {
-    if (this.bumpEvery > 0 && b % this.bumpEvery === 0) this.bump();
+    if (!(this.bumpEvery > 0 && b % this.bumpEvery === 0)) return;
+    const st = this.bumpStyle;
+    this.bump();
+    // estilo "terremoto": temblor corto + giro alternado + destello opcional
+    if (st.shake) this.shake(st.shake, 0.2);
+    if (st.tilt) {
+      this.tiltKick = (this.bumpSide * st.tilt * Math.PI) / 180;
+      this.bumpSide *= -1;
+    }
+    if (st.flash) this.game.stage.flash(0.16, st.flash, st.flashAlpha ?? 0.2);
   }
 
   update(dt) {
@@ -153,6 +173,7 @@ FB.Camera = class Camera {
       if (k >= 1) delete this.tweens[key];
     }
     this.bumpZoom += (0 - this.bumpZoom) * Math.min(1, dt * 4);
+    this.tiltKick += (0 - this.tiltKick) * Math.min(1, dt * 5);
     this.shakeT = Math.max(0, this.shakeT - dt);
   }
 
@@ -189,7 +210,7 @@ FB.Camera = class Camera {
     const c = this.center;
     const s = this.shakeOffset;
     ctx.translate(this.W / 2 + s.x, this.H / 2 + s.y);
-    if (this.angle) ctx.rotate(this.angle);
+    if (this.angle || this.tiltKick) ctx.rotate(this.angle + this.tiltKick);
     ctx.scale(z, z);
     ctx.translate(-c.x, -c.y);
   }
@@ -238,7 +259,8 @@ FB.Camera = class Camera {
         this.zoomTo(ev.to ?? 1, d(ev.dur ?? 0.5), ev.ease);
         return true;
       case 'bump':
-        if (ev.every !== undefined) this.setBump(ev.every, ev.amount ?? this.bumpAmount);
+        if (ev.every !== undefined)
+          this.setBump(ev.every, ev.amount ?? this.bumpAmount, { shake: ev.shake, tilt: ev.tilt, flash: ev.flash, flashAlpha: ev.flashAlpha });
         else if (!instant) this.bump(ev.amount);
         return true;
       case 'focus':

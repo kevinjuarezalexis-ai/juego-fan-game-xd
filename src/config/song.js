@@ -35,6 +35,18 @@ const RATERO = (() => {
       dur: 1.3,
     });
   }
+  // cortes de cámara (uno por "¡RATERO!" hasta 2:23): zoom y ángulo distintos sobre el Chavo
+  const persp = [
+    [320, 120, 1.9, -3], [230, 40, 1.45, 4], [360, 160, 2.3, -1], [180, 70, 1.6, -5],
+    [300, 10, 1.75, 3], [380, 110, 2.1, 5], [250, 140, 1.85, -4], [340, 60, 1.55, 2],
+  ];
+  out.filter((e) => e.t < 143).forEach((e, j) => {
+    const [x, y, z, deg] = persp[j % persp.length];
+    out.push({ t: e.t, type: 'pan', x, y, dur: 0.12, ease: 'out' });
+    out.push({ t: e.t, type: 'zoom', to: z, dur: 0.12, ease: 'out' });
+    out.push({ t: e.t, type: 'tilt', deg, dur: 0.12 });
+    out.push({ t: e.t, type: 'shake', power: 4, dur: 0.2 });
+  });
   return out;
 })();
 
@@ -409,7 +421,14 @@ FB.SONG = {
     // 2:35.76 su verdadera forma → combate DIFÍCIL hasta 2:46
     {
       t: 155.76,
-      stage: { opponents: [...ATRAS, P('chavo', 'revelado', 960, { face: 'left' })], tension: 0.9, bumpEvery: 2 },
+      stage: {
+        opponents: [...ATRAS, P('chavo', 'revelado', 960, { face: 'left' })],
+        tension: 0.9,
+        // el drop: zoom + temblor fuerte en cada beat, giro alternado y destellos rojos
+        bumpEvery: 1,
+        bumpAmount: 0.07,
+        bumpStyle: { shake: 13, tilt: 2.6, flash: '#ff1010', flashAlpha: 0.22 },
+      },
       mechanic: {
         type: 'bulletbox',
         damage: 14,
@@ -792,6 +811,7 @@ FB.SONG = {
     { t: 22.43, type: 'shake', power: 7, dur: 2.4 },
     { t: 22.43, type: 'bump', amount: 0.05 },
     { t: 24.9, type: 'setState', char: 'quico', state: 'corrupto' },
+    { t: 24.9, type: 'bump', every: 2 }, // arranca el zoom rítmico (estilo terremoto)
     { t: 25.5, type: 'focus', on: 'center', zoom: 1, dur: 1.5 },
     // 0:30.8 → 0:37 se gritan (tiempos marcados con M)
     ...[
@@ -805,8 +825,11 @@ FB.SONG = {
       [36.55, 'quico', 'grito'],
     ].flatMap(([t, char, state]) => [
       { t, type: 'setState', char, state },
-      { t, type: 'bump', amount: 0.045 },
+      { t, type: 'focus', on: char, zoom: 1.45, dur: 0.12, ease: 'out' },
+      { t, type: 'shake', power: 6, dur: 0.25 },
     ]),
+    { t: 37.25, type: 'flash', dur: 0.35, alpha: 0.85 },
+    { t: 37.25, type: 'focus', on: 'center', zoom: 1, dur: 0.05 },
     { t: 36.55, type: 'shake', power: 8, dur: 1 },
     // 0:37.3 sale Doña Florinda (después del "¡DE NADAAA!")
     { t: 37.3, type: 'setState', char: 'jirafales', state: 'asustado' },
@@ -856,17 +879,20 @@ FB.SONG = {
     // ── 2:10 el Chavo: zoom fuerte a él y de a poco se abre hasta ver sólo al Prof y al Chavo ──
     { t: 130, type: 'pan', x: 320, y: 125, dur: 0.5, ease: 'out' },
     { t: 130, type: 'zoom', to: 2, dur: 0.5, ease: 'out' },
-    { t: 131.5, type: 'pan', x: 140, y: 55, dur: 9, ease: 'inOut' },
-    { t: 131.5, type: 'zoom', to: 1.55, dur: 9, ease: 'inOut' },
+    // 2:23 la cámara se acomoda: el Prof y el Chavo (y se puede hablar con él); temblores chiquitos hasta el drop
+    { t: 143.3, type: 'pan', x: 140, y: 55, dur: 0.9, ease: 'inOut' },
+    { t: 143.3, type: 'zoom', to: 1.55, dur: 0.9, ease: 'inOut' },
+    { t: 143.3, type: 'tilt', deg: 0, dur: 0.9 },
+    ...Array.from({ length: 7 }, (_, i) => ({ t: +(144.2 + i * 1.644).toFixed(2), type: 'shake', power: 3, dur: 0.35 })),
     { t: 133, type: 'walk', char: 'jirafales', from: 400, to: 600, dur: 2.5, end: 'hablando' },
     // 2:10 → 2:36 la tensión sube: viñeta roja y los "¡RATERO!" de fondo
     { t: 131, type: 'tension', to: 0.85, dur: 24.5 },
-    { t: 150, type: 'bump', every: 2, amount: 0.025 },
+    { t: 150, type: 'bump', every: 2, amount: 0.025, shake: 3, tilt: 0.8 },
     ...RATERO,
     { t: 142, type: 'setState', char: 'jirafales', state: 'normal' },
     // 2:35.76 verdadera forma
     { t: 155.3, type: 'filter', mode: 'oscuro', dur: 0.4 },
-    { t: 155.76, type: 'flash', dur: 0.5 },
+    { t: 155.76, type: 'flash', dur: 0.25, color: '#ff1a1a', alpha: 0.75 },
     { t: 155.76, type: 'flashSprite', char: 'chavo', dur: 0.5, shake: 12 },
     { t: 155.76, type: 'shake', power: 18, dur: 0.8 },
     { t: 155.76, type: 'filter', mode: 'bn', dur: 0, keep: ['chavo'] },
