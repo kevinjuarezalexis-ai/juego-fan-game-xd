@@ -55,7 +55,11 @@ FB.MECHANICS.rescue = class Rescue extends FB.Mechanic {
     if (this.box) this.box.update(dt, time);
     this.choice.update(dt, time);
     // mientras te habla (pregunta en pantalla) usa su pose de "corrupto hablando" si la tiene
-    if (this.choice.active) this.game.stage.pose(this.p.target, 'corrupto_hablando', 0.15);
+    if (this.choice.active) {
+      this.game.stage.pose(this.p.target, 'corrupto_hablando', 0.15);
+      // el jugador le habla (ej. el Sr. Barriga a Ñoño): pose de hablar si la tiene
+      this.game.stage.pose(this.game.stage.player.id, 'hablando', 0.15);
+    }
     // hopePose: cuando la barra de liberación supera hopeAt, cambia a esa pose (ej. Ñoño "salvando")
     if (this.p.hopePose) {
       const st = this.game.stage;

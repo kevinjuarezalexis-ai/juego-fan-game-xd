@@ -1007,6 +1007,7 @@ FB.SONG = {
     { t: 455.9, type: 'swapPlayer', char: 'barriga' },
     { t: 456, type: 'flash', dur: 0.4 },
     { t: 456, type: 'flashSprite', char: 'barriga', dur: 0.6, shake: 4 },
+    { t: 456, type: 'setState', char: 'barriga', state: 'curado' }, // recién curado; al llegar junto a Quico queda 'sano'
     { t: 456.2, type: 'face', char: 'barriga', dir: 'left' },
     { t: 456.2, type: 'walk', char: 'barriga', from: 760, to: 400, dur: 1.6, end: 'sano' },
     { t: 457.9, type: 'face', char: 'barriga', dir: 'right' },

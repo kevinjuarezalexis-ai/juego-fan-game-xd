@@ -130,9 +130,16 @@ FB.CHARACTERS = {
     nombre: 'Sr. Barriga',
     color: '#3d5c4f',
     height: 330,
+    facing: 'right',
+    // cuando habla en un diálogo con tiempo, usa la pose de hablar
+    talkPose: { sano: 'hablando', curado: 'hablando' },
+    // barriga_sheet.png: 0 corrupto, 1 recién curado (preocupado), 2 sano idle, 3 hablando
     sprites: {
-      corrupto: 'src/assets/personaje/barriga_corrupto.png',
-      sano: 'src/assets/personaje/barriga_sano.png',
+      corrupto: { src: 'src/assets/personaje/barriga/barriga_sheet.png', cols: 4, frame: 0 },
+      curado: { src: 'src/assets/personaje/barriga/barriga_sheet.png', cols: 4, frame: 1 },
+      asustado: { src: 'src/assets/personaje/barriga/barriga_sheet.png', cols: 4, frame: 1 },
+      sano: { src: 'src/assets/personaje/barriga/barriga_sheet.png', cols: 4, frame: 2 },
+      hablando: { src: 'src/assets/personaje/barriga/barriga_sheet.png', cols: 4, frame: 3 },
     },
   },
 };
