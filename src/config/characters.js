@@ -43,14 +43,24 @@ FB.CHARACTERS = {
     nombre: 'Quico',
     color: '#3b6fb6',
     height: 250,
-    // quico_sheet.png: 6 poses en fila (0..5), los pies alineados abajo
+    // cuando habla sano en un diálogo con tiempo, usa la pose de hablar
+    talkPose: { sano: 'hablando' },
+    // quico_sheet.png: 10 poses (miran a la derecha):
+    //   corrupto: 0 idle, 1 grito "mamaaa", 2 gritando enojado (señala), 3 enojado, 4 dudando (barra de liberación)
+    //   sano:     5 recién curado, 6 hablando, 7 idle, 8 recibe daño, 9 gritando (¡ÑOÑO!)
     sprites: {
-      corrupto: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 6, frame: 0 },
-      grito: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 6, frame: 1 },
-      responde: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 6, frame: 2 },
-      enojado: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 6, frame: 3 },
-      sano: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 6, frame: 4 },
-      hablando: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 6, frame: 5 },
+      corrupto: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 10, frame: 0 },
+      grito: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 10, frame: 1 },
+      grito_enojado: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 10, frame: 2 },
+      enojado: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 10, frame: 3 },
+      dudando: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 10, frame: 4 },
+      curado: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 10, frame: 5 },
+      hablando: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 10, frame: 6 },
+      sano: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 10, frame: 7 },
+      dano: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 10, frame: 8 },
+      gritando: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 10, frame: 9 },
+      responde: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 10, frame: 2 },
+      asustado: { src: 'src/assets/personaje/quico/quico_sheet.png', cols: 10, frame: 8 },
     },
   },
   florinda: {

@@ -547,6 +547,8 @@ FB.Game = class Game {
         const def = FB.CHARACTERS[id];
         if (!def.talkPose || def.nombre !== x[1]) continue;
         const a = this.stage.actorOf(id);
+        // si ya tiene otra pose puesta por un evento (ej. un grito), la respeta
+        if (a && a.tempT > 0 && a.tempState !== def.talkPose[a.state]) continue;
         if (a && def.talkPose[a.state]) this.stage.pose(id, def.talkPose[a.state], 0.12);
       }
     }

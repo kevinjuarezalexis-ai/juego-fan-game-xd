@@ -392,6 +392,8 @@ FB.SONG = {
         type: 'rescue',
         target: 'quico',
         questions: Q.quico,
+        hopePose: 'dudando', // barra de liberación > 60%: Quico duda
+        hopeAt: 0.6,
         dodge: {
           damage: 9,
           patterns: [
@@ -815,20 +817,22 @@ FB.SONG = {
     { t: 24.9, type: 'setState', char: 'quico', state: 'corrupto' },
     { t: 24.9, type: 'bump', every: 2 }, // arranca el zoom rítmico (estilo terremoto)
     { t: 25.5, type: 'focus', on: 'center', zoom: 1, dur: 1.5 },
+    { t: 30.83, type: 'setState', char: 'quico', state: 'enojado' },
     // 0:30.8 → 0:37 se gritan (tiempos marcados con M)
     ...[
       [30.83, 'jirafales', 'enojado', '¡QUICO!', 0.85],
-      [31.68, 'quico', 'responde', '¡¿QUÉEE?!', 0.82],
+      [31.68, 'quico', 'enojado', '¡¿QUÉEE?!', 0.82],
       [32.5, 'jirafales', 'enojado', '¡¿ESTÁ TU MADRE?!', 0.92],
-      [33.42, 'quico', 'responde', '¡¿DE PARTE DE QUIÉN?!', 0.74],
+      [33.42, 'quico', 'enojado', '¡¿DE PARTE DE QUIÉN?!', 0.74],
       [34.16, 'jirafales', 'enojado', '¡DE PARTE MÍA!', 0.72],
-      [34.88, 'quico', 'responde', '¡SÍ ESTÁAA!', 0.89],
+      [34.88, 'quico', 'enojado', '¡SÍ ESTÁAA!', 0.89],
       [35.77, 'jirafales', 'enojado', '¡GRAAACIAS!', 0.78],
-      [36.55, 'quico', 'grito', '¡DE NADAAA!', 1.2],
+      [36.55, 'quico', 'enojado', '¡DE NADAAA!', 1.2],
     ].flatMap(([t, char, state, grito, dur]) => [
       { t, type: 'setState', char, state },
       // Jirafales: pose de gritar mientras grita (y vuelve a 'enojado' entre gritos)
-      ...(char === 'jirafales' ? [{ t, type: 'pose', char, state: 'grito', dur }] : []),
+      // Quico: grita señalando y entre gritos queda enojado (mientras grita el profe)
+      { t, type: 'pose', char, state: char === 'jirafales' ? 'grito' : 'grito_enojado', dur },
       // con el zoom al que grita, queda en el centro: el texto va arriba de su cabeza
       // posición en pantalla con el zoom puesto (Jirafales queda corrido a la derecha por el borde)
       { t, type: 'text', text: grito, size: 46, x: char === 'quico' ? 470 : 860, y: 120, color: char === 'quico' ? '#4aa3ff' : '#ffd23f', dur },
@@ -870,7 +874,7 @@ FB.SONG = {
     // ── 2:00 Quico curado, se juntan a la izquierda ──
     { t: 120, type: 'flash', dur: 0.4 },
     { t: 120, type: 'flashSprite', char: 'quico', dur: 0.6, shake: 4 },
-    { t: 120.2, type: 'setState', char: 'quico', state: 'hablando' },
+    { t: 120.2, type: 'setState', char: 'quico', state: 'curado' },
     { t: 123, type: 'setState', char: 'quico', state: 'sano' },
     { t: 123, type: 'setState', char: 'florinda', state: 'hablando' },
     { t: 117, type: 'liberate', char: 'quico', dur: 3 },
@@ -1015,6 +1019,7 @@ FB.SONG = {
     { t: 393.72, type: 'shake', power: 12, dur: 0.5 },
     { t: 393.72, type: 'propMove', id: 'barril', x: 980, y: 620, dur: 1.3, rot: 2.2 },
     { t: 393.72, type: 'fall', char: 'nono', dur: 1.3 },
+    { t: 394.63, type: 'pose', char: 'quico', state: 'gritando', dur: 1.8 },
     { t: 394.63, type: 'text', text: '¡ÑOÑOOOO!', size: 42, x: 380, y: 220, color: '#000', dur: 1.8 },
     // 6:36 Quico se une al combate
     { t: 396, type: 'flashSprite', char: 'quico', dur: 0.3, shake: 4 },
@@ -1030,12 +1035,12 @@ FB.SONG = {
     { t: 411, type: 'text', text: '¡AAAAAY!', size: 48, x: 760, y: 260, color: '#ff5050', dur: 1.6 },
     // Quico grita "¡ÑOÑOOO!" (7:35, 7:58, 8:21 en la música)
     ...[455, 478, 501].flatMap((t) => [
-      { t, type: 'pose', char: 'quico', state: 'hablando', dur: 1.2 }, // sano: grita con su pose de hablar (la de 'grito' es la corrupta)
+      { t, type: 'pose', char: 'quico', state: 'gritando', dur: 1.2 },
       { t, type: 'text', text: '¡ÑOÑOOO!', size: 34, x: 260, y: 270, color: '#4aa3ff', dur: 1.5 },
       { t, type: 'bump', amount: 0.05 },
     ]),
     // 8:33 el último, ya con Ñoño libre: de alegría, justo antes del video
-    { t: 513, type: 'setState', char: 'quico', state: 'hablando' },
+    { t: 513, type: 'pose', char: 'quico', state: 'gritando', dur: 1.2 },
     { t: 513, type: 'text', text: '¡ÑOÑOOO!', size: 40, x: 640, y: 260, color: '#7dff9a', dur: 1.2 },
     { t: 513, type: 'bump', amount: 0.06 },
     // 7:36 Barriga libre → reemplaza a Don Ramón

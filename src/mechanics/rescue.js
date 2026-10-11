@@ -64,7 +64,7 @@ FB.MECHANICS.rescue = class Rescue extends FB.Mechanic {
     if (this.p.hopePose) {
       const st = this.game.stage;
       const a = st.actorOf(this.p.target);
-      if (a && a.state !== 'sano') {
+      if (a && (a.state === 'corrupto' || a.state === this.p.hopePose)) {
         const want = this.meter >= (this.p.hopeAt ?? 0.6) ? this.p.hopePose : 'corrupto';
         if (a.state !== want) st.setState(this.p.target, want);
       }
