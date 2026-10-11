@@ -117,6 +117,17 @@ FB.Stage = class Stage {
   }
 
   hurtPlayer() {
+    // con un compañero al lado (segmento con `ally`), los golpes se turnan:
+    // uno lo recibe el profe, el siguiente el compañero (la barra de vida es una sola)
+    const al = this.ally && this.actors[this.ally];
+    if (al && al.target > 0) {
+      this._hurtTurn = (this._hurtTurn || 0) + 1;
+      if (this._hurtTurn % 2 === 0) {
+        al.hit = 0.45;
+        this.pose(this.ally, 'dano', 0.5);
+        return;
+      }
+    }
     this.player.hit = 0.45;
     // pose de daño: con la escopeta → 'dano_escopeta'; si no → 'dano' (o 'asustado' si no la tiene)
     const def = FB.CHARACTERS[this.player.id] || {};

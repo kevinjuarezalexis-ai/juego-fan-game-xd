@@ -371,6 +371,8 @@ FB.SONG = {
         type: 'rescue',
         target: 'florinda',
         questions: Q.florinda,
+        hopePose: 'dudando', // barra de liberación > 60%: está por liberarse
+        hopeAt: 0.6,
         dodge: {
           damage: 9,
           patterns: [
@@ -386,6 +388,7 @@ FB.SONG = {
       t: 90,
       stage: {
         opponents: [P('quico', 'corrupto', 300), P('florinda', 'sano', 1150, { back: true, face: 'left' })],
+        ally: 'florinda', // pelea junto al profe: los golpes se turnan entre los dos (la vida es una sola)
         tension: 0.4,
         bumpEvery: 4,
       },
@@ -869,7 +872,7 @@ FB.SONG = {
     { t: 94.1, type: 'face', char: 'florinda', dir: 'left' },
     { t: 90, type: 'flash', dur: 0.4 },
     { t: 90, type: 'flashSprite', char: 'florinda', dur: 0.6, shake: 4 },
-    { t: 90.2, type: 'setState', char: 'florinda', state: 'hablando' },
+    { t: 90.2, type: 'setState', char: 'florinda', state: 'curada' },
     { t: 94, type: 'setState', char: 'florinda', state: 'sano' },
 
     // ── 2:00 Quico curado, se juntan a la izquierda ──

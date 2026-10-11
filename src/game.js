@@ -189,6 +189,9 @@ FB.Game = class Game {
   applySegment(seg, instant = false, withStage = true) {
     if (withStage) this.stage.apply(instant ? seg.stage || {} : this._holdForWalks(seg));
     const st = seg.stage || {};
+    // compañero que pelea al lado del jugador (se turnan la animación de daño)
+    this.stage.ally = st.ally || null;
+    this.stage._hurtTurn = 0;
     if (st.bumpEvery !== undefined) this.camera.setBump(st.bumpEvery, st.bumpAmount ?? 0.066, st.bumpStyle);
     const cam = seg.camera;
     if (cam) {

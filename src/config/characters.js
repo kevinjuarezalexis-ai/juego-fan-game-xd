@@ -67,11 +67,17 @@ FB.CHARACTERS = {
     nombre: 'Doña Florinda',
     color: '#a8456b',
     height: 330,
-    // florinda_sheet.png: 3 poses (0 corrupta, 1 sana, 2 sana hablando), miran a la derecha
+    // florinda_sheet.png: 6 poses (miran a la derecha):
+    //   0 corrupta, 1 sana, 2 sana hablando, 3 corrupta por liberarse (barra de liberación),
+    //   4 recién curada, 5 recibe daño (cuando pelea junto al profe)
     sprites: {
-      corrupto: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 3, frame: 0 },
-      sano: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 3, frame: 1 },
-      hablando: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 3, frame: 2 },
+      corrupto: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 0 },
+      sano: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 1 },
+      hablando: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 2 },
+      dudando: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 3 },
+      curada: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 4 },
+      dano: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 5 },
+      asustado: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 5 },
     },
   },
   chavo: {
