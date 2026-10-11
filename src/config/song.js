@@ -321,6 +321,7 @@ const Q = {
 FB.SONG = {
   titulo: 'Fiesta de la Buena Vecindad',
   music: 'src/assets/music/fiesta.mp3',
+  menuMusic: 'src/assets/music/menu.mp3', // suena en loop en el menú principal
   bpm: 146,
   offset: 0.36, // segundos hasta el primer beat
   length: 628, // solo se usa si no hay archivo de música
