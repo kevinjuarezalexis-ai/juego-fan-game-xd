@@ -907,6 +907,9 @@ FB.SONG = {
     { t: 131, type: 'tension', to: 0.85, dur: 24.5 },
     { t: 150, type: 'bump', every: 2, amount: 0.025, shake: 3, tilt: 0.8 },
     ...RATERO,
+    // mientras le gritan ¡RATERO! el Chavo queda quieto (tensión) hasta que muestra su verdadera forma
+    { t: 132.79, type: 'still', char: 'chavo', on: true },
+    { t: 155.76, type: 'still', char: 'chavo', on: false },
     { t: 142, type: 'setState', char: 'jirafales', state: 'normal' },
     // 2:35.76 verdadera forma
     { t: 155.3, type: 'filter', mode: 'oscuro', dur: 0.4 },

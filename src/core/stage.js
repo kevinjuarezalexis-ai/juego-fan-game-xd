@@ -120,9 +120,11 @@ FB.Stage = class Stage {
   }
 
   beat() {
-    this.player.bop = 1;
+    this.still = this.still || new Set();
+    if (!this.still.has(this.player.id)) this.player.bop = 1;
     this.player.animT = 0;
     for (const id in this.actors) {
+      if (this.still.has(id)) continue; // quieto (sin rebote): escenas de tensión
       this.actors[id].bop = 1;
       this.actors[id].animT = 0;
     }
@@ -563,7 +565,8 @@ FB.Stage = class Stage {
     ctx.save();
     const sx = 1 + 0.035 * a.bop;
     const ph = a.id.length * 1.7; // fase fija por personaje
-    const sy = 1 - 0.055 * a.bop + (a.walking ? 0 : Math.sin(t * 2.2 + ph) * 0.008);
+    const quieto = this.still && this.still.has(a.id);
+    const sy = 1 - 0.055 * a.bop + (a.walking || quieto ? 0 : Math.sin(t * 2.2 + ph) * 0.008);
     ctx.scale(sx, sy);
     const spr = this._spriteFor(def, a.tempState || a.state);
     const img = spr && this.game.img(spr.src);

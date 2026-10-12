@@ -354,6 +354,13 @@ FB.Game = class Game {
       case 'flashSprite':
         if (!instant) this.stage.flashSprite(ev.char, ev.dur ?? 0.3, ev.shake ?? 6);
         break;
+      case 'still': {
+        // { t, type: 'still', char: 'chavo', on: true } → deja de rebotar con el beat (on: false vuelve)
+        const S = (this.stage.still = this.stage.still || new Set());
+        if (ev.on === false) S.delete(ev.char);
+        else S.add(ev.char);
+        break;
+      }
       case 'setState':
         this.stage.setState(ev.char, ev.state);
         break;
