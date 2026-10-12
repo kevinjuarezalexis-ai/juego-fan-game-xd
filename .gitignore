@@ -1,0 +1,6 @@
+# videos (pesados): ponelos a mano en tu PC — menos los que usa el juego (ya comprimidos)
+src/assets/video/*
+!src/assets/video/ratero.mp4
+!src/assets/video/ratero.webm
+!src/assets/video/escena.mp4
+!src/assets/video/escena.webm

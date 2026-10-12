@@ -157,12 +157,17 @@ FB.Game = class Game {
     this.stage = new FB.Stage(this);
     this.regen = null;
     Engine2D.Particles.clear();
+    this._pendingVideo = null;
+    this.stopVideo();
     this.replayUntil(from);
     this.conductor.play(from);
     this.fadeIn = 0.6; // sale de negro
     this.lastBeat = Math.floor(this.conductor.beatAt(from)) - 1;
     this.state = 'playing';
     UI.show(null);
+    const pv = this._pendingVideo;
+    this._pendingVideo = null;
+    if (pv && from < pv.t + (pv.dur ?? 10)) this.playVideo(pv, from - pv.t);
   }
 
   // Al arrancar a mitad de canción (reintento / ?t=) deja cámara, filtros y
@@ -236,7 +241,7 @@ FB.Game = class Game {
 
   pause() {
     if (this.state !== 'playing') return;
-    this.stopVideo();
+    if (this.video) this.video.pause(); // el video de escena se pausa con el juego
     this.state = 'paused';
     this.conductor.pause();
     if (FB.Mobile) FB.Mobile.onPause(this);
@@ -247,6 +252,12 @@ FB.Game = class Game {
     if (this.state !== 'paused') return;
     this.state = 'playing';
     this.conductor.resume();
+    if (this.video) {
+      try {
+        this.video.currentTime = Math.max(0, this.conductor.time - this.videoStart);
+      } catch (e) {}
+      this.video.play().catch(() => {});
+    }
     UI.show(null);
   }
 
@@ -416,7 +427,9 @@ FB.Game = class Game {
         }
         break;
       case 'video':
-        if (!instant) this.playVideo(ev);
+        // al entrar a mitad de canción (reintento / ?t=) se guarda y se arranca después, por donde iba
+        if (instant) this._pendingVideo = ev;
+        else this.playVideo(ev);
         break;
       case 'mech':
         // cambia parámetros de la mecánica actual (ej. el clímax de la pelea final)
@@ -450,26 +463,51 @@ FB.Game = class Game {
     }
   }
 
-  // video corto encima del juego (la música sigue sonando). Si el archivo no existe, no pasa nada.
-  playVideo(ev) {
+  // video de escena a pantalla completa, encima del juego. La música sigue sonando y el
+  // video suena junto con ella (volumen = música × videoVolume, 0.9 por defecto).
+  // ev: { src, dur, volume: 0.9, muted: false } · offset: segundos ya transcurridos (si se entró a mitad)
+  playVideo(ev, offset = 0) {
     this.stopVideo();
     const box = document.getElementById('stage-box');
-    const v = document.createElement('video');
-    v.src = ev.src;
-    v.muted = ev.muted !== false;
-    v.playsInline = true;
-    v.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;z-index:5;opacity:0;transition:opacity .4s';
+    const v = FB.sceneVideoEl(ev.src);
+    v.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;z-index:5;opacity:0;transition:opacity .25s';
     v.onerror = () => this.stopVideo();
-    v.oncanplay = () => (v.style.opacity = '1');
     box.appendChild(v);
-    const p = v.play();
-    if (p && p.catch) p.catch(() => {});
     this.video = v;
+    this.videoEv = ev;
+    this.videoStart = ev.t;
     this.videoUntil = ev.t + (ev.dur ?? 10);
+    v.muted = ev.muted === true;
+    this._videoVolume();
+    try {
+      v.currentTime = Math.max(0, offset);
+    } catch (e) {}
+    const show = () => (v.style.opacity = '1');
+    if (v.readyState >= 2) show();
+    else v.oncanplay = show;
+    const p = v.play();
+    // si el navegador no deja reproducir con sonido, por lo menos que se vea
+    if (p && p.catch)
+      p.catch(() => {
+        v.muted = true;
+        v.play().catch(() => {});
+      });
+  }
+
+  _videoVolume() {
+    const v = this.video;
+    if (!v) return;
+    const A = Engine2D.Audio;
+    const music = this.conductor.audio ? this.conductor.audio.volume : Math.min(1, A.getVolume() * A.getMusicVolume() * 1.6);
+    v.volume = Math.max(0, Math.min(1, music * (this.videoEv && this.videoEv.volume != null ? this.videoEv.volume : 0.9)));
+    if (A.isMuted()) v.muted = true;
   }
 
   stopVideo() {
-    if (this.video) this.video.remove();
+    if (this.video) {
+      this.video.pause();
+      this.video.remove();
+    }
     this.video = null;
   }
 
@@ -501,7 +539,8 @@ FB.Game = class Game {
 
     this.stage.update(dt);
     this.camera.update(dt);
-    if (this.video && (time >= this.videoUntil || this.state !== 'playing')) this.stopVideo();
+    if (this.video && (time >= this.videoUntil || this.state === 'menu' || this.state === 'ending')) this.stopVideo();
+    if (this.video) this._videoVolume();
     if (this.regen) {
       if (time < this.regen.until) this.heal(this.regen.perSec * dt);
       else this.regen = null;

@@ -1080,7 +1080,8 @@ FB.SONG = {
     { t: 502, type: 'flash', dur: 0.4 },
     { t: 502, type: 'flashSprite', char: 'nono', dur: 0.6, shake: 4 },
     // 8:34 video
-    { t: 514, type: 'video', src: 'src/assets/video/escena.mp4', dur: 12.5 },
+    // video a pantalla completa con su audio (volume: 0.9 = 90% del volumen de la música)
+    { t: 514, type: 'video', src: 'src/assets/video/escena.mp4', dur: 11.7, volume: 0.9 },
     // 8:47 batalla final
     { t: 526.8, type: 'swapPlayer', char: 'jirafales' },
     { t: 526.9, type: 'face', char: 'jirafales', dir: 'right' },

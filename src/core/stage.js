@@ -28,9 +28,25 @@ FB.bgVideoEl = function (src) {
   FB._bgVideos[src] = el;
   return el;
 };
+// videos de escena (a pantalla completa, con sonido): precargados al tocar Jugar
+FB._sceneVideos = {};
+FB.sceneVideoEl = function (src) {
+  if (FB._sceneVideos[src]) return FB._sceneVideos[src];
+  const el = document.createElement('video');
+  el.playsInline = true;
+  el.setAttribute('playsinline', '');
+  el.setAttribute('webkit-playsinline', '');
+  el.preload = 'auto';
+  const webm = src.replace(/\.mp4$/, '.webm');
+  el.src = webm !== src && el.canPlayType('video/webm; codecs="vp9, opus"') ? webm : src;
+  el.load();
+  FB._sceneVideos[src] = el;
+  return el;
+};
 // precarga + "desbloqueo" con el toque de Jugar (en el celu el video solo arranca después de tocar algo)
 FB.unlockBgVideos = function () {
   for (const ev of (FB.SONG && FB.SONG.events) || []) {
+    if (ev.type === 'video' && ev.src) FB.sceneVideoEl(ev.src); // solo precarga
     if (ev.type !== 'bgVideo' || !ev.src) continue;
     const el = FB.bgVideoEl(ev.src);
     const p = el.play();
