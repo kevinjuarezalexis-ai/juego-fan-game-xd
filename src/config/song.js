@@ -457,7 +457,7 @@ FB.SONG = {
     // ── Parte 4 (2:47): la Chilindrina → 3:00 Don Ramón ──
     {
       t: 167,
-      stage: { opponents: [...ATRAS, P('chilindrina', 'corrupto', 840, { face: 'left' })], tension: 0.6 },
+      stage: { opponents: [...ATRAS, P('chilindrina', 'corrupto', 1080, { face: 'left' })], tension: 0.6 },
       mechanic: { type: 'none' },
     },
     // 2:59.3 → 4:00 hablarle a Don Ramón mientras esquivás sus ataques
@@ -466,8 +466,8 @@ FB.SONG = {
       stage: {
         opponents: [
           ...ATRAS,
-          P('chilindrina', 'corrupto', 840, { face: 'left' }),
-          P('ramon', 'corrupto', 1080, { face: 'left' }),
+          P('chilindrina', 'corrupto', 1080, { face: 'left' }),
+          P('ramon', 'corrupto', 840, { face: 'left' }),
         ],
         tension: 0.6,
         bumpEvery: 4,
@@ -486,14 +486,14 @@ FB.SONG = {
         },
       },
     },
-    // 4:00 Don Ramón libre: "les fallé..." → hay que motivarlo (cinemática)
+    // 3:55.80 parte tranquila: Don Ramón "les fallé..." → hay que motivarlo (cinemática)
     {
-      t: 240,
+      t: 235.8,
       stage: {
         opponents: [
           ...ATRAS,
-          P('chilindrina', 'corrupto', 840, { face: 'left' }),
-          P('ramon', 'curando', 1080, { face: 'left' }),
+          P('chilindrina', 'corrupto', 1080, { face: 'left' }),
+          P('ramon', 'curando', 840, { face: 'left' }),
         ],
         tension: 0.4,
         bumpEvery: 0,
@@ -868,7 +868,7 @@ FB.SONG = {
     { t: 87, type: 'liberate', char: 'florinda', dur: 3 },
     // ── 1:30 Florinda liberada → se pone atrás de Jirafales ──
     { t: 91.5, type: 'face', char: 'florinda', dir: 'right' },
-    { t: 91.5, type: 'walk', char: 'florinda', from: 450, to: 1150, dur: 2.5, end: 'sano' },
+    { t: 91.5, type: 'walk', char: 'florinda', from: 450, to: 1150, dur: 2.5, end: 'curada' },
     { t: 94.1, type: 'face', char: 'florinda', dir: 'left' },
     { t: 90, type: 'flash', dur: 0.4 },
     { t: 90, type: 'flashSprite', char: 'florinda', dur: 0.6, shake: 4 },
@@ -949,10 +949,10 @@ FB.SONG = {
     { t: 179.3, type: 'shake', power: 12, dur: 0.5 },
     { t: 182.6, type: 'setState', char: 'jirafales', state: 'normal' },
     // 4:00 Don Ramón libre
-    { t: 240, type: 'flash', dur: 0.4 },
-    { t: 240, type: 'flashSprite', char: 'ramon', dur: 0.6, shake: 4 },
+    { t: 235.8, type: 'flash', dur: 0.4 },
+    { t: 235.8, type: 'flashSprite', char: 'ramon', dur: 0.6, shake: 4 },
     // 4:00 parte tranquila: curación incompleta mientras lo motivás ("les fallé a los dos...")
-    { t: 240, type: 'setState', char: 'ramon', state: 'curando' },
+    { t: 235.8, type: 'setState', char: 'ramon', state: 'curando' },
     // al contestar el último mensaje queda casi curado (lo hace la mecánica: onLast); si no contestó, a las 4:15 igual
     { t: 255, type: 'setState', char: 'ramon', state: 'casi' },
     { t: 255, type: 'liberate', char: 'ramon', dur: 2.5 },
@@ -962,12 +962,13 @@ FB.SONG = {
     { t: 257.5, type: 'setState', char: 'ramon', state: 'curado' },
 
     // ── 4:22 jugás con Don Ramón ──
-    { t: 257.5, type: 'walk', char: 'ramon', from: 1080, to: 400, dur: 4, end: 'sano' },
+    { t: 257.5, type: 'walk', char: 'ramon', from: 840, to: 400, dur: 4, end: 'curado' },
+    { t: 260, type: 'setState', char: 'ramon', state: 'sano' },
     { t: 257.5, type: 'face', char: 'jirafales', dir: 'left' },
     { t: 257.5, type: 'walk', char: 'jirafales', from: 400, to: 110, dur: 2.5, end: 'normal' },
     { t: 260.1, type: 'face', char: 'jirafales', dir: 'right' },
     { t: 261.9, type: 'swapPlayer', char: 'ramon' },
-    { t: 262.2, type: 'walk', char: 'chilindrina', from: 840, to: 720, dur: 1.5, end: 'corrupto' },
+    { t: 262.2, type: 'walk', char: 'chilindrina', from: 1080, to: 720, dur: 1.5, end: 'corrupto' },
     { t: 261.6, type: 'face', char: 'ramon', dir: 'right' },
     { t: 262, type: 'focus', on: 'ramon', zoom: 1.2, dur: 1 },
     { t: 262, type: 'tension', to: 0.15, dur: 2 }, // se calma la música (intro del Chapulín)
@@ -987,7 +988,8 @@ FB.SONG = {
     { t: 302.6, type: 'setState', char: 'chilindrina', state: 'curada' },
     { t: 303.1, type: 'face', char: 'chilindrina', dir: 'left' }, // corre hacia su papá
     { t: 305.7, type: 'face', char: 'chilindrina', dir: 'right' },
-    { t: 303.1, type: 'walk', char: 'chilindrina', from: 720, to: 650, dur: 2.5, end: 'sano' },
+    { t: 303.1, type: 'walk', char: 'chilindrina', from: 720, to: 650, dur: 2.5, end: 'curada' },
+    { t: 305.6, type: 'setState', char: 'chilindrina', state: 'sano' },
     { t: 303.1, type: 'walk', char: 'ramon', from: 400, to: 520, dur: 1.2, end: 'sano' },
     { t: 303.1, type: 'walk', char: 'florinda', from: 290, to: 230, dur: 1, end: 'sano' },
     { t: 303.1, type: 'walk', char: 'quico', from: 200, to: 100, dur: 1, end: 'sano' },
@@ -1142,7 +1144,7 @@ FB.SONG = {
     // 3:00 Don Ramón de maestro
     [179.48, 'Don Ramón', 'Esta calavera significa...', 1.6],
     // 4:00 Don Ramón
-    [240.3, 'Don Ramón', 'Les fallé a los dos... al Chavo y a mi hijita...', 4.5],
+    [236.1, 'Don Ramón', 'Les fallé a los dos... al Chavo y a mi hijita...', 4.5],
     // 4:22 Monchito
     [262.5, 'Don Ramón', 'Perdóname, hijita...', 3.5],
     [266.5, 'Don Ramón', 'No te preocupes, hijita...', 2.8],

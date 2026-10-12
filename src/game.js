@@ -373,9 +373,18 @@ FB.Game = class Game {
       case 'setState':
         this.stage.setState(ev.char, ev.state);
         break;
-      case 'walk':
-        this.stage.walk(ev.char || 'jirafales', ev.from, ev.to, ev.dur ?? 2, ev.end || 'normal', instant);
+      case 'walk': {
+        // solo en el prólogo se camina con animación; después el personaje se teletransporta
+        // a su lugar con un destellito blanco (no hay sprites de caminar). anim: true fuerza caminar.
+        const id = ev.char || 'jirafales';
+        const anim = ev.anim || ev.t < 37.3;
+        if (anim || instant) this.stage.walk(id, ev.from, ev.to, ev.dur ?? 2, ev.end || 'normal', instant);
+        else {
+          this.stage.walk(id, ev.from, ev.to, 0, ev.end || 'normal', true);
+          this.stage.flashSprite(id, 0.22, 0);
+        }
         break;
+      }
       case 'silhouette':
         this.stage.silhouette(ev.char, ev.on !== false, instant ? 0 : ev.dur ?? 0.3);
         break;
