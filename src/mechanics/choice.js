@@ -12,6 +12,7 @@
 //   numbersOnly   solo 1/2/3 o click (para usar mientras esquivás con las flechas)
 //   replyTime     segundos que se ve la respuesta (default 2.2)
 //   onResult(r)   avisa 'good' | 'bad' | 'neutral' | 'timeout' (lo usa la mecánica rescate)
+//   onLast        { char, state, from } al contestar la última pregunta pone esa pose (si está en 'from')
 
 FB.MECHANICS.choice = class Choice extends FB.Mechanic {
   constructor(game, p, t0, t1) {
@@ -48,6 +49,11 @@ FB.MECHANICS.choice = class Choice extends FB.Mechanic {
     if (!q) return;
     q.state = 'done';
     this.active = null;
+    const L = this.p.onLast;
+    if (L && this.questions.every((x) => x.state === 'done' || x.state === 'skipped')) {
+      const a = this.game.stage.actorOf(L.char);
+      if (a && (!L.from || a.state === L.from)) this.game.stage.setState(L.char, L.state);
+    }
     const time = this.cond.time;
     if (i < 0) {
       this.game.hurt(this.p.timeoutDamage || 12);

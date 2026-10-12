@@ -6,6 +6,38 @@
 
 window.FB = window.FB || {};
 
+// videos de fondo: uno por archivo, creados una sola vez y pegados (invisibles) al documento,
+// así el celular los decodifica y se pueden dibujar en el canvas
+FB._bgVideos = {};
+FB.bgVideoEl = function (src) {
+  if (FB._bgVideos[src]) return FB._bgVideos[src];
+  const el = document.createElement('video');
+  el.muted = true;
+  el.loop = true;
+  el.playsInline = true;
+  el.setAttribute('muted', '');
+  el.setAttribute('playsinline', '');
+  el.setAttribute('webkit-playsinline', '');
+  el.preload = 'auto';
+  el.style.cssText = 'position:fixed;left:0;top:0;width:2px;height:2px;opacity:0.01;pointer-events:none;z-index:-1';
+  // si hay versión .webm al lado y el navegador la soporta, usa esa; si no, el .mp4
+  const webm = src.replace(/\.mp4$/, '.webm');
+  el.src = webm !== src && el.canPlayType('video/webm') ? webm : src;
+  document.body.appendChild(el);
+  el.load();
+  FB._bgVideos[src] = el;
+  return el;
+};
+// precarga + "desbloqueo" con el toque de Jugar (en el celu el video solo arranca después de tocar algo)
+FB.unlockBgVideos = function () {
+  for (const ev of (FB.SONG && FB.SONG.events) || []) {
+    if (ev.type !== 'bgVideo' || !ev.src) continue;
+    const el = FB.bgVideoEl(ev.src);
+    const p = el.play();
+    if (p && p.then) p.then(() => !el._enUso && el.pause()).catch(() => {});
+  }
+};
+
 FB.Stage = class Stage {
   constructor(game) {
     this.game = game;
@@ -121,10 +153,11 @@ FB.Stage = class Stage {
 
   beat() {
     this.still = this.still || new Set();
-    if (!this.still.has(this.player.id)) this.player.bop = 1;
+    const todos = this.still.has('*');
+    if (!todos && !this.still.has(this.player.id)) this.player.bop = 1;
     this.player.animT = 0;
     for (const id in this.actors) {
-      if (this.still.has(id)) continue; // quieto (sin rebote): escenas de tensión
+      if (todos || this.still.has(id)) continue; // quieto (sin rebote): escenas de tensión
       this.actors[id].bop = 1;
       this.actors[id].animT = 0;
     }
@@ -389,6 +422,7 @@ FB.Stage = class Stage {
     this._drawBg(ctx);
     // video de fondo semitransparente (ej. los ¡RATERO! de los vecinos), detrás de los personajes
     const bv = this.bgVideo;
+    if (bv && bv.el.paused && !bv._retry) (bv._retry = 1), bv.el.play().catch(() => {}), setTimeout(() => bv && (bv._retry = 0), 500);
     if (bv && bv.el.readyState >= 2) {
       bv.a = Math.min(bv.alpha, (bv.a || 0) + 1 / 60 / (bv.fade || 0.4)); // fade de entrada
       ctx.save();
@@ -405,21 +439,14 @@ FB.Stage = class Stage {
 
   // { src, alpha, fade } → arranca un video en loop, sin sonido, de fondo · null → lo saca
   setBgVideo(cfg) {
-    if (this.bgVideo) {
-      this.bgVideo.el.pause();
-      this.bgVideo.el.removeAttribute('src');
-      this.bgVideo.el.load();
-    }
+    if (this.bgVideo) (this.bgVideo.el._enUso = false), this.bgVideo.el.pause();
     this.bgVideo = null;
     if (!cfg) return;
-    const el = document.createElement('video');
-    // si hay versión .webm al lado y el navegador la soporta, usa esa (anda en todos); si no, el .mp4
-    const webm = cfg.src.replace(/\.mp4$/, '.webm');
-    el.src = webm !== cfg.src && el.canPlayType('video/webm') ? webm : cfg.src;
-    el.muted = true;
-    el.loop = true;
-    el.playsInline = true;
-    el.preload = 'auto';
+    const el = FB.bgVideoEl(cfg.src);
+    el._enUso = true;
+    try {
+      el.currentTime = 0;
+    } catch (e) {}
     const p = el.play();
     if (p && p.catch) p.catch(() => {});
     this.bgVideo = { el, alpha: cfg.alpha ?? 0.18, fade: cfg.fade ?? 0.4, a: 0 };
@@ -596,7 +623,7 @@ FB.Stage = class Stage {
     ctx.save();
     const sx = 1 + 0.035 * a.bop;
     const ph = a.id.length * 1.7; // fase fija por personaje
-    const quieto = this.still && this.still.has(a.id);
+    const quieto = this.still && (this.still.has('*') || this.still.has(a.id));
     const sy = 1 - 0.055 * a.bop + (a.walking || quieto ? 0 : Math.sin(t * 2.2 + ph) * 0.008);
     ctx.scale(sx, sy);
     const spr = this._spriteFor(def, a.tempState || a.state);

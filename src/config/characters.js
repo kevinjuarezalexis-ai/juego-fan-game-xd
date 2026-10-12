@@ -133,8 +133,6 @@ FB.CHARACTERS = {
       corrupto: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 0 },
       grito: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 1 },
       curando: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 2 },
-      // mientras le hablás en el rescate (pregunta en pantalla) se le va pasando
-      corrupto_hablando: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 2 },
       casi: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 3 },
       curado: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 4 },
       sano: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 5 },

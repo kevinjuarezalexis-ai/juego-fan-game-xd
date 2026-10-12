@@ -493,12 +493,12 @@ FB.SONG = {
         opponents: [
           ...ATRAS,
           P('chilindrina', 'corrupto', 840, { face: 'left' }),
-          P('ramon', 'sano', 1080, { face: 'left' }),
+          P('ramon', 'curando', 1080, { face: 'left' }),
         ],
         tension: 0.4,
         bumpEvery: 0,
       },
-      mechanic: { type: 'choice', healOk: 8, questions: Q.motivar },
+      mechanic: { type: 'choice', healOk: 8, questions: Q.motivar, onLast: { char: 'ramon', state: 'casi', from: 'curando' } },
     },
 
     // ── Parte 5 (4:22): jugás con Don Ramón; los demás atrás de él ──
@@ -908,8 +908,9 @@ FB.SONG = {
     { t: 150, type: 'bump', every: 2, amount: 0.025, shake: 3, tilt: 0.8 },
     ...RATERO,
     // mientras le gritan ¡RATERO! el Chavo queda quieto (tensión) hasta que muestra su verdadera forma
-    { t: 132.79, type: 'still', char: 'chavo', on: true },
-    { t: 155.76, type: 'still', char: 'chavo', on: false },
+    // desde que empieza la parte del Chavo nadie rebota (tensión) hasta que muestra su verdadera forma
+    { t: 129.62, type: 'still', char: '*', on: true },
+    { t: 155.76, type: 'still', char: '*', on: false },
     // de fondo, muy transparente: los vecinos diciéndole ratero (loop) → se corta cuando muestra su verdadera forma
     { t: 132.79, type: 'bgVideo', src: 'src/assets/video/ratero.mp4', alpha: 0.2 }, // alpha: qué tanto se ve (0 a 1)
     { t: 155.76, type: 'bgVideo', off: true },
@@ -947,13 +948,18 @@ FB.SONG = {
     { t: 179.45, type: 'pose', char: 'ramon', state: 'grito', dur: 3.2 }, // "Esta calavera significa PE-LI-GRO" (después queda enojado)
     { t: 179.3, type: 'shake', power: 12, dur: 0.5 },
     { t: 182.6, type: 'setState', char: 'jirafales', state: 'normal' },
-    { t: 237, type: 'setState', char: 'ramon', state: 'casi' }, // último mensaje: casi curado, parpadea y se cura
-    { t: 237, type: 'liberate', char: 'ramon', dur: 3 },
     // 4:00 Don Ramón libre
     { t: 240, type: 'flash', dur: 0.4 },
     { t: 240, type: 'flashSprite', char: 'ramon', dur: 0.6, shake: 4 },
-    { t: 240.3, type: 'setState', char: 'ramon', state: 'curado' },
-    { t: 245, type: 'setState', char: 'ramon', state: 'sano' },
+    // 4:00 parte tranquila: curación incompleta mientras lo motivás ("les fallé a los dos...")
+    { t: 240, type: 'setState', char: 'ramon', state: 'curando' },
+    // al contestar el último mensaje queda casi curado (lo hace la mecánica: onLast); si no contestó, a las 4:15 igual
+    { t: 255, type: 'setState', char: 'ramon', state: 'casi' },
+    { t: 255, type: 'liberate', char: 'ramon', dur: 2.5 },
+    // 4:17.5 se cura: pose de curado solo ese momento, y camina hacia la Chilindrina
+    { t: 257.5, type: 'flash', dur: 0.35 },
+    { t: 257.5, type: 'flashSprite', char: 'ramon', dur: 0.6, shake: 4 },
+    { t: 257.5, type: 'setState', char: 'ramon', state: 'curado' },
 
     // ── 4:22 jugás con Don Ramón ──
     { t: 257.5, type: 'walk', char: 'ramon', from: 1080, to: 400, dur: 4, end: 'sano' },
