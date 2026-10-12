@@ -801,8 +801,10 @@ FB.SONG = {
     { t: 0, type: 'filter', mode: 'oscuro', dur: 0 },
     { t: 0, type: 'zoom', to: 1.4, dur: 0 },
     { t: 0, type: 'vignette', to: 0.6, dur: 0 }, // bordes oscuros todo el nivel (se cambia en drops / escenas)
-    // entra caminando desde la derecha (fuera de cuadro) hasta su lugar; la cámara queda quieta
-    { t: 0, type: 'walk', char: 'jirafales', from: 1600, to: 1010, dur: 5, end: 'asustado' },
+    // entra caminando desde la izquierda (por ahí está la entrada de la vecindad) hasta su lugar; la cámara queda quieta
+    { t: 0, type: 'face', char: 'jirafales', dir: 'right' },
+    { t: 0, type: 'walk', char: 'jirafales', from: 280, to: 1010, dur: 5, end: 'asustado' },
+    { t: 5, type: 'face', char: 'jirafales', dir: 'left' }, // al llegar se da vuelta hacia el patio
     { t: 0, type: 'pan', x: 370, y: 0, dur: 0 },
     { t: 6, type: 'setState', char: 'jirafales', state: 'enojado' }, // grita
     { t: 6, type: 'shake', power: 6, dur: 1.5 },
