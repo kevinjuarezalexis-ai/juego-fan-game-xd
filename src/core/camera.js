@@ -117,6 +117,12 @@ FB.Camera = class Camera {
   }
 
   setFilter(mode = 'none', dur = 0.3, opts = {}) {
+    // 'none' vuelve al filtro base del nivel (song.baseFilter), no a la imagen limpia
+    const base = this.game.song && this.game.song.baseFilter;
+    if (mode === 'none' && base && !opts.clean) {
+      mode = base.mode;
+      opts = { ...opts, amount: opts.amount ?? base.amount };
+    }
     const amount = opts.amount ?? 1;
     if (mode === 'gris') {
       this.tween('gray', 0.85 * amount, dur, 'linear');

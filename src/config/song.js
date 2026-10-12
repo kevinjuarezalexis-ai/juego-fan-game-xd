@@ -42,6 +42,12 @@ const RATERO = (() => {
     e.size = Math.round(38 + j * 7);
   });
   ult.slice(-3).forEach((e) => out.push({ t: e.t, type: 'flash', dur: 0.18, color: '#ff2020', alpha: 0.25 }));
+  // que ninguno se salga de la pantalla (la fuente es de ancho fijo: ~1 tamaño por letra)
+  for (const e of out) {
+    if (e.type !== 'text') continue;
+    const w = e.text.length * e.size * 1.15;
+    e.x = Math.round(Math.max(w / 2 + 16, Math.min(1280 - w / 2 - 16, e.x)));
+  }
   return out;
 })();
 
@@ -313,6 +319,8 @@ const Q = {
 
 FB.SONG = {
   titulo: 'Fiesta de la Buena Vecindad',
+  // filtro de todo el nivel (el de la entrada del profe): 'filter none' vuelve a este
+  baseFilter: { mode: 'oscuro', amount: 1 },
   music: 'src/assets/music/fiesta.mp3',
   menuMusic: 'src/assets/music/menu.mp3', // suena en loop en el menú principal
   bpm: 146,
@@ -793,8 +801,9 @@ FB.SONG = {
     { t: 0, type: 'filter', mode: 'oscuro', dur: 0 },
     { t: 0, type: 'zoom', to: 1.4, dur: 0 },
     { t: 0, type: 'vignette', to: 0.6, dur: 0 }, // bordes oscuros todo el nivel (se cambia en drops / escenas)
-    { t: 0, type: 'walk', char: 'jirafales', from: 1380, to: 1010, dur: 5, end: 'asustado' },
-    { t: 0, type: 'focus', on: 'jirafales', follow: true, dur: 0 },
+    // entra caminando desde la derecha (fuera de cuadro) hasta su lugar; la cámara queda quieta
+    { t: 0, type: 'walk', char: 'jirafales', from: 1600, to: 1010, dur: 5, end: 'asustado' },
+    { t: 0, type: 'pan', x: 370, y: 0, dur: 0 },
     { t: 6, type: 'setState', char: 'jirafales', state: 'enojado' }, // grita
     { t: 6, type: 'shake', power: 6, dur: 1.5 },
     { t: 6, type: 'bump', amount: 0.08 },
@@ -806,7 +815,7 @@ FB.SONG = {
     { t: 11, type: 'silhouette', char: 'quico', on: false, dur: 0.15 },
     { t: 11, type: 'setState', char: 'quico', state: 'corrupto' },
     { t: 11, type: 'flashSprite', char: 'quico', dur: 0.4, shake: 8 },
-    { t: 11, type: 'filter', mode: 'oscuro', amount: 0.45, dur: 0.4 },
+    { t: 11, type: 'filter', mode: 'oscuro', dur: 0.4 },
     { t: 11, type: 'focus', on: 'quico', zoom: 1.3, dur: 0.35, ease: 'out' },
     { t: 13, type: 'focus', on: 'jirafales', zoom: 1.25, dur: 0.8 },
     { t: 13, type: 'setState', char: 'jirafales', state: 'hablando' },
@@ -903,25 +912,31 @@ FB.SONG = {
     // temblores chiquitos hasta el drop
     ...Array.from({ length: 7 }, (_, i) => ({ t: +(144.2 + i * 1.644).toFixed(2), type: 'shake', power: 3, dur: 0.35 })),
     // 2:22.55 hablan (sin cuadros de diálogo: las frases salen como los ¡RATERO!) y el Prof se le va acercando de a poco
-    { t: 142.6, type: 'walk', char: 'jirafales', slide: true, from: 400, to: 740, dur: 12.8, end: 'normal' },
+    // en cada frase el Prof se teletransporta un poco más cerca del Chavo (destellito)
     ...[
-      [142.8, 'jirafales', '¿Chavo? ¿Eres tú?', 2.4],
-      [145.3, 'jirafales', '¿Qué te pasó? ¿Por qué hiciste esto?', 2.6],
-      [148.1, 'chavo', '...', 1.6],
-      [149.9, 'jirafales', 'Contesta, Chavito...', 2.1],
-      [152.2, 'chavo', 'Les dije que yo no fui.', 3.2],
-    ].flatMap(([t, who, text, dur]) => [
-      {
-        t, type: 'text', text, dur,
-        size: who === 'chavo' ? 30 : 26,
-        // en pantalla: al lado de la cabeza de cada uno (el Prof se va acercando: 400 → 740)
-        x: who === 'chavo' ? 1040 : Math.round((400 + ((t - 142.6) / 12.8) * 340 - 680) * 1.4 + 640 + 200),
-        y: who === 'chavo' ? 265 : 120,
-        color: who === 'chavo' ? (text === '...' ? '#cfcfd6' : '#ff5a5a') : '#ffd23f',
-        rot: who === 'chavo' ? 0.04 : -0.04,
-      },
-      ...(who === 'jirafales' ? [{ t, type: 'pose', char: 'jirafales', state: 'hablando', dur }] : []),
-    ]),
+      [142.8, 'jirafales', '¿Chavo? ¿Eres tú?', 2.4, 480],
+      [145.3, 'jirafales', '¿Qué te pasó? ¿Por qué hiciste esto?', 2.6, 560],
+      [148.1, 'chavo', '...', 1.6, 620],
+      [149.9, 'jirafales', 'Contesta, Chavito...', 2.1, 690],
+      [152.2, 'chavo', 'Les dije que yo no fui.', 3.2, 740],
+    ].flatMap(([t, who, text, dur, px], i, arr) => {
+      const size = who === 'chavo' ? 24 : 20;
+      const w = text.length * size; // la fuente es de ancho fijo: así nunca se corta en los bordes
+      const sx = (px - 680) * 1.4 + 640; // dónde queda el Prof en pantalla (zoom 1.4)
+      const x0 = who === 'chavo' ? 1032 : sx + 120;
+      const x = Math.round(Math.max(w / 2 + 24, Math.min(1280 - w / 2 - 24, x0)));
+      const from = i ? arr[i - 1][4] : 400;
+      return [
+        { t, type: 'walk', char: 'jirafales', from, to: px, end: 'normal' },
+        {
+          t, type: 'text', text, dur, size, x,
+          y: who === 'chavo' ? 265 : 120,
+          color: who === 'chavo' ? (text === '...' ? '#cfcfd6' : '#ff5a5a') : '#ffd23f',
+          rot: who === 'chavo' ? 0.03 : -0.03,
+        },
+        ...(who === 'jirafales' ? [{ t: t + 0.01, type: 'pose', char: 'jirafales', state: 'hablando', dur }] : []),
+      ];
+    }),
     // 2:10 → 2:36 la tensión sube: viñeta roja y los "¡RATERO!" de fondo
     { t: 131, type: 'tension', to: 0.85, dur: 24.5 },
     { t: 150, type: 'bump', every: 2, amount: 0.025, shake: 3, tilt: 0.8 },
