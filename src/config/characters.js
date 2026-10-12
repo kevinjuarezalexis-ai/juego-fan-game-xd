@@ -71,10 +71,10 @@ FB.CHARACTERS = {
     //   0 corrupta, 1 sana, 2 sana hablando, 3 corrupta por liberarse (barra de liberación),
     //   4 recién curada, 5 recibe daño (cuando pelea junto al profe)
     sprites: {
-      corrupto: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 0 },
+      corrupto: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 0, mirror: true }, // invertida: mira al profe
       sano: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 1 },
       hablando: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 2 },
-      dudando: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 3 },
+      dudando: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 3, mirror: true },
       curada: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 4 },
       dano: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 5 },
       asustado: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 5 },
