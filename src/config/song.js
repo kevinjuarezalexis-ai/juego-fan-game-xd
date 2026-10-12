@@ -402,7 +402,8 @@ FB.SONG = {
           damage: 9,
           patterns: [
             { type: 'pelota', every: 2 }, // pelotas de Quico
-            { type: 'lagrimas', every: 4, offset: 1, count: 3 }, // lágrimas de Quico
+            { type: 'pelota', every: 4, invert: true }, // ahora también al revés (sube y rebota en el techo); puede salir junto con la normal
+            { type: 'lagrimas', every: 4, offset: 1, count: 3 }, // lágrimas de Quico (suben en diagonal)
           ],
         },
       },
@@ -867,7 +868,7 @@ FB.SONG = {
     // ── 1:27 → 1:30 Florinda se está liberando (parpadeo + temblor) ──
     { t: 87, type: 'liberate', char: 'florinda', dur: 3 },
     // ── 1:30 Florinda liberada → se pone atrás de Jirafales ──
-    { t: 91.5, type: 'face', char: 'florinda', dir: 'right' },
+    { t: 91.5, type: 'face', char: 'florinda', dir: 'left' },
     { t: 91.5, type: 'walk', char: 'florinda', from: 450, to: 1150, dur: 2.5, end: 'curada' },
     { t: 94.1, type: 'face', char: 'florinda', dir: 'left' },
     { t: 90, type: 'flash', dur: 0.4 },
@@ -1071,9 +1072,11 @@ FB.SONG = {
     { t: 456, type: 'flash', dur: 0.4 },
     { t: 456, type: 'flashSprite', char: 'barriga', dur: 0.6, shake: 4 },
     { t: 456, type: 'setState', char: 'barriga', state: 'curado' }, // recién curado; al llegar junto a Quico queda 'sano'
+    // se queda 2 s con la pose de recién curado y recién ahí se teletransporta junto a los demás
     { t: 456.2, type: 'face', char: 'barriga', dir: 'left' },
-    { t: 456.2, type: 'walk', char: 'barriga', from: 760, to: 400, dur: 1.6, end: 'sano' },
-    { t: 457.9, type: 'face', char: 'barriga', dir: 'right' },
+    { t: 458, type: 'walk', char: 'barriga', from: 760, to: 400, dur: 1.6, end: 'curado' },
+    { t: 458, type: 'face', char: 'barriga', dir: 'right' },
+    { t: 459.5, type: 'setState', char: 'barriga', state: 'sano' },
     { t: 456.2, type: 'walk', char: 'ramon', from: 400, to: 245, dur: 1, end: 'sano' },
     // 8:22 Ñoño libre
     { t: 499, type: 'liberate', char: 'nono', dur: 3 },
