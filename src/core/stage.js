@@ -425,9 +425,11 @@ FB.Stage = class Stage {
     if (bv && bv.el.paused && !bv._retry) (bv._retry = 1), bv.el.play().catch(() => {}), setTimeout(() => bv && (bv._retry = 0), 500);
     if (bv && bv.el.readyState >= 2) {
       bv.a = Math.min(bv.alpha, (bv.a || 0) + 1 / 60 / (bv.fade || 0.4)); // fade de entrada
+      // se dibuja en la pantalla (no en el mundo): siempre ocupa toda la vista, haya zoom o no
       ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.globalAlpha = bv.a;
-      ctx.drawImage(bv.el, -24, -24, this.W + 48, this.H + 48); // el video ya es 16:9 como el juego
+      ctx.drawImage(bv.el, 0, 0, this.W, this.H); // el video ya es 16:9 como el juego
       ctx.restore();
     }
     if (this.ink > 0.001) {
