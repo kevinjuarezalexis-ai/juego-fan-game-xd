@@ -352,7 +352,7 @@ FB.SONG = {
     { n: 7, nombre: 'Ñoño', t: 375.92 },
     { n: 8, nombre: 'El Sr. Barriga', t: 411 },
     { n: 9, nombre: 'Rescatar a Ñoño', t: 456 },
-    { n: 10, nombre: 'La última fiesta', t: 527 },
+    { n: 10, nombre: 'La última fiesta', t: 525.7 },
   ],
 
   // Cada segmento lista TODOS los personajes en escena además del jugador
@@ -731,7 +731,7 @@ FB.SONG = {
 
     // ── Parte 10 (8:47): batalla final contra el Chavo en su forma final (escopeta: bloquear / disparar) ──
     {
-      t: 527,
+      t: 525.7,
       stage: {
         bg: 'patio',
         opponents: [
@@ -1081,25 +1081,25 @@ FB.SONG = {
     { t: 502, type: 'flashSprite', char: 'nono', dur: 0.6, shake: 4 },
     // 8:34 video
     // video a pantalla completa con su audio (volume: 0.5 = 50% del volumen de la música)
-    // entra con destello blanco y sale con destello rojo justo cuando arranca la pelea final (8:47)
-    { t: 515.3, type: 'video', src: 'src/assets/video/escena.mp4', dur: 11.7, volume: 0.5, flashIn: '#ffffff', flashOut: '#ff1a1a' },
-    // 8:47 batalla final
-    { t: 526.8, type: 'swapPlayer', char: 'jirafales' },
-    { t: 526.9, type: 'face', char: 'jirafales', dir: 'right' },
-    { t: 527, type: 'flash', dur: 0.6, color: '#ff1a1a', alpha: 0.9 }, // rojo, sale del video
-    { t: 527, type: 'flashSprite', char: 'chavo', dur: 0.5, shake: 12 },
-    { t: 527, type: 'shake', power: 16, dur: 0.7 },
-    { t: 527, type: 'filter', mode: 'oscuro', amount: 0.45, dur: 0.5 },
+    // 8:34 entra con destello blanco y sale con destello rojo justo cuando arranca la pelea final (8:45.7)
+    { t: 514, type: 'video', src: 'src/assets/video/escena.mp4', dur: 11.7, volume: 0.5, flashIn: '#ffffff', flashOut: '#ff1a1a' },
+    // 8:45.7 batalla final (arranca apenas termina el video)
+    { t: 525.5, type: 'swapPlayer', char: 'jirafales' },
+    { t: 525.6, type: 'face', char: 'jirafales', dir: 'right' },
+    { t: 525.7, type: 'flash', dur: 0.6, color: '#ff1a1a', alpha: 0.9 }, // rojo, sale del video
+    { t: 525.7, type: 'flashSprite', char: 'chavo', dur: 0.5, shake: 12 },
+    { t: 525.7, type: 'shake', power: 16, dur: 0.7 },
+    { t: 525.7, type: 'filter', mode: 'oscuro', amount: 0.45, dur: 0.5 },
     // 8:53 su forma verdadera
     { t: 533, type: 'flash', dur: 0.5 },
     { t: 533, type: 'flashSprite', char: 'chavo', dur: 0.6, shake: 14 },
     { t: 533, type: 'setState', char: 'chavo', state: 'final' },
     { t: 533, type: 'shake', power: 14, dur: 0.6 },
     { t: 533, type: 'bump', amount: 0.08 },
-    { t: 527, type: 'walk', char: 'jirafales', from: 290, to: 400, dur: 0.6, end: 'escopeta' },
-    { t: 527, type: 'walk', char: 'barriga', from: 400, to: 155, dur: 0.8, end: 'sano' },
-    { t: 527, type: 'walk', char: 'nono', from: 960, to: 65, dur: 1.6, end: 'asustado' }, // atrás del grupo, con miedo
-    { t: 527, type: 'walk', char: 'quico', from: 260, to: 110, dur: 0.8, end: 'sano' },
+    { t: 525.7, type: 'walk', char: 'jirafales', from: 290, to: 400, dur: 0.6, end: 'escopeta' },
+    { t: 525.7, type: 'walk', char: 'barriga', from: 400, to: 155, dur: 0.8, end: 'sano' },
+    { t: 525.7, type: 'walk', char: 'nono', from: 960, to: 65, dur: 1.6, end: 'asustado' }, // atrás del grupo, con miedo
+    { t: 525.7, type: 'walk', char: 'quico', from: 260, to: 110, dur: 0.8, end: 'sano' },
     // 9:32 clímax: últimos segundos para ganar
     { t: 572, type: 'flash', dur: 0.4 },
     { t: 572, type: 'mech', set: { attackEvery: 2, warnBeats: 1.5, damage: 15 } },
