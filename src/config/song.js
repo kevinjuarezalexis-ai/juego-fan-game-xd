@@ -378,6 +378,10 @@ FB.SONG = {
           patterns: [
             { type: 'mano', every: 4, warn: 1 }, // cachetadas de Florinda (mano gris que cruza)
             { type: 'pelota', every: 4, offset: 2 }, // pelotas de Quico
+            { type: 'taza', every: 4, offset: 1, count: 2 }, // tazas de café (¿no gusta pasar a tomar una tacita?)
+            { type: 'cafe', every: 4, offset: 3, count: 3 }, // gotas de café
+            { type: 'corazon', every: 8, offset: 5, count: 2 }, // corazones partidos
+            { type: 'autito', every: 8, offset: 7, warn: 1 }, // autito de juguete de Quico por arriba o abajo
           ],
         },
       },
@@ -481,7 +485,7 @@ FB.SONG = {
           damage: 8,
           patterns: [
             { type: 'lluvia', every: 2, count: 2 },
-            { type: 'cachetada', every: 4, offset: 1, warn: 1.5, dir: 'col' }, // coscorrón
+            { type: 'cachetada', every: 4, offset: 1, warn: 1.5, dir: 'col', fist: true }, // coscorrón (puño cerrado de Don Ramón)
             { type: 'muro', every: 8, offset: 3, gap: 80, speed: 200 },
           ],
         },

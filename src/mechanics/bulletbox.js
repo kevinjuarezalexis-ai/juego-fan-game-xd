@@ -13,7 +13,12 @@
 //     apuntado   proyectiles que van hacia el corazón (speed)
 //     muro       pared que cruza la caja con un hueco (gap, speed)
 //     mano       mano gris (pixel art) que cruza la caja en línea recta (warn: beats de aviso, speed, vertical: prob.)
-//     lagrimas   lágrimas celestes que suben en diagonal (izquierda o derecha) desde abajo (count)
+//     lagrimas   lágrimas celestes que caen en diagonal (izquierda o derecha) desde arriba (count)
+//     taza       tazas de café que caen girando (count)
+//     cafe       gotas de café que caen rápido (count)
+//     corazon    corazones partidos que caen meciéndose (count)
+//     autito     autito de juguete que cruza por arriba o por abajo (avisa con flechas; warn: beats)
+//     cachetada  fist: true → puño cerrado (coscorrón de Don Ramón) en vez de mano abierta
 //     corte      cortes rojos finos en cualquier ángulo; avisan dónde caen (warnSec, default 2 s; count, len)
 
 // ── pixel art (se dibuja una vez en un canvas chico y se escala sin suavizado) ──
@@ -203,7 +208,7 @@ FB.drawSlapHand = function (ctx, w, skin = '#c9c4b4', shade = '#9c9686') {
 };
 
 // lágrima: cabeza redonda adelante y punta atrás (apunta hacia donde va)
-FB.drawTear = function (ctx, x, y, r, ang) {
+FB.drawTear = function (ctx, x, y, r, ang, pal) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(ang);
@@ -213,18 +218,236 @@ FB.drawTear = function (ctx, x, y, r, ang) {
   ctx.arc(0, 0, r, -Math.PI / 2, Math.PI / 2);
   ctx.quadraticCurveTo(-r * 0.6, r * 1.05, -r * 2.6, 0);
   const g = ctx.createLinearGradient(-r * 2.6, 0, r, 0);
-  g.addColorStop(0, 'rgba(120,205,255,0.25)');
-  g.addColorStop(0.55, '#5cc0ff');
-  g.addColorStop(1, '#2f8fe0');
+  const P = pal || ['rgba(120,205,255,0.25)', '#5cc0ff', '#2f8fe0', '#0e4f8c'];
+  g.addColorStop(0, P[0]);
+  g.addColorStop(0.55, P[1]);
+  g.addColorStop(1, P[2]);
   ctx.fillStyle = g;
   ctx.fill();
   ctx.lineWidth = 1.6;
-  ctx.strokeStyle = '#0e4f8c';
+  ctx.strokeStyle = P[3];
   ctx.stroke();
   ctx.fillStyle = 'rgba(255,255,255,0.85)';
   ctx.beginPath();
   ctx.ellipse(r * 0.15, -r * 0.4, r * 0.35, r * 0.2, 0, 0, Math.PI * 2);
   ctx.fill();
+  ctx.restore();
+};
+
+// puño cerrado de Don Ramón corrupto (nudillos hacia +x), centrado en 0,0; w = largo total
+FB.drawFist = function (ctx, w) {
+  const s = w / 60;
+  ctx.save();
+  ctx.scale(s, s);
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 2.6;
+  ctx.strokeStyle = '#1e1d22';
+  const skin = '#e9b48f';
+  const shade = '#c98d6a';
+  // manga rota (remera gris verdosa)
+  ctx.beginPath();
+  ctx.moveTo(-30, -15);
+  ctx.lineTo(-14, -15);
+  ctx.lineTo(-11, -9);
+  ctx.lineTo(-15, -3);
+  ctx.lineTo(-11, 3);
+  ctx.lineTo(-15, 9);
+  ctx.lineTo(-12, 15);
+  ctx.lineTo(-30, 15);
+  ctx.closePath();
+  ctx.fillStyle = '#6f746a';
+  ctx.fill();
+  ctx.stroke();
+  // puño
+  ctx.beginPath();
+  ctx.moveTo(-14, -13);
+  ctx.quadraticCurveTo(4, -19, 18, -15);
+  ctx.quadraticCurveTo(28, -12, 28, 0);
+  ctx.quadraticCurveTo(28, 13, 17, 15);
+  ctx.quadraticCurveTo(0, 18, -14, 13);
+  ctx.closePath();
+  ctx.fillStyle = skin;
+  ctx.fill();
+  ctx.stroke();
+  // nudillos / dedos doblados
+  ctx.lineWidth = 1.8;
+  for (const y of [-7.5, 0, 7.5]) {
+    ctx.beginPath();
+    ctx.moveTo(10, y);
+    ctx.quadraticCurveTo(22, y - 1, 27, y);
+    ctx.stroke();
+  }
+  ctx.fillStyle = shade;
+  for (const y of [-11, -3.7, 3.7, 11]) {
+    ctx.beginPath();
+    ctx.ellipse(20, y, 4, 2.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  // pulgar cruzado
+  ctx.lineWidth = 2.4;
+  ctx.beginPath();
+  ctx.moveTo(-6, -12);
+  ctx.quadraticCurveTo(10, -10, 14, -3);
+  ctx.quadraticCurveTo(10, 1, 0, -4);
+  ctx.closePath();
+  ctx.fillStyle = skin;
+  ctx.fill();
+  ctx.stroke();
+  // manchas de sangre
+  ctx.fillStyle = 'rgba(150,10,10,0.85)';
+  for (const [x, y, r] of [[-4, 6, 3.2], [6, 10, 2], [15, -12, 1.8], [-8, -6, 1.5], [22, 7, 1.6]]) {
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+};
+
+// taza de café (con plato), centrada en 0,0
+FB.drawCup = function (ctx, w) {
+  const s = w / 40;
+  ctx.save();
+  ctx.scale(s, s);
+  ctx.lineWidth = 2.2;
+  ctx.strokeStyle = '#1e1d22';
+  ctx.lineJoin = 'round';
+  // asa
+  ctx.beginPath();
+  ctx.ellipse(13, 0, 7, 6, 0, -Math.PI / 2, Math.PI / 2);
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = '#1e1d22';
+  ctx.stroke();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#f4efe6';
+  ctx.stroke();
+  ctx.lineWidth = 2.2;
+  ctx.strokeStyle = '#1e1d22';
+  // cuerpo
+  ctx.beginPath();
+  ctx.moveTo(-14, -9);
+  ctx.lineTo(14, -9);
+  ctx.quadraticCurveTo(13, 11, 0, 11);
+  ctx.quadraticCurveTo(-13, 11, -14, -9);
+  ctx.closePath();
+  ctx.fillStyle = '#f4efe6';
+  ctx.fill();
+  ctx.stroke();
+  // franja roja
+  ctx.fillStyle = '#d0343c';
+  ctx.fillRect(-12.5, -3, 25, 3.5);
+  // café adentro
+  ctx.beginPath();
+  ctx.ellipse(0, -9, 14, 3.4, 0, 0, Math.PI * 2);
+  ctx.fillStyle = '#5a3418';
+  ctx.fill();
+  ctx.stroke();
+  // plato
+  ctx.beginPath();
+  ctx.ellipse(0, 12, 19, 3.6, 0, 0, Math.PI * 2);
+  ctx.fillStyle = '#e6dfd2';
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+};
+
+// corazón partido (rajadura en zigzag), centrado en 0,0
+FB.drawBrokenHeart = function (ctx, w, open = 0.25) {
+  const s = w / 40;
+  ctx.save();
+  ctx.scale(s, s);
+  const half = (side) => {
+    ctx.save();
+    ctx.translate(side * open * 4, side * open * 1.5);
+    ctx.rotate(side * open * 0.25);
+    ctx.beginPath();
+    // mitad del corazón hasta la rajadura central
+    if (side < 0) {
+      ctx.moveTo(0, -8);
+      ctx.bezierCurveTo(-4, -18, -20, -16, -19, -4);
+      ctx.bezierCurveTo(-18, 6, -6, 12, 0, 18);
+      ctx.lineTo(-3, 10);
+      ctx.lineTo(2, 4);
+      ctx.lineTo(-3, -2);
+      ctx.lineTo(1, -5);
+    } else {
+      ctx.moveTo(0, -8);
+      ctx.bezierCurveTo(4, -18, 20, -16, 19, -4);
+      ctx.bezierCurveTo(18, 6, 6, 12, 0, 18);
+      ctx.lineTo(-3, 10);
+      ctx.lineTo(2, 4);
+      ctx.lineTo(-3, -2);
+      ctx.lineTo(1, -5);
+    }
+    ctx.closePath();
+    ctx.fillStyle = '#e8355a';
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#3a0b14';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    ctx.restore();
+  };
+  half(-1);
+  half(1);
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.beginPath();
+  ctx.ellipse(-11, -8, 3.5, 2, -0.6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+};
+
+// autito de juguete rojo (mira a +x), centrado en 0,0
+FB.drawToyCar = function (ctx, w, t) {
+  const s = w / 60;
+  ctx.save();
+  ctx.scale(s, s);
+  ctx.lineWidth = 2.2;
+  ctx.strokeStyle = '#1e1d22';
+  ctx.lineJoin = 'round';
+  // cabina
+  ctx.beginPath();
+  ctx.moveTo(-14, -6);
+  ctx.lineTo(-8, -16);
+  ctx.lineTo(10, -16);
+  ctx.lineTo(16, -6);
+  ctx.closePath();
+  ctx.fillStyle = '#d93a2f';
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#9fd8ff';
+  ctx.fillRect(-6, -13, 6.5, 6);
+  ctx.fillRect(3, -13, 7, 6);
+  // carrocería
+  ctx.beginPath();
+  ctx.moveTo(-28, 6);
+  ctx.lineTo(-28, -3);
+  ctx.quadraticCurveTo(-26, -7, -18, -7);
+  ctx.lineTo(22, -7);
+  ctx.quadraticCurveTo(29, -6, 29, 1);
+  ctx.lineTo(29, 6);
+  ctx.closePath();
+  ctx.fillStyle = '#e84a3c';
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#ffe066';
+  ctx.fillRect(25, -4, 3.5, 3.5); // faro
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(-20, -2, 36, 2.5); // franja
+  // ruedas girando
+  for (const x of [-16, 17]) {
+    ctx.beginPath();
+    ctx.arc(x, 7, 6.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#222';
+    ctx.fill();
+    ctx.stroke();
+    ctx.save();
+    ctx.translate(x, 7);
+    ctx.rotate(t * 14);
+    ctx.fillStyle = '#bdbdbd';
+    ctx.fillRect(-3.5, -1, 7, 2);
+    ctx.fillRect(-1, -3.5, 2, 7);
+    ctx.restore();
+  }
   ctx.restore();
 };
 
@@ -281,7 +504,7 @@ FB.MECHANICS.bulletbox = class BulletBox extends FB.Mechanic {
           dir === 'col'
             ? { x: FB.rand(B.x, B.x + B.w - size), y: B.y, w: size, h: B.h }
             : { x: B.x, y: FB.rand(B.y, B.y + B.h - size), w: B.w, h: size };
-        this.bullets.push({ kind: 'slap', ...r, start: time, hitAt: time + warn, until: time + warn + 0.3 });
+        this.bullets.push({ kind: 'slap', ...r, fist: !!pat.fist, start: time, hitAt: time + warn, until: time + warn + 0.3 });
         break;
       }
       case 'lluvia': {
@@ -343,16 +566,79 @@ FB.MECHANICS.bulletbox = class BulletBox extends FB.Mechanic {
         const dir = Math.random() < 0.5 ? -1 : 1; // todas inclinadas para el mismo lado en cada tanda
         for (let i = 0; i < n; i++) {
           const sp = FB.rand(150, 215) * (pat.speedMul || 1);
-          const ang = -Math.PI / 2 + dir * FB.rand(0.3, 0.55); // arriba, inclinada a izquierda o derecha
+          const ang = Math.PI / 2 + dir * FB.rand(0.3, 0.55); // abajo, inclinada a izquierda o derecha
           this.bullets.push({
             kind: 'tear',
-            x: FB.rand(B.x + 10, B.x + B.w - 10) - dir * 40,
-            y: B.y + B.h + 14 + i * 38,
+            x: FB.rand(B.x + 10, B.x + B.w - 10) - Math.cos(ang) * 60,
+            y: B.y - 14 - i * 38,
             vx: Math.cos(ang) * sp,
             vy: Math.sin(ang) * sp,
             r: 7,
           });
         }
+        break;
+      }
+      case 'taza': {
+        const n = pat.count || 1;
+        for (let i = 0; i < n; i++) {
+          this.bullets.push({
+            kind: 'cup',
+            x: FB.rand(B.x + 20, B.x + B.w - 20),
+            y: B.y - 24 - i * 55,
+            vx: FB.rand(-25, 25),
+            vy: FB.rand(120, 170) * (pat.speedMul || 1),
+            g: 140,
+            rot: FB.rand(-0.5, 0.5),
+            spin: FB.rand(-3, 3),
+            r: 13,
+          });
+        }
+        break;
+      }
+      case 'cafe': {
+        const n = pat.count || 3;
+        for (let i = 0; i < n; i++) {
+          this.bullets.push({
+            kind: 'drop',
+            x: FB.rand(B.x + 8, B.x + B.w - 8),
+            y: B.y - 12 - i * 26,
+            vx: 0,
+            vy: FB.rand(230, 300) * (pat.speedMul || 1),
+            r: 5,
+          });
+        }
+        break;
+      }
+      case 'corazon': {
+        const n = pat.count || 1;
+        for (let i = 0; i < n; i++) {
+          this.bullets.push({
+            kind: 'heartb',
+            x0: FB.rand(B.x + 30, B.x + B.w - 30),
+            y: B.y - 22 - i * 60,
+            vy: FB.rand(85, 120) * (pat.speedMul || 1),
+            ph: Math.random() * 6,
+            r: 12,
+          });
+        }
+        break;
+      }
+      case 'autito': {
+        // cruza pegado al borde de arriba o de abajo: castiga quedarse en un borde
+        const top = pat.side ? pat.side === 'top' : Math.random() < 0.5;
+        const left = Math.random() < 0.5;
+        const w = 58;
+        const h = 26;
+        const sp = pat.speed || 300;
+        this.bullets.push({
+          kind: 'car',
+          w, h,
+          x: left ? B.x - w - 6 : B.x + B.w + 6,
+          y: top ? B.y + 4 : B.y + B.h - h - 4,
+          vx: left ? sp : -sp,
+          top,
+          go: time + (pat.warn ?? 1) * crochet,
+        });
         break;
       }
       case 'corte': {
@@ -433,6 +719,25 @@ FB.MECHANICS.bulletbox = class BulletBox extends FB.Mechanic {
           b.y += b.vy * dt;
           if (b.x < B.x - b.w - 60 || b.x > B.x + B.w + 60 || b.y < B.y - b.h - 60 || b.y > B.y + B.h + 60) b.dead = true;
         }
+      } else if (b.kind === 'cup') {
+        b.vy += b.g * dt;
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        b.rot += b.spin * dt;
+        if (b.y > B.y + B.h + 40) b.dead = true;
+      } else if (b.kind === 'drop') {
+        b.y += b.vy * dt;
+        if (b.y > B.y + B.h + 30) b.dead = true;
+      } else if (b.kind === 'heartb') {
+        b.y += b.vy * dt;
+        b.ph += dt * 3;
+        b.x = b.x0 + Math.sin(b.ph) * 28;
+        if (b.y > B.y + B.h + 30) b.dead = true;
+      } else if (b.kind === 'car') {
+        if (time >= b.go) {
+          b.x += b.vx * dt;
+          if (b.x < B.x - b.w - 60 || b.x > B.x + B.w + 60) b.dead = true;
+        }
       } else if (b.kind === 'tear') {
         b.x += b.vx * dt;
         b.y += b.vy * dt;
@@ -464,7 +769,12 @@ FB.MECHANICS.bulletbox = class BulletBox extends FB.Mechanic {
       case 'hand':
         return time >= b.go && circRect(b.x + 3, b.y + 3, b.w - 6, b.h - 6);
       case 'tear':
+      case 'drop':
+      case 'cup':
+      case 'heartb':
         return (S.x - b.x) ** 2 + (S.y - b.y) ** 2 < (S.r + b.r - 3) ** 2;
+      case 'car':
+        return time >= b.go && circRect(b.x + 3, b.y + 3, b.w - 6, b.h - 4);
       case 'cut': {
         if (time < b.hitAt) return false;
         // distancia del corazón al segmento
@@ -557,7 +867,8 @@ FB.MECHANICS.bulletbox = class BulletBox extends FB.Mechanic {
           } else {
             ctx.translate(b.x + 6, b.y + b.h / 2);
           }
-          FB.drawSlapHand(ctx, Math.min(60, (col ? b.w : b.h) * 1.1));
+          if (b.fist) FB.drawFist(ctx, Math.min(56, (col ? b.w : b.h) * 0.95));
+          else FB.drawSlapHand(ctx, Math.min(60, (col ? b.w : b.h) * 1.1));
           ctx.restore();
         } else {
           // ¡PAF! la mano barre la franja con estela blanca
@@ -587,7 +898,19 @@ FB.MECHANICS.bulletbox = class BulletBox extends FB.Mechanic {
             ctx.translate(b.x + b.w / 2, b.y + b.h * k - size * 0.2);
             ctx.rotate(Math.PI / 2);
           } else ctx.translate(b.x + b.w * k - size * 0.2, b.y + b.h / 2);
-          FB.drawSlapHand(ctx, size);
+          if (b.fist) {
+            // ¡COSCORRÓN! puño cerrado + estrellitas al pegar
+            FB.drawFist(ctx, size * 0.9);
+            if (k >= 1) {
+              ctx.fillStyle = '#ffe14d';
+              for (let i = 0; i < 4; i++) {
+                const a = i * 1.57 + time * 6;
+                ctx.beginPath();
+                ctx.arc(size * 0.55 + Math.cos(a) * size * 0.3, Math.sin(a) * size * 0.3, 3, 0, Math.PI * 2);
+                ctx.fill();
+              }
+            }
+          } else FB.drawSlapHand(ctx, size);
           ctx.restore();
         }
         break;
@@ -633,6 +956,52 @@ FB.MECHANICS.bulletbox = class BulletBox extends FB.Mechanic {
       case 'tear':
         FB.drawTear(ctx, b.x, b.y, b.r, Math.atan2(b.vy, b.vx));
         break;
+      case 'drop':
+        FB.drawTear(ctx, b.x, b.y, b.r, Math.PI / 2, ['rgba(120,70,30,0.2)', '#8a5426', '#5a3418', '#2a1608']);
+        break;
+      case 'cup':
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.rotate(b.rot);
+        FB.drawCup(ctx, 34);
+        ctx.restore();
+        break;
+      case 'heartb':
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.rotate(Math.sin(b.ph) * 0.25);
+        FB.drawBrokenHeart(ctx, 30, 0.2 + Math.sin(b.ph * 2) * 0.08);
+        ctx.restore();
+        break;
+      case 'car': {
+        const B = this.box;
+        ctx.save();
+        if (time < b.go) {
+          // aviso: flechitas amarillas en el carril por donde va a pasar
+          const blink = Math.floor(time * 10) % 2 === 0;
+          ctx.fillStyle = 'rgba(255,220,60,' + (blink ? 0.22 : 0.1) + ')';
+          ctx.fillRect(B.x, b.y, B.w, b.h);
+          ctx.fillStyle = 'rgba(255,220,60,' + (blink ? 0.9 : 0.5) + ')';
+          ctx.font = 'bold 18px monospace';
+          ctx.textAlign = 'center';
+          const arrow = b.vx > 0 ? '»' : '«';
+          for (let x = B.x + 30; x < B.x + B.w; x += 60) ctx.fillText(arrow, x, b.y + b.h / 2 + 6);
+          ctx.restore();
+          break;
+        }
+        ctx.translate(b.x + b.w / 2, b.y + b.h / 2 - 2);
+        if (b.vx < 0) ctx.scale(-1, 1);
+        // humito atrás
+        ctx.fillStyle = 'rgba(220,220,220,0.4)';
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          ctx.arc(-b.w / 2 - 6 - i * 9, 6 - i * 2, 4 + i * 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        FB.drawToyCar(ctx, b.w, time);
+        ctx.restore();
+        break;
+      }
       case 'cut': {
         ctx.save();
         ctx.lineCap = 'round';
