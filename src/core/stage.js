@@ -84,9 +84,21 @@ FB.Stage = class Stage {
   }
 
   // pose por un rato y después vuelve a la que tenía (disparo, susto...)
+  // state puede ser una lista → animación: los cuadros se reparten el tiempo (ej. baile en 2 cuadros)
   pose(id, state, dur = 0.3) {
     const a = this.actorOf(id);
     if (!a) return;
+    if (Array.isArray(state)) {
+      const def0 = FB.CHARACTERS[a.id];
+      const seq = state.filter((s) => !def0 || !def0.sprites || def0.sprites[s]);
+      if (!seq.length) return;
+      a.tempSeq = seq;
+      a.tempDur = dur;
+      a.tempState = seq[0];
+      a.tempT = dur;
+      return;
+    }
+    a.tempSeq = null;
     // si el personaje no tiene esa pose, se queda con la que tiene
     const def = FB.CHARACTERS[a.id];
     if (def && def.sprites && !def.sprites[state]) return;
@@ -231,7 +243,11 @@ FB.Stage = class Stage {
       a.libT = Math.max(0, (a.libT || 0) - dt);
       a.lean = (a.lean || 0) * Math.max(0, 1 - dt * 5);
       a.hop = Math.max(0, (a.hop || 0) - dt * 4);
-      if (a.tempT > 0 && (a.tempT -= dt) <= 0) a.tempState = null;
+      if (a.tempT > 0 && (a.tempT -= dt) <= 0) (a.tempState = null), (a.tempSeq = null);
+      if (a.tempSeq && a.tempT > 0) {
+        const n = a.tempSeq.length;
+        a.tempState = a.tempSeq[Math.min(n - 1, Math.floor((1 - a.tempT / a.tempDur) * n))];
+      }
       a.jitT = Math.max(0, (a.jitT || 0) - dt);
       a.alpha += (a.target - a.alpha) * Math.min(1, dt * 5);
       if (a.silTarget !== undefined && a.sil !== a.silTarget) {

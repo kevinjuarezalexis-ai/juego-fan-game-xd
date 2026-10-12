@@ -128,7 +128,9 @@ FB.MECHANICS.rhythm = class Rhythm extends FB.Mechanic {
   danceMove(id, move) {
     if (!id) return;
     const st = this.game.stage;
-    const pose = this.p.dancePoses && this.p.dancePoses[move];
+    // el personaje puede tener sus propias poses de baile (ej. Don Ramón, en 2 cuadros)
+    const own = (FB.CHARACTERS[id] || {}).dancePoses;
+    const pose = (own && own[move]) || (this.p.dancePoses && this.p.dancePoses[move]);
     if (pose) st.pose(id, pose, 0.38);
     st.dance(id, move);
   }

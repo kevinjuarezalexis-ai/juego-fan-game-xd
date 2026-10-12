@@ -123,16 +123,29 @@ FB.CHARACTERS = {
     nombre: 'Don Ramón',
     color: '#4b4b6b',
     height: 320,
-    // ramon_sheet.png: 7 poses (0 corrupto, 1 sano, 2 hablando, 3 baile izq, 4 baile der, 5 baile enter, 6 corrupto hablando)
+    // ramon_sheet.png: 10 poses (miran a la derecha, menos el baile que mira a la izquierda):
+    //   0 corrupto enojado, 1 corrupto gritando (PE-LI-GRO), 2 curación incompleta, 3 curación casi completa,
+    //   4 recién curado, 5 sano (miedo / hablando), 6 sano "Monchito te va a salvar",
+    //   7-8 baile (2 cuadros, invertidos para la derecha), 9 baile enter
+    // baile en 2 cuadros: cada paso muestra el 1º y después el 2º
+    dancePoses: { left: ['baile_izq', 'baile_izq2'], right: ['baile_der', 'baile_der2'], confirm: 'baile_enter' },
     sprites: {
-      corrupto: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 0 },
-      sano: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 1 },
-      asustado: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 1 },
-      hablando: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 2 },
-      baile_izq: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 3 },
-      baile_der: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 4 },
-      baile_enter: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 5 },
-      corrupto_hablando: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 7, frame: 6 },
+      corrupto: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 0 },
+      grito: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 1 },
+      curando: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 2 },
+      // mientras le hablás en el rescate (pregunta en pantalla) se le va pasando
+      corrupto_hablando: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 2 },
+      casi: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 3 },
+      curado: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 4 },
+      sano: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 5 },
+      asustado: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 5 },
+      hablando: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 5 },
+      seguro: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 6 },
+      baile_izq: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 7 },
+      baile_izq2: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 8 },
+      baile_der: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 7, mirror: true },
+      baile_der2: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 8, mirror: true },
+      baile_enter: { src: 'src/assets/personaje/ramon/ramon_sheet.png', cols: 10, frame: 9 },
     },
   },
   nono: {

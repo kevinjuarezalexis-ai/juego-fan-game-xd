@@ -930,21 +930,23 @@ FB.SONG = {
     { t: 179.3, type: 'filter', mode: 'none', dur: 0.6 },
     // 3:00 referencia al capítulo del maestro: "Esta calavera significa PE-LI-GRO" (tiempos aprox.)
     { t: 179.6, type: 'text', text: '☠', size: 90, x: 640, y: 470, color: '#ffffff', dur: 3.2 },
-    { t: 181.15, type: 'text', text: 'PE', size: 46, x: 520, y: 550, color: '#ff4040', dur: 1.7 },
-    { t: 181.75, type: 'text', text: 'LI', size: 46, x: 640, y: 550, color: '#ff4040', dur: 1.3 },
+    // PE-LI-GRO más rápido (más pegado a la música)
+    { t: 181.6, type: 'text', text: 'PE', size: 46, x: 520, y: 550, color: '#ff4040', dur: 1.8 },
+    { t: 181.95, type: 'text', text: 'LI', size: 46, x: 640, y: 550, color: '#ff4040', dur: 1.45 },
     { t: 182.3, type: 'text', text: 'GRO', size: 46, x: 770, y: 550, color: '#ff4040', dur: 1.1 },
     { t: 182.56, type: 'shake', power: 8, dur: 0.4 },
     { t: 182.56, type: 'bump', amount: 0.06 },
     { t: 182.56, type: 'tension', to: 0.7, dur: 0.5 },
     { t: 179.3, type: 'flashSprite', char: 'ramon', dur: 0.4, shake: 10 },
-    { t: 179.45, type: 'pose', char: 'ramon', state: 'corrupto_hablando', dur: 3.2 }, // "Esta calavera significa PE-LI-GRO"
+    { t: 179.45, type: 'pose', char: 'ramon', state: 'grito', dur: 3.2 }, // "Esta calavera significa PE-LI-GRO" (después queda enojado)
     { t: 179.3, type: 'shake', power: 12, dur: 0.5 },
     { t: 182.6, type: 'setState', char: 'jirafales', state: 'normal' },
+    { t: 237, type: 'setState', char: 'ramon', state: 'casi' }, // último mensaje: casi curado, parpadea y se cura
     { t: 237, type: 'liberate', char: 'ramon', dur: 3 },
     // 4:00 Don Ramón libre
     { t: 240, type: 'flash', dur: 0.4 },
     { t: 240, type: 'flashSprite', char: 'ramon', dur: 0.6, shake: 4 },
-    { t: 240.3, type: 'setState', char: 'ramon', state: 'hablando' },
+    { t: 240.3, type: 'setState', char: 'ramon', state: 'curado' },
     { t: 245, type: 'setState', char: 'ramon', state: 'sano' },
 
     // ── 4:22 jugás con Don Ramón ──
@@ -958,6 +960,8 @@ FB.SONG = {
     { t: 262, type: 'focus', on: 'ramon', zoom: 1.2, dur: 1 },
     { t: 262, type: 'tension', to: 0.15, dur: 2 }, // se calma la música (intro del Chapulín)
     { t: 262.5, type: 'setState', char: 'ramon', state: 'hablando' },
+    // "No te preocupes, hijita... ¡MONCHITO TE VA A SALVAR!" → pose de seguro hasta que arranca el baile
+    { t: 266.5, type: 'setState', char: 'ramon', state: 'seguro' },
     { t: 269.5, type: 'bump', amount: 0.08 },
     { t: 269.5, type: 'shake', power: 6, dur: 0.6 },
     { t: 274, type: 'setState', char: 'ramon', state: 'sano' },
@@ -1129,7 +1133,7 @@ FB.SONG = {
     [240.3, 'Don Ramón', 'Les fallé a los dos... al Chavo y a mi hijita...', 4.5],
     // 4:22 Monchito
     [262.5, 'Don Ramón', 'Perdóname, hijita...', 3.5],
-    [266.5, 'Don Ramón', 'No te preocupes...', 2.8],
+    [266.5, 'Don Ramón', 'No te preocupes, hijita...', 2.8],
     [269.5, 'Don Ramón', '¡MONCHITO TE VA A SALVAR!', 4],
     // 5:04 los 5 juntos
     [303.1, 'La Chilindrina', '¿Papá...? ¡PAPÁ!', 2.3],
