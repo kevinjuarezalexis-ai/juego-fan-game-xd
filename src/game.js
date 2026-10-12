@@ -159,6 +159,7 @@ FB.Game = class Game {
     Engine2D.Particles.clear();
     this._pendingVideo = null;
     this.stopVideo();
+    for (const e of this.song.events) if (e.type === 'video') e._pre = false;
     this.replayUntil(from);
     this.conductor.play(from);
     this.fadeIn = 0.6; // sale de negro
@@ -470,21 +471,21 @@ FB.Game = class Game {
     this.stopVideo();
     const box = document.getElementById('stage-box');
     const v = FB.sceneVideoEl(ev.src);
-    v.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;z-index:5;opacity:0;transition:opacity .25s';
+    v.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;z-index:5;opacity:1';
     v.onerror = () => this.stopVideo();
-    box.appendChild(v);
+    if (v.parentNode !== box) box.appendChild(v);
     this.video = v;
     this.videoEv = ev;
     this.videoStart = ev.t;
     this.videoUntil = ev.t + (ev.dur ?? 10);
     v.muted = ev.muted === true;
     this._videoVolume();
-    try {
-      v.currentTime = Math.max(0, offset);
-    } catch (e) {}
-    const show = () => (v.style.opacity = '1');
-    if (v.readyState >= 2) show();
-    else v.oncanplay = show;
+    const want = Math.max(0, offset);
+    if (Math.abs(v.currentTime - want) > 0.05) {
+      try {
+        v.currentTime = want;
+      } catch (e) {}
+    }
     const p = v.play();
     // si el navegador no deja reproducir con sonido, por lo menos que se vea
     if (p && p.catch)
@@ -492,6 +493,57 @@ FB.Game = class Game {
         v.muted = true;
         v.play().catch(() => {});
       });
+    // destello blanco de entrada (tapa el primer instante)
+    this._videoFlash(ev.flashIn || '#ffffff', 0.5);
+  }
+
+  // un poco antes del video lo arranca oculto y en silencio, así el navegador ya lo tiene
+  // decodificado y no se congela al aparecer
+  _prerollVideos(time) {
+    if (this.state !== 'playing' || this.video) return;
+    this._videoEvs = this._videoEvs || this.song.events.filter((e) => e.type === 'video' && e.src);
+    for (const ev of this._videoEvs) {
+      if (ev._pre || time < ev.t - 1.5 || time >= ev.t) continue;
+      ev._pre = true;
+      const v = FB.sceneVideoEl(ev.src);
+      const box = document.getElementById('stage-box');
+      v.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:5;opacity:0;pointer-events:none';
+      if (v.parentNode !== box) box.appendChild(v);
+      v.muted = true;
+      try {
+        v.currentTime = 0;
+      } catch (e) {}
+      const done = () => {
+        v.removeEventListener('playing', done);
+        setTimeout(() => {
+          if (this.video === v) return; // ya arrancó de verdad
+          v.pause();
+          try {
+            v.currentTime = 0;
+          } catch (e) {}
+        }, 250);
+      };
+      v.addEventListener('playing', done);
+      v.play().catch(() => {});
+    }
+  }
+
+  // capa de color encima del video que se desvanece (destello)
+  _videoFlash(color, dur) {
+    const box = document.getElementById('stage-box');
+    const f = document.createElement('div');
+    f.style.cssText = 'position:absolute;inset:0;z-index:6;pointer-events:none;opacity:1;background:' + color + ';transition:opacity ' + dur + 's ease-out';
+    box.appendChild(f);
+    requestAnimationFrame(() => requestAnimationFrame(() => (f.style.opacity = '0')));
+    setTimeout(() => f.remove(), dur * 1000 + 100);
+  }
+
+  // fin del video: destello (rojo por defecto) y vuelve al juego
+  endVideo() {
+    const ev = this.videoEv || {};
+    this.stopVideo();
+    this.stage.flash(0.6, ev.flashOut || '#ff1a1a', 0.9);
+    this.camera.shake && this.camera.shake(10, 0.4);
   }
 
   _videoVolume() {
@@ -539,7 +591,9 @@ FB.Game = class Game {
 
     this.stage.update(dt);
     this.camera.update(dt);
-    if (this.video && (time >= this.videoUntil || this.state === 'menu' || this.state === 'ending')) this.stopVideo();
+    if (this.video && time >= this.videoUntil) this.endVideo();
+    else if (this.video && (this.state === 'menu' || this.state === 'ending')) this.stopVideo();
+    this._prerollVideos(time);
     if (this.video) this._videoVolume();
     if (this.regen) {
       if (time < this.regen.until) this.heal(this.regen.perSec * dt);
