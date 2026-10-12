@@ -227,19 +227,20 @@ FB.Stage = class Stage {
   }
 
   // caminar de una x a otra (pose 'camina' + paso), al llegar queda en endState
-  walk(id, from, to, dur = 2, endState = 'normal', instant = false) {
+  walk(id, from, to, dur = 2, endState = 'normal', instant = false, slide = false) {
     const a = this.actorOf(id);
     if (!a) return;
     if (instant || dur <= 0) {
       a.x = to;
       if (a.homeX !== undefined) a.homeX = to;
-      a.state = endState;
+      a.state = endState || a.state;
       a.walk = null;
       a.walking = false;
       return;
     }
-    a.walk = { from: from ?? a.x, to, t: 0, dur, end: endState };
+    a.walk = { from: from ?? a.x, to, t: 0, dur, end: endState || a.state };
     a.x = a.walk.from;
+    if (slide) return; // se desliza: sin paso ni pose de caminar
     a.walking = true;
     const def = FB.CHARACTERS[id];
     if (def && def.sprites && def.sprites.camina) a.state = 'camina';
@@ -263,6 +264,17 @@ FB.Stage = class Stage {
   }
 
   // subir/bajar la tensión de a poco (viñeta, rojo, parpadeo de luz)
+  // valores que cambian de a poco: vig (viñeta base) y bgDark (oscurecer el fondo)
+  fadeVal(key, to, dur = 1) {
+    this._fades = this._fades || {};
+    if (dur <= 0) {
+      this[key] = to;
+      delete this._fades[key];
+      return;
+    }
+    this._fades[key] = { from: this[key] ?? 0, to, t: 0, dur };
+  }
+
   tensionTo(v, dur = 1) {
     this._tens = { from: this.tension, to: v, t: 0, dur: Math.max(0.01, dur) };
   }
@@ -284,6 +296,13 @@ FB.Stage = class Stage {
   }
 
   update(dt) {
+    for (const k in this._fades || {}) {
+      const f = this._fades[k];
+      f.t += dt;
+      const e = Math.min(1, f.t / f.dur);
+      this[k] = f.from + (f.to - f.from) * e;
+      if (e >= 1) delete this._fades[k];
+    }
     const decay = (v) => Math.max(0, v - dt * 4);
     const all = [this.player, ...Object.values(this.actors)];
     for (const a of all) {
@@ -436,6 +455,14 @@ FB.Stage = class Stage {
 
   drawBackground(ctx) {
     this._drawBg(ctx);
+    // fondo más oscuro (solo el fondo: los personajes se ven igual)
+    if (this.bgDark > 0.001) {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.fillStyle = 'rgba(0,0,0,' + Math.min(0.9, this.bgDark) + ')';
+      ctx.fillRect(0, 0, this.W, this.H);
+      ctx.restore();
+    }
     // video de fondo semitransparente (ej. los ¡RATERO! de los vecinos), detrás de los personajes
     const bv = this.bgVideo;
     if (bv && bv.el.paused && !bv._retry) (bv._retry = 1), bv.el.play().catch(() => {}), setTimeout(() => bv && (bv._retry = 0), 500);
@@ -769,7 +796,8 @@ FB.Stage = class Stage {
       this._vignette = g;
     }
     ctx.save();
-    ctx.globalAlpha = 0.35 + T * 0.65;
+    // viñeta: base (evento 'vignette', bordes oscuros todo el nivel) + lo que sume la tensión
+    ctx.globalAlpha = Math.min(1, (this.vig ?? 0.35) + T * 0.55);
     ctx.fillStyle = this._vignette;
     ctx.fillRect(0, 0, this.W, this.H);
     ctx.restore();

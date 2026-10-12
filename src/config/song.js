@@ -15,40 +15,33 @@ window.FB = window.FB || {};
 
 // Personaje en escena: P(id, pose, x, { face: 'left'|'right', sil: true })
 const P = (id, state, x, extra = {}) => ({ id, state, x, ...extra });
-// 2:12.8 → 2:35.8 de fondo se escucha "¡RATERO!" con la voz de cada personaje:
-// aparecen en pantalla con el color de cada uno, cada vez más grandes (tiempos aprox.)
+// 2:12.8 → 2:35.8 de fondo se escucha "¡RATERO!": en rojo débil; los últimos 5 cada vez
+// más fuertes y más grandes. La cámara no salta: hace un zoom fijo que se va abriendo (ver eventos 2:10).
 const RATERO = (() => {
-  const cols = ['#4aa3ff', '#ff6fb0', '#a9b0ff', '#ff8a3d', '#e8c060', '#6fd0a0', '#ffffff'];
   const out = [];
   let i = 0;
   for (let t = 132.79; t < 155.4; t += 1.45 - (t - 132.79) * 0.035) {
     const k = (t - 132.79) / 22.6; // 0 → 1
+    i++;
     out.push({
       t: +t.toFixed(2),
       type: 'text',
       text: '¡RATERO!',
-      color: cols[i++ % cols.length],
+      color: 'rgba(255,70,70,0.45)',
       x: 640 + Math.sin(i * 2.3) * 420,
-      y: 130 + ((i * 97) % 230),
-      size: Math.round(22 + k * 26),
+      y: 110 + ((i * 97) % 200),
+      size: Math.round(22 + k * 14),
       rot: Math.sin(i * 1.7) * 0.18,
       dur: 1.3,
     });
   }
-  // cada "¡RATERO!" hasta 2:23: golpe de zoom centrado en el Chavo (siempre se ve entero), alternando cerca/lejos
-  const zs = [1.85, 1.75, 1.95, 1.8, 2.0, 1.85, 1.95, 1.8]; // ≥1.75: el Profe queda fuera de cuadro
-  out.filter((e) => e.t < 143).forEach((e, j) => {
-    out.push({ t: e.t, type: 'pan', x: 320, y: 115, dur: 0.12, ease: 'out' });
-    out.push({ t: e.t, type: 'zoom', to: zs[j % zs.length], dur: 0.12, ease: 'out' });
-    out.push({ t: e.t, type: 'shake', power: 4, dur: 0.2 });
-  });
-  const ult = out.filter((e) => e.type === 'text').slice(-3);
+  // los últimos 5: rojo cada vez más fuerte y más grandes
+  const ult = out.slice(-5);
   ult.forEach((e, j) => {
-    // cada vez más cerca, con el cuerpo entero a la vista (centrado en el cuerpo, no en el piso)
-    out.push({ t: e.t, type: 'pan', x: 320, y: 120, dur: 0.15, ease: 'out' });
-    out.push({ t: e.t, type: 'zoom', to: 1.95 + j * 0.15, dur: 0.15, ease: 'out' });
-    out.push({ t: e.t, type: 'flash', dur: 0.18, alpha: 0.6 });
+    e.color = 'rgba(255,' + (50 - j * 10) + ',' + (50 - j * 10) + ',' + (0.6 + j * 0.1).toFixed(2) + ')';
+    e.size = Math.round(38 + j * 7);
   });
+  ult.slice(-3).forEach((e) => out.push({ t: e.t, type: 'flash', dur: 0.18, color: '#ff2020', alpha: 0.25 }));
   return out;
 })();
 
@@ -376,12 +369,13 @@ FB.SONG = {
         dodge: {
           damage: 9,
           patterns: [
-            { type: 'mano', every: 4, warn: 1 }, // cachetadas de Florinda (mano gris que cruza)
-            { type: 'pelota', every: 4, offset: 2 }, // pelotas de Quico
-            { type: 'taza', every: 4, offset: 1, count: 2 }, // tazas de café (¿no gusta pasar a tomar una tacita?)
-            { type: 'cafe', every: 4, offset: 3, count: 3 }, // gotas de café
-            { type: 'corazon', every: 8, offset: 5, count: 2 }, // corazones partidos
-            { type: 'autito', every: 8, offset: 7, warn: 1 }, // autito de juguete de Quico por arriba o abajo
+            { type: 'pelota', every: 4, offset: 2 }, // pelotas de Quico (todo el rato)
+            // 1ª tanda (hasta 1:02): tazas y gotas de café
+            { type: 'taza', every: 4, offset: 0, count: 1, to: 62 }, // ¿no gusta pasar a tomar una tacita de café?
+            { type: 'cafe', every: 4, offset: 1, count: 3, to: 62 },
+            // 2ª tanda (desde 1:02): corazones partidos grises y cachetadas
+            { type: 'corazon', every: 4, offset: 0, count: 2, gray: true, from: 62 },
+            { type: 'mano', every: 4, offset: 3, warn: 1, from: 62 }, // cachetadas de Florinda
           ],
         },
       },
@@ -407,7 +401,8 @@ FB.SONG = {
           patterns: [
             { type: 'pelota', every: 2 }, // pelotas de Quico
             { type: 'pelota', every: 4, invert: true }, // ahora también al revés (sube y rebota en el techo); puede salir junto con la normal
-            { type: 'lagrimas', every: 4, offset: 1, count: 3 }, // lágrimas de Quico (suben en diagonal)
+            { type: 'lagrimas', every: 4, offset: 1, count: 3 }, // lágrimas de Quico (caen en diagonal)
+            { type: 'autito', every: 8, offset: 3, warn: 1 }, // autito de juguete de Quico por arriba o abajo
           ],
         },
       },
@@ -422,14 +417,9 @@ FB.SONG = {
     // ── Parte 3 (2:10): aparece el Chavo a la derecha (los salvados, atrás de Jirafales) ──
     {
       t: 129.62, // 2:09.62 empieza la parte del Chavo (marca del usuario)
-      stage: { opponents: [...ATRAS, P('chavo', 'espalda', 960, { face: 'left' })], tension: 0.35 }, // de espaldas: no se le ve la cara
+      // solo el Prof y el Chavo (de espaldas): los demás no se ven hasta que muestra su verdadera forma
+      stage: { opponents: [P('chavo', 'espalda', 960, { face: 'left' })], tension: 0.35 },
       mechanic: { type: 'none' },
-    },
-    // la pregunta del Chavo
-    {
-      t: 148,
-      stage: { opponents: [...ATRAS, P('chavo', 'espalda', 960, { face: 'left' })] },
-      mechanic: { type: 'choice', replyTime: 2, questions: Q.chavo },
     },
     // 2:35.76 su verdadera forma → combate DIFÍCIL hasta 2:46
     {
@@ -446,6 +436,8 @@ FB.SONG = {
         type: 'bulletbox',
         damage: 14,
         speed: 280,
+        // en el medio, en el espacio vacío entre el Prof (atrás) y el Chavo
+        box: { w: 300, h: 190, x: 640, y: 240 },
         patterns: [
           { type: 'apuntado', every: 2, speed: 260 }, // pelotitas rojas
           { type: 'corte', every: 2, offset: 1, count: 2, warnSec: 2 }, // cortes rojos (avisan 2 s antes)
@@ -800,6 +792,7 @@ FB.SONG = {
     // ── prólogo ──
     { t: 0, type: 'filter', mode: 'oscuro', dur: 0 },
     { t: 0, type: 'zoom', to: 1.4, dur: 0 },
+    { t: 0, type: 'vignette', to: 0.6, dur: 0 }, // bordes oscuros todo el nivel (se cambia en drops / escenas)
     { t: 0, type: 'walk', char: 'jirafales', from: 1380, to: 1010, dur: 5, end: 'asustado' },
     { t: 0, type: 'focus', on: 'jirafales', follow: true, dur: 0 },
     { t: 6, type: 'setState', char: 'jirafales', state: 'enojado' }, // grita
@@ -899,15 +892,36 @@ FB.SONG = {
     { t: 128.3, type: 'face', char: 'florinda', dir: 'right' },
     { t: 128.3, type: 'face', char: 'quico', dir: 'right' },
 
-    // ── 2:10 el Chavo: zoom fuerte a él y de a poco se abre hasta ver sólo al Prof y al Chavo ──
-    { t: 129.62, type: 'pan', x: 320, y: 110, dur: 0.5, ease: 'out' },
-    { t: 129.62, type: 'zoom', to: 1.8, dur: 0.5, ease: 'out' },
-    // 2:23 la cámara se acomoda: el Prof y el Chavo (y se puede hablar con él); temblores chiquitos hasta el drop
-    { t: 143.3, type: 'pan', x: 140, y: 55, dur: 0.9, ease: 'inOut' },
-    { t: 143.3, type: 'zoom', to: 1.55, dur: 0.9, ease: 'inOut' },
-    { t: 143.3, type: 'tilt', deg: 0, dur: 0.9 },
+    // ── 2:10 el Chavo: mega zoom a él y la cámara se va alejando despacio (fija, sin saltos)
+    //    hasta 2:22.55, donde se ve al Prof y al Chavo ──
+    { t: 129.62, type: 'pan', x: 320, y: 110, dur: 0.4, ease: 'out' },
+    { t: 129.62, type: 'zoom', to: 2.5, dur: 0.4, ease: 'out' },
+    { t: 129.62, type: 'bgDark', to: 0.28, dur: 0.6 }, // el fondo un poco más oscuro
+    { t: 129.62, type: 'vignette', to: 0.75, dur: 0.6 },
+    { t: 130.1, type: 'pan', x: 40, y: 55, dur: 12.45, ease: 'inOut' },
+    { t: 130.1, type: 'zoom', to: 1.4, dur: 12.45, ease: 'inOut' },
+    // temblores chiquitos hasta el drop
     ...Array.from({ length: 7 }, (_, i) => ({ t: +(144.2 + i * 1.644).toFixed(2), type: 'shake', power: 3, dur: 0.35 })),
-    { t: 143.3, type: 'walk', char: 'jirafales', from: 400, to: 600, dur: 1.2, end: 'hablando' }, // entra a cuadro cuando se puede hablar
+    // 2:22.55 hablan (sin cuadros de diálogo: las frases salen como los ¡RATERO!) y el Prof se le va acercando de a poco
+    { t: 142.6, type: 'walk', char: 'jirafales', slide: true, from: 400, to: 740, dur: 12.8, end: 'normal' },
+    ...[
+      [142.8, 'jirafales', '¿Chavo? ¿Eres tú?', 2.4],
+      [145.3, 'jirafales', '¿Qué te pasó? ¿Por qué hiciste esto?', 2.6],
+      [148.1, 'chavo', '...', 1.6],
+      [149.9, 'jirafales', 'Contesta, Chavito...', 2.1],
+      [152.2, 'chavo', 'Les dije que yo no fui.', 3.2],
+    ].flatMap(([t, who, text, dur]) => [
+      {
+        t, type: 'text', text, dur,
+        size: who === 'chavo' ? 30 : 26,
+        // en pantalla: al lado de la cabeza de cada uno (el Prof se va acercando: 400 → 740)
+        x: who === 'chavo' ? 1040 : Math.round((400 + ((t - 142.6) / 12.8) * 340 - 680) * 1.4 + 640 + 200),
+        y: who === 'chavo' ? 265 : 120,
+        color: who === 'chavo' ? (text === '...' ? '#cfcfd6' : '#ff5a5a') : '#ffd23f',
+        rot: who === 'chavo' ? 0.04 : -0.04,
+      },
+      ...(who === 'jirafales' ? [{ t, type: 'pose', char: 'jirafales', state: 'hablando', dur }] : []),
+    ]),
     // 2:10 → 2:36 la tensión sube: viñeta roja y los "¡RATERO!" de fondo
     { t: 131, type: 'tension', to: 0.85, dur: 24.5 },
     { t: 150, type: 'bump', every: 2, amount: 0.025, shake: 3, tilt: 0.8 },
@@ -927,10 +941,16 @@ FB.SONG = {
     { t: 155.76, type: 'shake', power: 18, dur: 0.8 },
     { t: 155.76, type: 'filter', mode: 'bn', dur: 0, keep: ['chavo'] },
     { t: 155.76, type: 'setState', char: 'jirafales', state: 'asustado' },
-    { t: 155.76, type: 'walk', char: 'jirafales', from: 600, to: 400, dur: 0.6, end: 'asustado' },
-    { t: 155.76, type: 'focus', on: 'chavo', zoom: 1.35, dur: 0.25, ease: 'out' },
-    { t: 160, type: 'focus', on: 'center', zoom: 1, dur: 1.2 },
+    // el Prof sale despedido para atrás de golpe
+    { t: 155.76, type: 'walk', char: 'jirafales', slide: true, to: 380, dur: 0.18, end: 'asustado' },
+    { t: 155.76, type: 'bgDark', to: 0, dur: 0.3 },
+    // cámara: el Prof a la izquierda, el Chavo a la derecha y la caja de combate en el medio
+    { t: 155.76, type: 'pan', x: 30, y: 40, dur: 0.25, ease: 'out' },
+    { t: 155.76, type: 'zoom', to: 1.2, dur: 0.25, ease: 'out' },
     { t: 165, type: 'filter', mode: 'oscuro', amount: 0.6, dur: 1 },
+    { t: 166, type: 'pan', x: 0, y: 0, dur: 1.2, ease: 'inOut' },
+    { t: 166, type: 'zoom', to: 1, dur: 1.2, ease: 'inOut' },
+    { t: 166, type: 'vignette', to: 0.6, dur: 1.5 },
     { t: 165.5, type: 'silhouette', char: 'chavo', on: true, dur: 0.5 },
 
     // ── 2:47 Chilindrina / 3:00 Don Ramón ──
@@ -943,9 +963,9 @@ FB.SONG = {
     // 3:00 referencia al capítulo del maestro: "Esta calavera significa PE-LI-GRO" (tiempos aprox.)
     { t: 179.6, type: 'text', text: '☠', size: 90, x: 640, y: 470, color: '#ffffff', dur: 3.2 },
     // PE-LI-GRO más rápido (más pegado a la música)
-    { t: 181.6, type: 'text', text: 'PE', size: 46, x: 520, y: 550, color: '#ff4040', dur: 1.8 },
-    { t: 181.95, type: 'text', text: 'LI', size: 46, x: 640, y: 550, color: '#ff4040', dur: 1.45 },
-    { t: 182.3, type: 'text', text: 'GRO', size: 46, x: 770, y: 550, color: '#ff4040', dur: 1.1 },
+    { t: 181.08, type: 'text', text: 'PE', size: 46, x: 520, y: 550, color: '#ff4040', dur: 1.8 },
+    { t: 181.43, type: 'text', text: 'LI', size: 46, x: 640, y: 550, color: '#ff4040', dur: 1.45 },
+    { t: 181.78, type: 'text', text: 'GRO', size: 46, x: 770, y: 550, color: '#ff4040', dur: 1.1 },
     { t: 182.56, type: 'shake', power: 8, dur: 0.4 },
     { t: 182.56, type: 'bump', amount: 0.06 },
     { t: 182.56, type: 'tension', to: 0.7, dur: 0.5 },
@@ -1142,11 +1162,6 @@ FB.SONG = {
     [120.2, 'Quico', '¿Profesor? ¿Mami?', 2.8],
     [123, 'Doña Florinda', '¡Mi tesoro! Ven acá, no te juntes con... ay, ya no importa.', 3.5],
     // 2:10 el Chavo
-    [131, 'Prof. Jirafales', '¿Chavo? ¿Eres tú?', 3],
-    [134.5, 'El Chavo', '...', 2.5],
-    [137.5, 'Prof. Jirafales', 'Chavo, ¿dónde estabas? Todos te estábamos buscando.', 4],
-    [142, 'El Chavo', '...', 2.5],
-    [144.5, 'El Chavo', 'Yo le dije... que no fui yo.', 3.2],
     // 2:47 Chilindrina
     [168, 'Prof. Jirafales', '¡Noo! ¿Tú también, Chilindrina?', 3.5],
     [172.5, 'Prof. Jirafales', '...¿Y Don Ramón?', 3],

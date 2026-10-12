@@ -376,6 +376,14 @@ FB.Game = class Game {
         // { t, type: 'bgVideo', src, alpha } prende · { t, type: 'bgVideo', off: true } apaga
         this.stage.setBgVideo(ev.off ? null : ev);
         break;
+      case 'vignette':
+        // { t, type: 'vignette', to: 0.6, dur } bordes oscuros (0 = nada, 1 = muy oscuro)
+        this.stage.fadeVal('vig', ev.to, instant ? 0 : ev.dur ?? 1);
+        break;
+      case 'bgDark':
+        // { t, type: 'bgDark', to: 0.3, dur } oscurece solo el fondo
+        this.stage.fadeVal('bgDark', ev.to, instant ? 0 : ev.dur ?? 1);
+        break;
       case 'still': {
         // { t, type: 'still', char: 'chavo', on: true } → deja de rebotar con el beat (on: false vuelve)
         const S = (this.stage.still = this.stage.still || new Set());
@@ -390,6 +398,11 @@ FB.Game = class Game {
         // solo en el prólogo se camina con animación; después el personaje se teletransporta
         // a su lugar con un destellito blanco (no hay sprites de caminar). anim: true fuerza caminar.
         const id = ev.char || 'jirafales';
+        // slide: se desliza de a poco (o de golpe) sin pose de caminar
+        if (ev.slide) {
+          this.stage.walk(id, ev.from, ev.to, instant ? 0 : ev.dur ?? 1, ev.end, instant, true);
+          break;
+        }
         const anim = ev.anim || ev.t < 37.3;
         if (anim || instant) this.stage.walk(id, ev.from, ev.to, ev.dur ?? 2, ev.end || 'normal', instant);
         else {

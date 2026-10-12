@@ -351,7 +351,7 @@ FB.drawCup = function (ctx, w) {
 };
 
 // corazón partido (rajadura en zigzag), centrado en 0,0
-FB.drawBrokenHeart = function (ctx, w, open = 0.25) {
+FB.drawBrokenHeart = function (ctx, w, open = 0.25, gray = false) {
   const s = w / 40;
   ctx.save();
   ctx.scale(s, s);
@@ -379,10 +379,10 @@ FB.drawBrokenHeart = function (ctx, w, open = 0.25) {
       ctx.lineTo(1, -5);
     }
     ctx.closePath();
-    ctx.fillStyle = '#e8355a';
+    ctx.fillStyle = gray ? '#8e8e96' : '#e8355a';
     ctx.fill();
     ctx.lineWidth = 2;
-    ctx.strokeStyle = '#3a0b14';
+    ctx.strokeStyle = gray ? '#2a2a30' : '#3a0b14';
     ctx.lineJoin = 'round';
     ctx.stroke();
     ctx.restore();
@@ -457,7 +457,9 @@ FB.MECHANICS.bulletbox = class BulletBox extends FB.Mechanic {
     // por defecto arriba al centro, entre las cabezas: así no tapa a nadie
     const bw = (p.box && p.box.w) || 300;
     const bh = (p.box && p.box.h) || 175;
-    this.box = { x: game.W / 2 - bw / 2, y: (p.box && p.box.y) || 52, w: bw, h: bh };
+    // box.x = centro horizontal en pantalla (por defecto el medio)
+    const cx = (p.box && p.box.x) || game.W / 2;
+    this.box = { x: cx - bw / 2, y: (p.box && p.box.y) || 52, w: bw, h: bh };
     this.soul = { x: this.box.x + bw / 2, y: this.box.y + bh / 2, r: 7 };
     this.speed = p.speed || 250;
     this.damage = p.damage || 10;
@@ -619,6 +621,7 @@ FB.MECHANICS.bulletbox = class BulletBox extends FB.Mechanic {
             vy: FB.rand(85, 120) * (pat.speedMul || 1),
             ph: Math.random() * 6,
             r: 12,
+            gray: !!pat.gray,
           });
         }
         break;
@@ -970,7 +973,7 @@ FB.MECHANICS.bulletbox = class BulletBox extends FB.Mechanic {
         ctx.save();
         ctx.translate(b.x, b.y);
         ctx.rotate(Math.sin(b.ph) * 0.25);
-        FB.drawBrokenHeart(ctx, 30, 0.2 + Math.sin(b.ph * 2) * 0.08);
+        FB.drawBrokenHeart(ctx, 30, 0.2 + Math.sin(b.ph * 2) * 0.08, b.gray);
         ctx.restore();
         break;
       case 'car': {
