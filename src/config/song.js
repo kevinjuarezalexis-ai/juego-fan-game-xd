@@ -1080,13 +1080,13 @@ FB.SONG = {
     { t: 502, type: 'flash', dur: 0.4 },
     { t: 502, type: 'flashSprite', char: 'nono', dur: 0.6, shake: 4 },
     // 8:34 video
-    // video a pantalla completa con su audio (volume: 0.7 = 70% del volumen de la música)
-    // entra con destello blanco y sale con destello rojo → pelea final
-    { t: 514, type: 'video', src: 'src/assets/video/escena.mp4', dur: 11.7, volume: 0.7, flashIn: '#ffffff', flashOut: '#ff1a1a' },
+    // video a pantalla completa con su audio (volume: 0.5 = 50% del volumen de la música)
+    // entra con destello blanco y sale con destello rojo justo cuando arranca la pelea final (8:47)
+    { t: 515.3, type: 'video', src: 'src/assets/video/escena.mp4', dur: 11.7, volume: 0.5, flashIn: '#ffffff', flashOut: '#ff1a1a' },
     // 8:47 batalla final
     { t: 526.8, type: 'swapPlayer', char: 'jirafales' },
     { t: 526.9, type: 'face', char: 'jirafales', dir: 'right' },
-    { t: 527, type: 'flash', dur: 0.5 },
+    { t: 527, type: 'flash', dur: 0.6, color: '#ff1a1a', alpha: 0.9 }, // rojo, sale del video
     { t: 527, type: 'flashSprite', char: 'chavo', dur: 0.5, shake: 12 },
     { t: 527, type: 'shake', power: 16, dur: 0.7 },
     { t: 527, type: 'filter', mode: 'oscuro', amount: 0.45, dur: 0.5 },

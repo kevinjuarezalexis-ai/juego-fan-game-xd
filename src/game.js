@@ -159,7 +159,8 @@ FB.Game = class Game {
     Engine2D.Particles.clear();
     this._pendingVideo = null;
     this.stopVideo();
-    for (const e of this.song.events) if (e.type === 'video') e._pre = false;
+    for (const e of this.song.events) if (e.type === 'video') (e._pre = false), (e._fade = false);
+    if (this._flashDiv) this._flashDiv.remove(), (this._flashDiv = null);
     this.replayUntil(from);
     this.conductor.play(from);
     this.fadeIn = 0.6; // sale de negro
@@ -493,8 +494,14 @@ FB.Game = class Game {
         v.muted = true;
         v.play().catch(() => {});
       });
-    // destello blanco de entrada (tapa el primer instante)
-    this._videoFlash(ev.flashIn || '#ffffff', 0.5);
+    // destello blanco de entrada: queda un instante en blanco y se desvanece mostrando el video
+    const f = this._flashDiv || this._videoFlashIn(ev.flashIn || '#ffffff', true);
+    this._flashDiv = null;
+    setTimeout(() => {
+      f.style.transition = 'opacity .7s ease-out';
+      f.style.opacity = '0';
+      setTimeout(() => f.remove(), 800);
+    }, 150);
   }
 
   // un poco antes del video lo arranca oculto y en silencio, así el navegador ya lo tiene
@@ -503,6 +510,11 @@ FB.Game = class Game {
     if (this.state !== 'playing' || this.video) return;
     this._videoEvs = this._videoEvs || this.song.events.filter((e) => e.type === 'video' && e.src);
     for (const ev of this._videoEvs) {
+      // destello blanco que sube justo antes de que aparezca el video
+      if (!ev._fade && time >= ev.t - 0.2 && time < ev.t) {
+        ev._fade = true;
+        this._videoFlashIn(ev.flashIn || '#ffffff');
+      }
       if (ev._pre || time < ev.t - 1.5 || time >= ev.t) continue;
       ev._pre = true;
       const v = FB.sceneVideoEl(ev.src);
@@ -526,6 +538,19 @@ FB.Game = class Game {
       v.addEventListener('playing', done);
       v.play().catch(() => {});
     }
+  }
+
+  // capa blanca que aparece rápido (antes del video) y queda arriba hasta que playVideo la desvanece
+  _videoFlashIn(color, instant = false) {
+    const box = document.getElementById('stage-box');
+    const f = document.createElement('div');
+    f.style.cssText = 'position:absolute;inset:0;z-index:6;pointer-events:none;background:' + color + ';opacity:' + (instant ? 1 : 0) + ';transition:opacity .18s ease-in';
+    box.appendChild(f);
+    if (!instant) requestAnimationFrame(() => requestAnimationFrame(() => (f.style.opacity = '1')));
+    this._flashDiv = f;
+    // por si algo falla, nunca queda la pantalla en blanco
+    setTimeout(() => f.parentNode && this._flashDiv === f && ((this._flashDiv = null), f.remove()), 2000);
+    return f;
   }
 
   // capa de color encima del video que se desvanece (destello)
