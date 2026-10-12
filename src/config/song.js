@@ -910,6 +910,9 @@ FB.SONG = {
     // mientras le gritan ¡RATERO! el Chavo queda quieto (tensión) hasta que muestra su verdadera forma
     { t: 132.79, type: 'still', char: 'chavo', on: true },
     { t: 155.76, type: 'still', char: 'chavo', on: false },
+    // de fondo, muy transparente: los vecinos diciéndole ratero (loop) → se corta cuando muestra su verdadera forma
+    { t: 132.79, type: 'bgVideo', src: 'src/assets/video/ratero.mp4', alpha: 0.2 }, // alpha: qué tanto se ve (0 a 1)
+    { t: 155.76, type: 'bgVideo', off: true },
     { t: 142, type: 'setState', char: 'jirafales', state: 'normal' },
     // 2:35.76 verdadera forma
     { t: 155.3, type: 'filter', mode: 'oscuro', dur: 0.4 },

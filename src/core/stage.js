@@ -387,11 +387,42 @@ FB.Stage = class Stage {
 
   drawBackground(ctx) {
     this._drawBg(ctx);
+    // video de fondo semitransparente (ej. los ¡RATERO! de los vecinos), detrás de los personajes
+    const bv = this.bgVideo;
+    if (bv && bv.el.readyState >= 2) {
+      bv.a = Math.min(bv.alpha, (bv.a || 0) + 1 / 60 / (bv.fade || 0.4)); // fade de entrada
+      ctx.save();
+      ctx.globalAlpha = bv.a;
+      ctx.drawImage(bv.el, -24, -24, this.W + 48, this.H + 48); // el video ya es 16:9 como el juego
+      ctx.restore();
+    }
     if (this.ink > 0.001) {
       ctx.fillStyle = 'rgba(255,255,255,' + Math.min(1, this.ink) + ')';
       ctx.fillRect(-30, -30, this.W + 60, this.H + 60);
     }
     this.drawProps(ctx, performance.now() / 1000);
+  }
+
+  // { src, alpha, fade } → arranca un video en loop, sin sonido, de fondo · null → lo saca
+  setBgVideo(cfg) {
+    if (this.bgVideo) {
+      this.bgVideo.el.pause();
+      this.bgVideo.el.removeAttribute('src');
+      this.bgVideo.el.load();
+    }
+    this.bgVideo = null;
+    if (!cfg) return;
+    const el = document.createElement('video');
+    // si hay versión .webm al lado y el navegador la soporta, usa esa (anda en todos); si no, el .mp4
+    const webm = cfg.src.replace(/\.mp4$/, '.webm');
+    el.src = webm !== cfg.src && el.canPlayType('video/webm') ? webm : cfg.src;
+    el.muted = true;
+    el.loop = true;
+    el.playsInline = true;
+    el.preload = 'auto';
+    const p = el.play();
+    if (p && p.catch) p.catch(() => {});
+    this.bgVideo = { el, alpha: cfg.alpha ?? 0.18, fade: cfg.fade ?? 0.4, a: 0 };
   }
 
   _drawBg(ctx) {

@@ -25,6 +25,7 @@ FB.Game = class Game {
     this.conductor.setSong(this.song);
     this.conductor.onEnd = () => this.finish();
     this.camera = new FB.Camera(this);
+    if (this.stage && this.stage.setBgVideo) this.stage.setBgVideo(null);
     this.stage = new FB.Stage(this);
     this.images = {};
     this.state = 'menu';
@@ -133,6 +134,7 @@ FB.Game = class Game {
     if (this.mechanic) this.mechanic.end();
     this.mechanic = null;
     this.camera = new FB.Camera(this);
+    if (this.stage && this.stage.setBgVideo) this.stage.setBgVideo(null);
     this.stage = new FB.Stage(this);
     this.state = 'intro';
     UI.show(null);
@@ -150,6 +152,7 @@ FB.Game = class Game {
     if (this.mechanic) this.mechanic.end();
     this.mechanic = null;
     this.camera = new FB.Camera(this);
+    if (this.stage && this.stage.setBgVideo) this.stage.setBgVideo(null);
     this.stage = new FB.Stage(this);
     this.regen = null;
     Engine2D.Particles.clear();
@@ -253,6 +256,7 @@ FB.Game = class Game {
     this.mechanic = null;
     this.intro = null;
     this.camera = new FB.Camera(this);
+    if (this.stage && this.stage.setBgVideo) this.stage.setBgVideo(null);
     this.stage = new FB.Stage(this);
     this.state = 'menu';
     this.testMode = false;
@@ -353,6 +357,10 @@ FB.Game = class Game {
         break;
       case 'flashSprite':
         if (!instant) this.stage.flashSprite(ev.char, ev.dur ?? 0.3, ev.shake ?? 6);
+        break;
+      case 'bgVideo':
+        // { t, type: 'bgVideo', src, alpha } prende · { t, type: 'bgVideo', off: true } apaga
+        this.stage.setBgVideo(ev.off ? null : ev);
         break;
       case 'still': {
         // { t, type: 'still', char: 'chavo', on: true } → deja de rebotar con el beat (on: false vuelve)
