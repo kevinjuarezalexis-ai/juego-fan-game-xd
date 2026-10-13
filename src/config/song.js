@@ -800,7 +800,9 @@ FB.SONG = {
     // ── prólogo ──
     { t: 0, type: 'filter', mode: 'oscuro', dur: 0 },
     { t: 0, type: 'zoom', to: 1.4, dur: 0 },
-    { t: 0, type: 'vignette', to: 0.6, dur: 0 }, // bordes oscuros todo el nivel (se cambia en drops / escenas)
+    { t: 0, type: 'vignette', to: 0.6, dur: 0 },
+    { t: 0, type: 'still', char: '*', on: true }, // nadie rebota con la música hasta que sale Doña Florinda
+    { t: 37.3, type: 'still', char: '*', on: false }, // bordes oscuros todo el nivel (se cambia en drops / escenas)
     // entra caminando desde la izquierda (por ahí está la entrada de la vecindad) hasta su lugar; la cámara queda quieta
     { t: 0, type: 'face', char: 'jirafales', dir: 'right' },
     { t: 0, type: 'walk', char: 'jirafales', from: 280, to: 1010, dur: 5, end: 'asustado' },
@@ -848,7 +850,8 @@ FB.SONG = {
       { t, type: 'pose', char, state: char === 'jirafales' ? 'grito' : 'grito_enojado', dur },
       // con el zoom al que grita, queda en el centro: el texto va arriba de su cabeza
       // posición en pantalla con el zoom puesto (Jirafales queda corrido a la derecha por el borde)
-      { t, type: 'text', text: grito, size: 46, x: char === 'quico' ? 470 : 860, y: 120, color: char === 'quico' ? '#4aa3ff' : '#ffd23f', dur },
+      // Quico es más bajito: su grito sale arriba de su cabeza (más abajo que el del profe)
+      { t, type: 'text', text: grito, size: 46, x: char === 'quico' ? 470 : 860, y: char === 'quico' ? 300 : 120, color: char === 'quico' ? '#4aa3ff' : '#ffd23f', dur },
       { t, type: 'focus', on: char, zoom: 1.45, dur: 0.12, ease: 'out' },
       { t, type: 'shake', power: 6, dur: 0.25 },
     ]),
@@ -877,7 +880,7 @@ FB.SONG = {
     { t: 87, type: 'liberate', char: 'florinda', dur: 3 },
     // ── 1:30 Florinda liberada → se pone atrás de Jirafales ──
     { t: 91.5, type: 'face', char: 'florinda', dir: 'left' },
-    { t: 91.5, type: 'walk', char: 'florinda', from: 450, to: 1150, dur: 2.5, end: 'curada' },
+    { t: 91.5, type: 'walk', char: 'florinda', from: 450, to: 1150, dur: 2.5, end: 'sano' }, // en la pelea / atrás: pose normal
     { t: 94.1, type: 'face', char: 'florinda', dir: 'left' },
     { t: 90, type: 'flash', dur: 0.4 },
     { t: 90, type: 'flashSprite', char: 'florinda', dur: 0.6, shake: 4 },

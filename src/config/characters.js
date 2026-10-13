@@ -75,9 +75,9 @@ FB.CHARACTERS = {
       sano: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 1 },
       hablando: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 2 },
       dudando: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 3, mirror: true },
-      curada: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 4 },
-      dano: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 5 },
-      asustado: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 5 },
+      curada: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 4, mirror: true },
+      dano: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 5, mirror: true },
+      asustado: { src: 'src/assets/personaje/florinda/florinda_sheet.png', cols: 6, frame: 5, mirror: true },
     },
   },
   chavo: {

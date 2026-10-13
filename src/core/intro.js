@@ -25,7 +25,7 @@ FB.Intro = class Intro {
     this.fadeOut = 0;
     this.finishing = false;
     const p = game.stage.player;
-    game.stage.apply({ bg: cfg.bg || 'entrada', opponents: [], tension: 0.1 });
+    game.stage.apply({ bg: cfg.bg || 'entrada', opponents: [], tension: 0 }); // afuera todavía no hay parpadeo de luz
     p.x = cfg.startX ?? 1450;
     game.camera.zoomTo(cfg.zoom ?? 1.12, 0);
     game.camera.focus('jirafales', 0, 'out', true);
