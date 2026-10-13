@@ -528,3 +528,36 @@ body {
   white-space: normal;
   flex-shrink: 0;
 }
+
+/* menú vivo: el fondo se mece muy despacio de un lado al otro */
+.menu-bg {
+  animation: menu-sway 16s ease-in-out infinite alternate;
+}
+@keyframes menu-sway {
+  from { transform: scale(1.05) translateX(-1.4%); }
+  to { transform: scale(1.05) translateX(1.4%); }
+}
+/* los botones entran desde la izquierda, uno detrás del otro, con rebote
+   (se usa 'translate' aparte para no pisar el agrandado del mouse) */
+.menu-btns .img-btn {
+  animation: btn-in 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.25) backwards;
+}
+.menu-btns .img-btn:nth-child(1) { animation-delay: 0.15s; }
+.menu-btns .img-btn:nth-child(2) { animation-delay: 0.27s; }
+.menu-btns .img-btn:nth-child(3) { animation-delay: 0.39s; }
+@keyframes btn-in {
+  0% { translate: -130% 0; opacity: 0; }
+  70% { translate: 6% 0; opacity: 1; }
+  100% { translate: 0 0; opacity: 1; }
+}
+/* el logo cae desde arriba al abrir el menú */
+.menu-logo {
+  animation: logo-in 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.3) backwards;
+}
+@keyframes logo-in {
+  0% { translate: 0 -120%; opacity: 0; }
+  100% { translate: 0 0; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu-bg, .menu-btns .img-btn, .menu-logo { animation: none; }
+}
