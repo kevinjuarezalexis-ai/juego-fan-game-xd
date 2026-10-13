@@ -874,10 +874,32 @@ const UI = {
   game: null,
   el: (id) => document.getElementById(id),
 
+  // muestra una pantalla. Los carteles salen con animación (chiquitos → grandes con rebote)
+  // y al cerrarse se encogen hacia el medio. El menú queda de fondo detrás de sus carteles.
   show(name) {
-    for (const id of ['menu', 'pause', 'gameover', 'ending', 'partes', 'ajustes']) {
+    const enMenu = this.game && this.game.state === 'menu';
+    const sobreMenu = ['jugar', 'partes', 'ajustes', 'creditos'];
+    for (const id of ['menu', 'jugar', 'partes', 'ajustes', 'creditos', 'pause', 'gameover', 'ending']) {
       const m = this.el('m-' + id);
-      if (m) m.classList.toggle('hidden', id !== name);
+      if (!m) continue;
+      const visible = id === name || (id === 'menu' && enMenu && sobreMenu.includes(name));
+      const estaba = !m.classList.contains('hidden') && !m.classList.contains('closing');
+      clearTimeout(m._t);
+      if (visible) {
+        m.classList.remove('closing');
+        if (!estaba) {
+          m.classList.remove('hidden');
+          // reinicia la animación de entrada
+          const box = m.querySelector('.cartel-box');
+          if (box) (box.style.animation = 'none'), box.offsetWidth, (box.style.animation = '');
+        }
+      } else if (estaba && id !== 'menu' && m.querySelector('.cartel-box')) {
+        m.classList.add('closing');
+        m._t = setTimeout(() => m.classList.add('hidden'), 180);
+      } else {
+        m.classList.remove('closing');
+        m.classList.add('hidden');
+      }
     }
   },
 
@@ -898,13 +920,28 @@ const UI = {
     };
     this.el('btn-partes').onclick = () => openPartes(false);
     this.el('btn-test').onclick = () => openPartes(true);
-    this.el('btn-partes-volver').onclick = () => this.show('menu');
+    this.el('btn-partes-volver').onclick = () => this.show('jugar');
+    // botones del menú principal
+    this.el('btn-menu-jugar').onclick = () => this.show('jugar');
+    this.el('btn-menu-opciones').onclick = () => {
+      if (FB.Mobile) FB.Mobile.from = 'menu';
+      this.show('ajustes');
+    };
+    this.el('btn-menu-creditos').onclick = () => this.show('creditos');
+    document.querySelectorAll('[data-back]').forEach((b) => (b.onclick = () => this.show(b.dataset.back)));
+    // en el celu: efecto de apretar (se achica un instante)
+    document.querySelectorAll('.img-btn, .c-btn').forEach((b) =>
+      b.addEventListener('pointerdown', () => {
+        b.classList.add('press');
+        setTimeout(() => b.classList.remove('press'), 140);
+      }),
+    );
     const list = this.el('partes-list');
     list.innerHTML = '';
     for (const p of FB.SONG.partes) {
       const b = document.createElement('button');
-      b.className = 'btn-game-secondary';
-      b.textContent = (p.n ? 'Parte ' + p.n + ' · ' : '') + p.nombre;
+      b.className = 'c-btn c-sec';
+      b.textContent = (p.n ? p.n + '. ' : '') + p.nombre;
       b.onclick = () => {
         Engine2D.Audio.unlock();
         g.testMode = !!this.partesTest;
@@ -922,7 +959,6 @@ const UI = {
     this.el('btn-reintentar').onclick = () => g.retry();
     this.el('btn-go-menu').onclick = () => g.toMenu();
     this.el('btn-fin-menu').onclick = () => g.toMenu();
-    if (FB.SONG.titulo) this.el('menu-title').textContent = FB.SONG.titulo;
   },
 
   gameOver(parte) {
@@ -939,6 +975,7 @@ const UI = {
       '\nBloqueos: ' + s.blocks +
       '\nReintentos: ' + s.retries +
       '\n\n' + (s.bossDefeated ? 'El Chavo descansa en paz.' : 'El espíritu sigue en la vecindad...');
+    this.el('m-ending').querySelector('.c-title').textContent = s.bossDefeated ? '¡Ganaste!' : 'Fin de la fiesta';
     this.show('ending');
   },
 };

@@ -594,8 +594,10 @@ FB.Stage = class Stage {
 
     ctx.save();
     ctx.globalAlpha = a.alpha * (a.hit > 0 && Math.floor(a.hit * 20) % 2 ? 0.55 : 1);
-    ctx.translate(a.x + ox, this.floorY + oy - back * 22);
-    if (back) ctx.scale(0.84, 0.84); // más lejos = más chico
+    // fila de atrás: más arriba en el piso (más lejos) y más chica
+    const bgDef = FB.BACKGROUNDS[this.bgId] || {};
+    ctx.translate(a.x + ox, this.floorY + oy - back * (bgDef.backDepth ?? 22));
+    if (back) ctx.scale(0.82, 0.82);
     if (a.lean) ctx.rotate(a.lean * 0.12);
     if (fallRot) ctx.rotate(fallRot);
     // el sprite 'alma' ya viene fantasmal: menos transparencia y sin tinte celeste

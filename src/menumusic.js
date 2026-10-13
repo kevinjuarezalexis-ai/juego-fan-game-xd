@@ -51,6 +51,18 @@
         if (level === 0 && !a.paused) a.pause();
       }
       a.volume = target() * level;
+      // el logo late con la música: golpe en cada beat (más fuerte cada 2)
+      const logo = document.getElementById('menu-logo');
+      if (logo && on) {
+        let pulse = 1 + Math.sin(now / 900) * 0.008; // respira suave si no hay música
+        if (!a.paused) {
+          const beat = ((a.currentTime - 0.255) * 175.25) / 60;
+          const fr = beat - Math.floor(beat);
+          const k = Math.floor(beat) % 2 === 0 ? 0.055 : 0.028;
+          pulse = 1 + k * Math.max(0, 1 - fr / 0.4) ** 2;
+        }
+        logo.style.setProperty('--pulse', pulse.toFixed(4));
+      }
       a.muted = Engine2D.Audio.isMuted();
       requestAnimationFrame(tick);
     })();

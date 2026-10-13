@@ -181,8 +181,9 @@ FB.CHARACTERS = {
 // con los colores de abajo.
 FB.BACKGROUNDS = {
   // floorY = altura (en 720) donde apoyan los pies en ese fondo
-  entrada: { img: 'src/assets/fondo/fondo0.jpg', floorY: 548, top: '#151a26', bottom: '#2a2420', floor: '#2e2620', wall: '#3b3530' },
-  patio: { img: 'src/assets/fondo/fondo1.jfif', top: '#1a1416', bottom: '#2c1e1e', floor: '#2a1d1a', wall: '#4a3430' },
+  // backDepth = cuánto más arriba (más lejos) se paran los de la fila de atrás
+  entrada: { img: 'src/assets/fondo/fondo0.jpg', floorY: 522, top: '#151a26', bottom: '#2a2420', floor: '#2e2620', wall: '#3b3530' },
+  patio: { img: 'src/assets/fondo/fondo1.jpg', backDepth: 70, top: '#1a1416', bottom: '#2c1e1e', floor: '#2a1d1a', wall: '#4a3430' },
   patio_rojo: { img: 'src/assets/fondo/patio_rojo.png', top: '#2a0608', bottom: '#3d0d0d', floor: '#2a0a0a', wall: '#5a1a1a' },
   recuerdo: { img: 'src/assets/fondo/recuerdo.png', top: '#5a4a32', bottom: '#8a7350', floor: '#6b5638', wall: '#a08a62' },
   final: { img: 'src/assets/fondo/final.png', top: '#0a0000', bottom: '#260404', floor: '#1a0202', wall: '#300808' },

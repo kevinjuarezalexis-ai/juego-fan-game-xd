@@ -335,10 +335,10 @@ FB.SONG = {
     zoom: 1.12,
     startX: 1450,
     steps: [
-      { walk: { from: 1450, to: 780, dur: 4.5 }, say: ['Prof. Jirafales', 'Doña Florinda me invitó a la fiesta de la buena vecindad...'] },
+      { walk: { from: 1450, to: 900, dur: 4.5 }, say: ['Prof. Jirafales', 'Doña Florinda me invitó a la fiesta de la buena vecindad...'] },
       { say: ['Prof. Jirafales', 'Qué raro... no se escucha nada desde afuera.'] },
       { say: ['Prof. Jirafales', 'Tal vez todavía no empezó. Bueno... con permiso.'] },
-      { walk: { to: 640, dur: 1.4 }, exit: true }, // entra por el portón
+      { walk: { to: 735, dur: 1.2 }, exit: true }, // entra por el portón (puertas de madera del medio)
     ],
   },
 

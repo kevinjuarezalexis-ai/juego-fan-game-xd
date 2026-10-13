@@ -5,82 +5,117 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Fiesta de la Buena Vecindad</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="ui-components.css?v=202610130020" />
-    <link rel="stylesheet" href="css/fiesta.css?v=202610130020" />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Luckiest+Guy&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="ui-components.css?v=202610131921" />
+    <link rel="stylesheet" href="css/fiesta.css?v=202610131921" />
   </head>
   <body>
     <div id="wrap">
       <div id="stage-box">
         <canvas id="game"></canvas>
 
-        <!-- Menú principal -->
-        <div class="modal-game" id="m-menu">
-          <div class="modal-game-box">
-            <div class="fiesta-sub">FAN GAME · EL CHAVO DEL 8</div>
-            <div class="modal-game-title" id="menu-title">Fiesta de la Buena Vecindad</div>
-            <button class="btn-game-primary" id="btn-jugar">Jugar</button>
-            <button class="btn-game-secondary" id="btn-test">Modo prueba</button>
-            <button class="btn-game-secondary" id="btn-partes">Elegir parte</button>
-            <div class="fiesta-controls">
-              <b>Flechas / WASD</b> mover · flechas de ritmo<br />
-              <b>1 2 3</b> o <b>Z</b> elegir respuesta<br />
+        <!-- Menú principal: fondo, logo que late con la música y 3 botones abajo a la izquierda -->
+        <div class="modal-game menu-screen" id="m-menu">
+          <div class="menu-bg"></div>
+          <img class="menu-logo" id="menu-logo" src="src/assets/ui/logo.webp" alt="Fiesta de la Buena Vecindad — Fan Made" />
+          <div class="menu-btns">
+            <button class="img-btn" id="btn-menu-jugar" aria-label="Jugar">
+              <img src="src/assets/ui/btn_jugar.webp" alt="" /><img class="hov" src="src/assets/ui/btn_jugar_h.webp" alt="" />
+            </button>
+            <button class="img-btn" id="btn-menu-opciones" aria-label="Opciones">
+              <img src="src/assets/ui/btn_opciones.webp" alt="" /><img class="hov" src="src/assets/ui/btn_opciones_h.webp" alt="" />
+            </button>
+            <button class="img-btn" id="btn-menu-creditos" aria-label="Créditos">
+              <img src="src/assets/ui/btn_creditos.webp" alt="" /><img class="hov" src="src/assets/ui/btn_creditos_h.webp" alt="" />
+            </button>
+          </div>
+          <div id="menu-status">Cargando…</div>
+        </div>
+
+        <!-- Cartel: Jugar -->
+        <div class="modal-game cartel-v hidden" id="m-jugar">
+          <div class="cartel-box">
+            <div class="c-title">¡A jugar!</div>
+            <button class="c-btn" id="btn-jugar">Empezar</button>
+            <button class="c-btn c-sec" id="btn-partes">Elegir parte</button>
+            <button class="c-btn c-sec" id="btn-test">Modo prueba</button>
+            <div class="c-controls">
+              <b>Flechas / WASD</b> mover · ritmo<br />
+              <b>1 2 3</b> o <b>Z</b> responder<br />
               <b>X</b> bloquear · <b>Z</b> disparar<br />
-              <b>Esc</b> pausa · en el celu: controles en pantalla
+              <b>Esc</b> pausa
             </div>
-            <div id="menu-status">Cargando…</div>
+            <button class="c-btn c-back" data-back="menu">Volver</button>
           </div>
         </div>
 
-        <!-- Elegir parte (práctica) -->
-        <div class="modal-game hidden" id="m-partes">
-          <div class="modal-game-box">
-            <div class="modal-game-title" id="partes-title">Elegir parte</div>
-            <div class="modal-game-sub hidden" id="partes-test">Modo prueba: sos inmortal, ves el tiempo y podés marcar segundos (botón MARCAR o tecla M).</div>
-            <div class="fiesta-list" id="partes-list"></div>
-            <button class="btn-game-secondary" id="btn-partes-volver">Volver</button>
+        <!-- Cartel: Elegir parte (práctica) -->
+        <div class="modal-game cartel-v hidden" id="m-partes">
+          <div class="cartel-box">
+            <div class="c-title" id="partes-title">Elegir parte</div>
+            <div class="c-sub hidden" id="partes-test">Modo prueba: sos inmortal y podés marcar segundos (MARCAR o tecla M).</div>
+            <div class="c-list" id="partes-list"></div>
+            <button class="c-btn c-back" id="btn-partes-volver">Volver</button>
           </div>
         </div>
 
-        <!-- Pausa -->
-        <div class="modal-game hidden" id="m-pause">
-          <div class="modal-game-box">
-            <div class="modal-game-title">Pausa</div>
-            <button class="btn-game-primary" id="btn-continuar">Continuar</button>
-            <button class="btn-game-secondary" id="btn-reiniciar">Reiniciar parte</button>
-            <button class="btn-game-secondary" id="btn-pausa-ajustes">Ajustes</button>
-            <button class="btn-game-secondary hidden" id="btn-copiar-marcas">Copiar marcas</button>
-            <button class="btn-game-secondary" id="btn-salir">Salir al menú</button>
-          </div>
-        </div>
-
-        <!-- Ajustes -->
-        <div class="modal-game hidden" id="m-ajustes">
-          <div class="modal-game-box">
-            <div class="modal-game-title">Ajustes</div>
+        <!-- Cartel: Ajustes -->
+        <div class="modal-game cartel-v hidden" id="m-ajustes">
+          <div class="cartel-box">
+            <div class="c-title">Opciones</div>
             <label class="aj-row">Volumen <input type="range" id="aj-vol" min="0" max="100" step="1" /> <span id="aj-vol-n"></span></label>
-            <button class="btn-game-secondary" id="aj-fs">Pantalla completa</button>
-            <div class="modal-game-sub" id="aj-msg"></div>
-            <button class="btn-game-primary" id="aj-cerrar">Listo</button>
+            <button class="c-btn c-sec" id="aj-fs">Pantalla completa</button>
+            <div class="c-sub" id="aj-msg"></div>
+            <button class="c-btn c-back" id="aj-cerrar">Listo</button>
           </div>
         </div>
 
-        <!-- Game over -->
-        <div class="modal-game hidden" id="m-gameover">
-          <div class="modal-game-box">
-            <div class="modal-game-title">Perdiste</div>
-            <div class="modal-game-sub" id="go-parte"></div>
-            <button class="btn-game-primary" id="btn-reintentar">Reintentar</button>
-            <button class="btn-game-secondary" id="btn-go-menu">Menú</button>
+        <!-- Cartel: Créditos -->
+        <div class="modal-game cartel-v hidden" id="m-creditos">
+          <div class="cartel-box">
+            <div class="c-title">Créditos</div>
+            <div class="c-text">
+              <b>Fiesta de la Buena Vecindad</b><br />Fan game hecho por fans.<br /><br />
+              <b>Idea, historia y arte</b><br />Rey Mago<br /><br />
+              <b>Programación</b><br />Rey Mago, con ayuda de Claude<br /><br />
+              <small>El Chavo del Ocho y sus personajes pertenecen a sus dueños (Chespirito). Proyecto sin fines de lucro.</small>
+            </div>
+            <button class="c-btn c-back" data-back="menu">Volver</button>
           </div>
         </div>
 
-        <!-- Final -->
-        <div class="modal-game hidden" id="m-ending">
-          <div class="modal-game-box">
-            <div class="modal-game-title">Fin de la fiesta</div>
-            <div class="modal-game-sub" id="fin-stats"></div>
-            <button class="btn-game-primary" id="btn-fin-menu">Menú</button>
+        <!-- Cartel: Pausa -->
+        <div class="modal-game cartel-v hidden" id="m-pause">
+          <div class="cartel-box">
+            <div class="c-title">Pausa</div>
+            <button class="c-btn" id="btn-continuar">Continuar</button>
+            <button class="c-btn c-sec" id="btn-reiniciar">Reiniciar parte</button>
+            <button class="c-btn c-sec" id="btn-pausa-ajustes">Opciones</button>
+            <button class="c-btn c-sec hidden" id="btn-copiar-marcas">Copiar marcas</button>
+            <button class="c-btn c-back" id="btn-salir">Salir al menú</button>
+          </div>
+        </div>
+
+        <!-- Cartel: Perdiste -->
+        <div class="modal-game cartel-h hidden" id="m-gameover">
+          <div class="cartel-box">
+            <div class="c-title c-big c-lose">¡Perdiste!</div>
+            <div class="c-sub" id="go-parte"></div>
+            <div class="c-row">
+              <button class="c-btn" id="btn-reintentar">Volver a intentar</button>
+              <button class="c-btn c-back" id="btn-go-menu">Salir</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cartel: Ganaste -->
+        <div class="modal-game cartel-h hidden" id="m-ending">
+          <div class="cartel-box">
+            <div class="c-title c-big c-win">¡Ganaste!</div>
+            <div class="c-sub" id="fin-stats"></div>
+            <div class="c-row">
+              <button class="c-btn" id="btn-fin-menu">Salir al menú</button>
+            </div>
           </div>
         </div>
         <!-- botón de ajustes (siempre visible) -->
@@ -100,22 +135,22 @@
       </div>
     </div>
 
-    <script src="engine2d.js?v=202610130020"></script>
-    <script src="src/config/characters.js?v=202610130020"></script>
-    <script src="src/config/song.js?v=202610130020"></script>
-    <script src="src/core/conductor.js?v=202610130020"></script>
-    <script src="src/core/camera.js?v=202610130020"></script>
-    <script src="src/core/stage.js?v=202610130020"></script>
-    <script src="src/mechanics/base.js?v=202610130020"></script>
-    <script src="src/core/intro.js?v=202610130020"></script>
-    <script src="src/mechanics/bulletbox.js?v=202610130020"></script>
-    <script src="src/mechanics/rhythm.js?v=202610130020"></script>
-    <script src="src/mechanics/choice.js?v=202610130020"></script>
-    <script src="src/mechanics/blockshoot.js?v=202610130020"></script>
-    <script src="src/mechanics/rescue.js?v=202610130020"></script>
-    <script src="src/game.js?v=202610130020"></script>
-    <script src="src/mobile.js?v=202610130020"></script>
-    <script src="src/menumusic.js?v=202610130020"></script>
-    <script src="src/fxlab.js?v=202610130020"></script>
+    <script src="engine2d.js?v=202610131921"></script>
+    <script src="src/config/characters.js?v=202610131921"></script>
+    <script src="src/config/song.js?v=202610131921"></script>
+    <script src="src/core/conductor.js?v=202610131921"></script>
+    <script src="src/core/camera.js?v=202610131921"></script>
+    <script src="src/core/stage.js?v=202610131921"></script>
+    <script src="src/mechanics/base.js?v=202610131921"></script>
+    <script src="src/core/intro.js?v=202610131921"></script>
+    <script src="src/mechanics/bulletbox.js?v=202610131921"></script>
+    <script src="src/mechanics/rhythm.js?v=202610131921"></script>
+    <script src="src/mechanics/choice.js?v=202610131921"></script>
+    <script src="src/mechanics/blockshoot.js?v=202610131921"></script>
+    <script src="src/mechanics/rescue.js?v=202610131921"></script>
+    <script src="src/game.js?v=202610131921"></script>
+    <script src="src/mobile.js?v=202610131921"></script>
+    <script src="src/menumusic.js?v=202610131921"></script>
+    <script src="src/fxlab.js?v=202610131921"></script>
   </body>
 </html>

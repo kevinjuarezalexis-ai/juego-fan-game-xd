@@ -175,9 +175,13 @@
         from = game.state === 'paused' ? 'pause' : 'menu';
         UI.show('ajustes');
       };
-      $('aj-cerrar').onclick = () => UI.show(from || 'menu');
+      $('aj-cerrar').onclick = () => {
+        UI.show((FB.Mobile.from || from) === 'pause' ? 'pause' : 'menu');
+        FB.Mobile.from = null;
+      };
       $('btn-pausa-ajustes').onclick = () => {
         from = 'pause';
+        FB.Mobile.from = 'pause';
         UI.show('ajustes');
       };
 
