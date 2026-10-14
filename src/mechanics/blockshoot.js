@@ -61,6 +61,7 @@ FB.MECHANICS.blockshoot = class BlockShoot extends FB.Mechanic {
       if (atk) {
         atk.done = true;
         this.game.stats.blocks++;
+        if (FB.SFX) FB.SFX.play('bloqueo');
         this.stunUntil = time + (this.p.stunBeats || 2) * this.cond.crochet;
         this.popup('¡BLOQUEADO!', '#7dd8ff');
         const pp = this.game.stage.posOf('jirafales');
@@ -76,6 +77,7 @@ FB.MECHANICS.blockshoot = class BlockShoot extends FB.Mechanic {
       this.game.stage.pose('jirafales', 'disparar', 0.35);
       this.game.stage.shake(7, 0.15);
       this.game.stage.flash(0.06);
+      if (FB.SFX) FB.SFX.play('disparo');
       const stunned = time < this.stunUntil;
       const dmg = (this.p.shootDamage || 7) * (stunned ? 2 : 0.35);
       // minHpUntil: antes de ese segundo el jefe no puede caer (la canción manda)
@@ -83,6 +85,7 @@ FB.MECHANICS.blockshoot = class BlockShoot extends FB.Mechanic {
       this.hp = Math.max(floor, this.hp - dmg);
       this.game.stage.hit(this.boss);
       if (stunned) this.game.stage.pose(this.boss, 'dano', 0.4); // sprite de recibir daño
+      if (stunned && FB.SFX) FB.SFX.play('critico');
       this.popup(stunned ? '¡CRÍTICO!' : 'lo esquiva...', stunned ? '#ffd23f' : '#aaaaaa', true);
       const bp = this.game.stage.posOf(this.boss);
       Engine2D.Particles.burst(bp.x, bp.y, { amount: stunned ? 20 : 6, colors: ['#ff2020', '#600000'], speed: 220 });

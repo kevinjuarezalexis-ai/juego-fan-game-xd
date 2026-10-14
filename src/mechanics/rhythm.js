@@ -162,6 +162,7 @@ FB.MECHANICS.rhythm = class Rhythm extends FB.Mechanic {
         n.missed = true;
         this.combo = 0;
         this.game.stats.notesMiss++;
+        if (FB.SFX) FB.SFX.play('falla', { vol: 0.8 });
         this.game.hurt(this.p.missDamage || 5);
         this.rating = { text: 'FALLASTE', t: 0.6, color: '#ff5050' };
       }

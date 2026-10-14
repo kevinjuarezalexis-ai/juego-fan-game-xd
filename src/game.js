@@ -299,6 +299,7 @@ FB.Game = class Game {
     // modo prueba: inmortal (se ve el golpe pero no baja la vida)
     if (!this.testMode) this.hp = Math.max(0, this.hp - n);
     this.stats.hits++;
+    if (FB.SFX) FB.SFX.play('golpe');
     this.stage.hurtPlayer();
     this.stage.shake(6, 0.18);
     if (this.hp <= 0) this.gameOver();
@@ -408,6 +409,7 @@ FB.Game = class Game {
         else {
           this.stage.walk(id, ev.from, ev.to, 0, ev.end || 'normal', true);
           this.stage.flashSprite(id, 0.22, 0);
+          if (FB.SFX) FB.SFX.play('tp');
         }
         break;
       }
@@ -461,6 +463,7 @@ FB.Game = class Game {
         if (!instant) this.regen = { perSec: ev.amount ?? 6, until: ev.t + (ev.dur ?? 10) };
         break;
       case 'liberate':
+        if (!instant && FB.SFX) FB.SFX.play('liberar');
         if (!instant) this.stage.liberate(ev.char, ev.dur ?? 3);
         break;
       case 'face':
@@ -889,12 +892,14 @@ const UI = {
         m.classList.remove('closing');
         if (!estaba) {
           m.classList.remove('hidden');
+          if (FB.SFX && m.querySelector('.cartel-box') && id !== 'gameover' && id !== 'ending') FB.SFX.play('abrir');
           // reinicia la animación de entrada
           const box = m.querySelector('.cartel-box');
           if (box) (box.style.animation = 'none'), box.offsetWidth, (box.style.animation = '');
         }
       } else if (estaba && id !== 'menu' && m.querySelector('.cartel-box')) {
         m.classList.add('closing');
+        if (FB.SFX && !document.querySelector('.modal-game:not(.hidden):not(.closing) .cartel-box')) FB.SFX.play('cerrar');
         m._t = setTimeout(() => m.classList.add('hidden'), 180);
       } else {
         m.classList.remove('closing');
@@ -930,8 +935,14 @@ const UI = {
     this.el('btn-menu-creditos').onclick = () => this.show('creditos');
     document.querySelectorAll('[data-back]').forEach((b) => (b.onclick = () => this.show(b.dataset.back)));
     // en el celu: efecto de apretar (se achica un instante)
+    document.addEventListener('mouseover', (e) => {
+      const b = e.target.closest && e.target.closest('.img-btn, .c-btn');
+      if (b && b !== this._hov && FB.SFX) FB.SFX.play('hover', { gap: 60 });
+      this._hov = b;
+    });
     document.querySelectorAll('.img-btn, .c-btn').forEach((b) =>
       b.addEventListener('pointerdown', () => {
+        if (FB.SFX) FB.SFX.play('click');
         b.classList.add('press');
         setTimeout(() => b.classList.remove('press'), 140);
       }),
@@ -964,6 +975,7 @@ const UI = {
   gameOver(parte) {
     this.el('go-parte').textContent = 'Reintentar desde: ' + (parte.n ? 'Parte ' + parte.n + ' — ' : '') + parte.nombre;
     this.show('gameover');
+    if (FB.SFX) FB.SFX.play('perdiste');
   },
 
   ending(s) {
@@ -977,6 +989,7 @@ const UI = {
       '\n\n' + (s.bossDefeated ? 'El Chavo descansa en paz.' : 'El espíritu sigue en la vecindad...');
     this.el('m-ending').querySelector('.c-title').textContent = s.bossDefeated ? '¡Ganaste!' : 'Fin de la fiesta';
     this.show('ending');
+    if (FB.SFX) FB.SFX.play(s.bossDefeated ? 'ganaste' : 'perdiste');
   },
 };
 

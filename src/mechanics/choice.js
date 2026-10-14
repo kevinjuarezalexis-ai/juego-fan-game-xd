@@ -58,6 +58,7 @@ FB.MECHANICS.choice = class Choice extends FB.Mechanic {
     if (i < 0) {
       this.game.hurt(this.p.timeoutDamage || 12);
       this.game.stats.answersBad++;
+      if (FB.SFX) FB.SFX.play('mal');
       this.feedback = { speaker: '', text: '...se acabó el tiempo.', color: '#ff6060', until: time + 1.8 };
       if (this.p.onResult) this.p.onResult('timeout', q, null);
       return;
@@ -66,9 +67,11 @@ FB.MECHANICS.choice = class Choice extends FB.Mechanic {
     if (o.ok === true) {
       this.game.heal(this.p.healOk || 6);
       this.game.stats.answersGood++;
+      if (FB.SFX) FB.SFX.play('bien');
     } else if (o.ok === false) {
       this.game.hurt(this.p.wrongDamage || 10);
       this.game.stats.answersBad++;
+      if (FB.SFX) FB.SFX.play('mal');
     }
     const color = o.ok === true ? '#7dff9a' : o.ok === false ? '#ff6060' : '#dddddd';
     const who = q.speaker === 'Prof. Jirafales' ? '' : q.speaker;
