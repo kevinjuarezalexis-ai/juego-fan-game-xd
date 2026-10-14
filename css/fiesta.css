@@ -924,3 +924,33 @@ body {
 @keyframes toast-out {
   to { translate: -50% -180%; opacity: 0; }
 }
+
+/* info: texto largo con títulos */
+#info-texto p {
+  margin: 0 0 0.7cqw;
+  font-weight: 600;
+}
+#info-texto ol {
+  margin: 0 0 0.7cqw;
+  padding-left: 1.6cqw;
+  font-weight: 600;
+}
+#info-texto li {
+  margin-bottom: 0.4cqw;
+}
+.info-h {
+  font-family: 'Luckiest Guy', 'Impact', sans-serif;
+  font-weight: normal;
+  letter-spacing: 0.03em;
+  font-size: 1.55cqw;
+  line-height: 1.15;
+  color: #b5360f;
+  margin: 1cqw 0 0.5cqw;
+}
+.info-h:first-child {
+  margin-top: 0;
+}
+.info-fin {
+  text-align: center;
+  margin-top: 1.2cqw !important;
+}
