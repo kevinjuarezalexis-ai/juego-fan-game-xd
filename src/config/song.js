@@ -351,7 +351,7 @@ FB.SONG = {
     { n: 5, nombre: 'Monchito al rescate', t: 262 },
     { n: 6, nombre: 'La verdad del Chavo', t: 322.91 },
     { n: 7, nombre: 'Ñoño', t: 375.92 },
-    { n: 8, nombre: 'El Sr. Barriga', t: 411 },
+    { n: 8, nombre: 'El Sr. Barriga', t: 410.66 },
     { n: 9, nombre: 'Rescatar a Ñoño', t: 456 },
     { n: 10, nombre: 'La última fiesta', t: 525.7 },
   ],
@@ -597,7 +597,7 @@ FB.SONG = {
       mechanic: { type: 'none' },
     },
 
-    // ── Parte 7 (6:14): escena del capítulo animado, en tinta (fondo blanco, siluetas negras). Jugás con Don Ramón ──
+    // ── Parte 7 (6:14): escena del capítulo animado, en tinta (fondo blanco, siluetas negras). Jugás con Quico ──
     {
       t: 375.92,
       stage: {
@@ -611,13 +611,12 @@ FB.SONG = {
       },
       mechanic: { type: 'none' },
     },
-    // 6:36 Quico se une al combate (adelante, al lado de Don Ramón, a la izquierda)
+    // 6:36 vuelven los demás (Quico es el jugador hasta que vuelve el color)
     {
       t: 396,
       stage: {
         opponents: [
           ...BACKROW(['jirafales', 'florinda', 'chilindrina']),
-          P('quico', 'sano', 260, { face: 'right' }),
           P('chavo', 'normal', 860, { face: 'left' }),
         ],
       },
@@ -647,7 +646,7 @@ FB.SONG = {
 
     // ── Parte 8 (6:51): se suma el Sr. Barriga → primero liberarlo a él ──
     {
-      t: 411,
+      t: 410.66,
       stage: {
         opponents: [
           ...BACKROW(['jirafales', 'florinda', 'chilindrina']),
@@ -1024,8 +1023,8 @@ FB.SONG = {
     { t: 269.5, type: 'shake', power: 6, dur: 0.6 },
     { t: 274, type: 'setState', char: 'ramon', state: 'sano' },
     { t: 274, type: 'focus', on: 'center', zoom: 1, dur: 1.5 },
-    // canciones originales de fondo (vol 0.4 = 40% del volumen de la música)
-    { t: 276.18, type: 'voz', src: 'src/assets/music/voces/peluchin_x4.mp3?v=2', vol: 0.5 }, // Peluchín chin chin ×4, a 146 BPM: 1 frase = 2 tandas de flechas
+    // canciones originales de fondo (el volumen de fondo ya viene en el archivo: Peluchín 50%, el resto 40%)
+    { t: 276.18, type: 'voz', src: 'src/assets/music/voces/peluchin_x4.mp3?v=3' }, // Peluchín chin chin ×4, a 146 BPM: 1 frase = 2 tandas de flechas
 
     // ── 5:04 Chilindrina libre, se juntan los 5 ──
     { t: 299.6, type: 'liberate', char: 'chilindrina', dur: 3 },
@@ -1069,9 +1068,9 @@ FB.SONG = {
     { t: 358.7, type: 'tension', to: 0.6, dur: 17 },
     { t: 362.53, type: 'zoom', to: 1.12, dur: 14, ease: 'in' },
     // 6:14 escena del capítulo animado (tinta)
-    { t: 375.73, type: 'swapPlayer', char: 'ramon' },
-    { t: 375.78, type: 'walk', char: 'ramon', from: 520, to: 400, dur: 0.05, end: 'sano' },
-    { t: 375.82, type: 'face', char: 'ramon', dir: 'right' },
+    { t: 375.73, type: 'swapPlayer', char: 'quico' },
+    { t: 375.78, type: 'walk', char: 'quico', from: 100, to: 400, dur: 0.05, end: 'sano' },
+    { t: 375.82, type: 'face', char: 'quico', dir: 'right' },
     { t: 375.92, type: 'flash', dur: 0.3 },
     { t: 375.92, type: 'ink', on: true, dur: 0.15 },
     { t: 375.92, type: 'zoom', to: 1, dur: 0 },
@@ -1088,10 +1087,13 @@ FB.SONG = {
     { t: 393.72, type: 'shake', power: 12, dur: 0.5 },
     { t: 393.72, type: 'propMove', id: 'barril', x: 980, y: 620, dur: 1.3, rot: 2.2 },
     { t: 393.72, type: 'fall', char: 'nono', dur: 1.3 },
-    { t: 394.63, type: 'pose', char: 'quico', state: 'gritando', dur: 1.8 },
-    { t: 394.63, type: 'text', text: '¡ÑOÑOOOO!', size: 42, x: 380, y: 220, color: '#000', dur: 1.8 },
+    { t: 397.98, type: 'pose', char: 'quico', state: 'gritando', dur: 1.8 },
+    { t: 397.98, type: 'text', text: '¡ÑOÑOOOO!', size: 42, x: 380, y: 220, color: '#000', dur: 1.8 },
     // 6:36 Quico se une al combate
-    { t: 396, type: 'flashSprite', char: 'quico', dur: 0.3, shake: 4 },
+    // 6:39 vuelve el color: Don Ramón vuelve a ser el jugador y Quico pasa a su lado
+    { t: 398.95, type: 'swapPlayer', char: 'ramon' },
+    { t: 398.97, type: 'walk', char: 'ramon', from: 520, to: 400, dur: 0.05, end: 'sano' },
+    { t: 398.98, type: 'face', char: 'ramon', dir: 'right' },
     // 6:39 vuelve el color, Ñoño corrompido
     { t: 399, type: 'ink', on: false, dur: 0.25 },
     { t: 399, type: 'flash', dur: 0.4 },
@@ -1099,13 +1101,13 @@ FB.SONG = {
     { t: 399, type: 'prop', id: 'globos', on: false },
     { t: 399, type: 'flashSprite', char: 'nono', dur: 0.4, shake: 8 },
     // 6:51 Sr. Barriga (grito del capítulo del callo)
-    { t: 411, type: 'flashSprite', char: 'barriga', dur: 0.4, shake: 10 },
-    { t: 411, type: 'shake', power: 12, dur: 0.6 },
-    { t: 410.5, type: 'voz', src: 'src/assets/music/voces/barriga_grito.mp3?v=2', vol: 0.4 }, // 6:50.5 (en el drop) el grito del Sr. Barriga (el callo), lento y se aleja
-    { t: 434.5, type: 'voz', src: 'src/assets/music/voces/churi_churin.mp3?v=2', vol: 0.4 }, // 7:14.5 Churi Churin Fun Flais
-    { t: 445, type: 'voz', src: 'src/assets/music/voces/joven_aun.mp3', vol: 0.4 }, // 7:25 Joven aún
-    { t: 458, type: 'voz', src: 'src/assets/music/voces/oyelo.mp3', vol: 0.4 }, // 7:38 Óyelo y escúchalo
-    { t: 411, type: 'text', text: '¡AAAAAY!', size: 48, x: 760, y: 260, color: '#ff5050', dur: 1.6 },
+    { t: 410.66, type: 'flashSprite', char: 'barriga', dur: 0.4, shake: 10 },
+    { t: 410.66, type: 'shake', power: 12, dur: 0.6 },
+    { t: 410.66, type: 'voz', src: 'src/assets/music/voces/barriga_grito.mp3?v=3' }, // 6:50.66 (en el drop) el grito del Sr. Barriga (el callo), lento y se aleja
+    { t: 434.5, type: 'voz', src: 'src/assets/music/voces/churi_churin.mp3?v=3' }, // 7:14.5 Churi Churin Fun Flais
+    { t: 445, type: 'voz', src: 'src/assets/music/voces/joven_aun.mp3?v=3' }, // 7:25 Joven aún
+    { t: 458, type: 'voz', src: 'src/assets/music/voces/oyelo.mp3?v=3' }, // 7:38 Óyelo y escúchalo
+    { t: 410.66, type: 'text', text: '¡AAAAAY!', size: 48, x: 760, y: 260, color: '#ff5050', dur: 1.6 },
     // Quico grita "¡ÑOÑOOO!" (7:35, 7:58, 8:21 en la música)
     ...[455, 478, 501].flatMap((t) => [
       { t, type: 'pose', char: 'quico', state: 'gritando', dur: 1.2 },

@@ -120,6 +120,7 @@ FB.Stage = class Stage {
     delete this.actors[newId];
     delete neu.homeX;
     neu.back = false; // el jugador siempre va adelante
+    neu.target = 1; // si venía de estar fuera de escena, vuelve a verse
     old.homeX = old.x;
     this.actors[old.id] = old;
     this.player = neu;

@@ -125,7 +125,7 @@ FB.Game = class Game {
   // ── flujo ──
   start(from = 0, opts = {}) {
     if (FB.unlockBgVideos) FB.unlockBgVideos(); // viene de un toque: el celu deja arrancar el video
-    if (FB.Voces) FB.Voces.preload(this.song.events); // gritos / canciones de referencia
+    if (FB.Voces) FB.Voces.unlock(this.song.events); // gritos / canciones de referencia (se habilitan con este toque)
     this.resetStats();
     if (from === 0 && this.song.intro && !opts.skipIntro) return this.startIntro();
     this.begin(from);
