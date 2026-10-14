@@ -584,3 +584,43 @@ body {
 .c-scroll {
   width: 112%;
 }
+
+/* barra de desplazamiento de los carteles: riel de madera y manija verde (gorra del Chavo) */
+.c-list,
+.c-scroll {
+  overflow-x: hidden;
+}
+/* Firefox no entiende ::-webkit-scrollbar: ahí va una versión simple con los mismos colores */
+@supports (-moz-appearance: none) {
+  .c-list,
+  .c-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #5fae2c #7a4a22;
+  }
+}
+.c-list::-webkit-scrollbar,
+.c-scroll::-webkit-scrollbar {
+  width: 0.9cqw;
+  min-width: 8px;
+}
+.c-list::-webkit-scrollbar-track,
+.c-scroll::-webkit-scrollbar-track {
+  background: linear-gradient(90deg, #6b3f1c, #8a5a2c 50%, #6b3f1c);
+  border: 2px solid #3a1d08;
+  border-radius: 999px;
+}
+.c-list::-webkit-scrollbar-thumb,
+.c-scroll::-webkit-scrollbar-thumb {
+  /* cuadritos verde claro / oscuro */
+  background: repeating-linear-gradient(0deg, #8fd14f 0 6px, #3f7d1c 6px 12px);
+  border: 2px solid #1f3d0e;
+  border-radius: 999px;
+}
+.c-list::-webkit-scrollbar-thumb:hover,
+.c-scroll::-webkit-scrollbar-thumb:hover {
+  background: repeating-linear-gradient(0deg, #a6e15a 0 6px, #4f9a22 6px 12px);
+}
+.c-list::-webkit-scrollbar-button,
+.c-scroll::-webkit-scrollbar-button {
+  display: none; /* sin flechitas arriba/abajo */
+}
