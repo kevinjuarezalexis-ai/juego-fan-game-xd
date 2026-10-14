@@ -152,6 +152,20 @@
         $('aj-vol-n').textContent = vol.value + '%';
         game.conductor._applyVolume();
       });
+      // volumen de efectos de sonido (aparte de la música)
+      const sfx = $('aj-sfx');
+      if (sfx) {
+        sfx.value = Math.round(Engine2D.Audio.getSfxVolume() * 100);
+        $('aj-sfx-n').textContent = sfx.value + '%';
+        let probe = 0;
+        sfx.addEventListener('input', () => {
+          Engine2D.Audio.setSfxVolume(sfx.value / 100);
+          $('aj-sfx-n').textContent = sfx.value + '%';
+          // un "tic" de muestra para escuchar cómo queda (no más de uno cada 120 ms)
+          const now = performance.now();
+          if (FB.SFX && now - probe > 120) (probe = now), FB.SFX.play('click', { gap: 0 });
+        });
+      }
       const fsBtn = $('aj-fs');
       const fsLabel = () => (fsBtn.textContent = document.fullscreenElement ? 'Salir de pantalla completa' : 'Pantalla completa');
       fsLabel();

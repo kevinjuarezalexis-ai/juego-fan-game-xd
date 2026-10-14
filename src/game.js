@@ -146,6 +146,7 @@ FB.Game = class Game {
   }
 
   begin(from) {
+    if (FB.SFX) FB.SFX.ambientOff(); // adentro de la vecindad ya no se oye la calle
     this.hp = this.maxHp;
     this.hpShown = this.maxHp;
     this.segIdx = -1;
@@ -264,6 +265,7 @@ FB.Game = class Game {
   }
 
   toMenu() {
+    if (FB.SFX) FB.SFX.ambientOff();
     this.stopVideo();
     this.conductor.stop();
     if (this.mechanic) this.mechanic.end();

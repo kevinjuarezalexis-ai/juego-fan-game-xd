@@ -30,6 +30,7 @@ FB.Intro = class Intro {
     game.camera.zoomTo(cfg.zoom ?? 1.12, 0);
     game.camera.focus('jirafales', 0, 'out', true);
     game.camera.panX = p.x - game.W / 2;
+    if (FB.SFX) FB.SFX.ambient('calle', true); // pajaritos y ruido de calle
     this.next();
   }
 
@@ -48,7 +49,10 @@ FB.Intro = class Intro {
     const st = this.game.stage;
     if (s.walk) st.walk('jirafales', s.walk.from, s.walk.to, s.walk.dur ?? 2, s.pose || 'normal');
     else if (s.pose) st.setState('jirafales', s.pose);
-    if (s.exit) st.player.target = 0;
+    if (s.exit) {
+      st.player.target = 0;
+      if (FB.SFX) FB.SFX.play('porton'); // el portón se abre
+    }
   }
 
   get walking() {

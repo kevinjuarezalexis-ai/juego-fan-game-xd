@@ -126,6 +126,38 @@ window.FB = window.FB || {};
       tone(c, o, { f: 600, f2: 2400, type: 'sine', dur: 0.14, vol: 0.1 });
       noise(c, o, { dur: 0.14, vol: 0.06, freq: 5000, q: 1, type: 'highpass' });
     },
+    // portón de madera abriéndose: chirrido de bisagra + golpe al final
+    porton: (c, o) => {
+      // chirrido: diente de sierra que tiembla, filtrado como madera/metal viejo
+      const osc = c.createOscillator();
+      const lfo = c.createOscillator();
+      const lfoG = c.createGain();
+      const bp = c.createBiquadFilter();
+      const g = c.createGain();
+      const t0 = c.currentTime;
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(260, t0);
+      osc.frequency.linearRampToValueAtTime(420, t0 + 0.6);
+      osc.frequency.linearRampToValueAtTime(330, t0 + 1.1);
+      lfo.frequency.value = 23;
+      lfoG.gain.value = 35;
+      lfo.connect(lfoG).connect(osc.frequency);
+      bp.type = 'bandpass';
+      bp.frequency.value = 1300;
+      bp.Q.value = 4;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.16, t0 + 0.08);
+      g.gain.setValueAtTime(0.16, t0 + 0.8);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.15);
+      osc.connect(bp).connect(g).connect(o);
+      osc.start(t0);
+      lfo.start(t0);
+      osc.stop(t0 + 1.2);
+      lfo.stop(t0 + 1.2);
+      // el portón golpea contra la pared
+      tone(c, o, { f: 110, f2: 50, type: 'sine', t: 1.12, dur: 0.35, vol: 0.45 });
+      noise(c, o, { t: 1.12, dur: 0.18, vol: 0.22, freq: 600, q: 0.8, type: 'lowpass' });
+    },
     // empieza a liberarse (brillo que sube)
     liberar: (c, o) => {
       [523, 659, 784, 1047, 1319].forEach((f, i) => tone(c, o, { f, type: 'sine', t: i * 0.09, dur: 0.35, vol: 0.09 }));
@@ -133,7 +165,92 @@ window.FB = window.FB || {};
     },
   };
 
+  // ── ambientes (sonido de fondo continuo) ──
+  // 'calle': rumor de ciudad, autos que pasan de vez en cuando y pajaritos
+  const amb = {};
+  function ambVolume() {
+    const A = window.Engine2D && Engine2D.Audio;
+    if (!A) return 0.5;
+    if (A.isMuted && A.isMuted()) return 0;
+    return A.getVolume() * (A.getSfxVolume ? A.getSfxVolume() : 0.8);
+  }
+  function startCalle(c) {
+    const master = c.createGain();
+    master.gain.value = 0.0001;
+    master.connect(c.destination);
+    // rumor de ciudad: ruido grave y suave que respira
+    const s = c.createBufferSource();
+    s.buffer = noiseBuf;
+    s.loop = true;
+    const lp = c.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 380;
+    const hum = c.createGain();
+    hum.gain.value = 0.22;
+    const lfo = c.createOscillator();
+    const lfoG = c.createGain();
+    lfo.frequency.value = 0.13;
+    lfoG.gain.value = 0.08;
+    lfo.connect(lfoG).connect(hum.gain);
+    s.connect(lp).connect(hum).connect(master);
+    s.start();
+    lfo.start();
+    const timers = [];
+    // pajarito: 2 a 5 trinos rápidos
+    const pajaro = () => {
+      const base = 2600 + Math.random() * 1800;
+      const n = 2 + Math.floor(Math.random() * 4);
+      for (let i = 0; i < n; i++) {
+        const t = i * (0.09 + Math.random() * 0.05);
+        tone(c, master, { f: base * (0.9 + Math.random() * 0.25), f2: base * (1.25 + Math.random() * 0.3), type: 'sine', t, dur: 0.07, vol: 0.05 + Math.random() * 0.03 });
+      }
+      timers.push(setTimeout(pajaro, 900 + Math.random() * 2600));
+    };
+    // auto que pasa: ruido que sube y baja con un leve cambio de tono
+    const auto = () => {
+      const d = 2.2 + Math.random() * 1.5;
+      noise(c, master, { dur: d, vol: 0.16, freq: 250, freq2: 600, q: 0.6, type: 'lowpass', attack: d * 0.45 });
+      tone(c, master, { f: 70 + Math.random() * 20, f2: 55, type: 'sawtooth', dur: d, vol: 0.02, attack: d * 0.45 });
+      timers.push(setTimeout(auto, 5000 + Math.random() * 7000));
+    };
+    timers.push(setTimeout(pajaro, 300));
+    timers.push(setTimeout(auto, 1800 + Math.random() * 2500));
+    // el volumen sigue a Ajustes
+    const vt = setInterval(() => master.gain.setTargetAtTime(ambVolume() * 0.9, c.currentTime, 0.3), 400);
+    master.gain.setTargetAtTime(ambVolume() * 0.9, c.currentTime, 0.6); // entra suave
+    return {
+      stop() {
+        timers.forEach(clearTimeout);
+        clearInterval(vt);
+        master.gain.setTargetAtTime(0.0001, c.currentTime, 0.35); // se va suave
+        setTimeout(() => {
+          try {
+            s.stop();
+            lfo.stop();
+          } catch (e) {}
+          master.disconnect();
+        }, 1600);
+      },
+    };
+  }
+  const AMBIENTES = { calle: startCalle };
+
   FB.SFX = {
+    // FB.SFX.ambient('calle', true) prende · FB.SFX.ambient('calle', false) apaga (con fundido)
+    ambient(name, on) {
+      if (!on) {
+        if (amb[name]) amb[name].stop();
+        delete amb[name];
+        return;
+      }
+      if (amb[name] || !AMBIENTES[name]) return;
+      const c = audio();
+      if (!c) return;
+      amb[name] = AMBIENTES[name](c);
+    },
+    ambientOff() {
+      for (const k in amb) this.ambient(k, false);
+    },
     play(name, opts = {}) {
       const fn = SOUNDS[name];
       if (!fn) return;
