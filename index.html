@@ -6,8 +6,8 @@
     <title>Fiesta de la Buena Vecindad</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Luckiest+Guy&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="ui-components.css?v=202610140818" />
-    <link rel="stylesheet" href="css/fiesta.css?v=202610140818" />
+    <link rel="stylesheet" href="ui-components.css?v=202610142034" />
+    <link rel="stylesheet" href="css/fiesta.css?v=202610142034" />
   </head>
   <body>
     <div id="wrap">
@@ -27,6 +27,18 @@
             </button>
             <button class="img-btn" id="btn-menu-creditos" aria-label="Créditos">
               <img src="src/assets/ui/btn_creditos.webp" alt="" /><img class="hov" src="src/assets/ui/btn_creditos_h.webp" alt="" />
+            </button>
+          </div>
+          <!-- botones chicos abajo a la derecha: logros, cómo jugar, info -->
+          <div class="menu-sq">
+            <button class="img-btn" id="btn-menu-logros" aria-label="Logros">
+              <img src="src/assets/ui/btn_logros.webp" alt="" /><img class="hov" src="src/assets/ui/btn_logros_h.webp" alt="" />
+            </button>
+            <button class="img-btn" id="btn-menu-como" aria-label="Cómo jugar">
+              <img src="src/assets/ui/btn_como.webp" alt="" /><img class="hov" src="src/assets/ui/btn_como_h.webp" alt="" />
+            </button>
+            <button class="img-btn" id="btn-menu-info" aria-label="Info">
+              <img src="src/assets/ui/btn_info.webp" alt="" /><img class="hov" src="src/assets/ui/btn_info_h.webp" alt="" />
             </button>
           </div>
           <div id="menu-status">Cargando…</div>
@@ -90,6 +102,75 @@
           </div>
         </div>
 
+        <!-- Cartel: Logros -->
+        <div class="modal-game cartel-lg hidden" id="m-logros">
+          <div class="cartel-box">
+            <div class="lg-head"><div class="c-title">Logros</div><div class="lg-cuenta" id="logros-cuenta">00/10</div></div>
+            <div class="logros-list" id="logros-list"></div>
+            <button class="c-btn c-back" data-back="menu">Volver</button>
+          </div>
+        </div>
+
+        <!-- Cartel: Cómo jugar (una página por mecánica) -->
+        <div class="modal-game cartel-como hidden" id="m-como">
+          <div class="cartel-box">
+            <div class="c-title">Cómo jugar</div>
+            <div class="como-pag">
+              <div class="como-t">Caja de combate</div>
+              <div class="como-demo"><span class="cd-box"><span class="cd-heart">♥</span></span></div>
+              <p>Sos el <b>corazón rojo</b>. Movelo y esquivá todo lo que entra a la caja: pelotas, cachetadas, lágrimas... Cada golpe te saca vida.</p>
+              <p class="como-keys"><b>PC:</b> flechas o WASD · <b>Celu:</b> joystick</p>
+            </div>
+            <div class="como-pag hidden">
+              <div class="como-t">Rescate</div>
+              <div class="como-demo"><span class="cd-opt">1</span><span class="cd-opt">2</span><span class="cd-opt">3</span></div>
+              <p>Hablale al vecino corrompido. Las <b>respuestas buenas</b> llenan su barra de <b>Liberar</b> y te curan; las malas te sacan vida. Si tardás mucho, cuenta como mala.</p>
+              <p>A veces tenés que contestar <b>mientras esquivás</b> en la caja.</p>
+              <p class="como-keys"><b>PC:</b> 1 2 3 (o ↑↓ + Z) · <b>Celu:</b> tocá la respuesta</p>
+            </div>
+            <div class="como-pag hidden">
+              <div class="como-t">Flechas</div>
+              <div class="como-demo"><span class="cd-arr">←</span><span class="cd-arr">↓</span><span class="cd-arr">↑</span><span class="cd-arr">→</span></div>
+              <p>Cuando cada flecha llega a su lugar, apretá <b>la misma flecha</b> a tiempo con la música.</p>
+              <p>Primero baila el vecino y sale <b>¡REPITE!</b>: después hacés vos el mismo paso.</p>
+              <p class="como-keys"><b>PC:</b> flechas / WASD (y Enter si aparece) · <b>Celu:</b> tocá los carriles</p>
+            </div>
+            <div class="como-pag hidden">
+              <div class="como-t">Bloquear y disparar</div>
+              <div class="como-demo"><span class="cd-ring"></span></div>
+              <p>Antes de cada ataque aparece un <b>anillo</b> que se cierra: <b>bloqueá</b> justo cuando llega al círculo.</p>
+              <p>Si bloqueás bien, queda <b>aturdido</b> un momento: ahí <b>disparale</b> para hacerle mucho daño.</p>
+              <p class="como-keys"><b>PC:</b> X bloquear · Z disparar · <b>Celu:</b> botones BLOQUEAR / DISPARAR</p>
+            </div>
+            <div class="como-pag hidden">
+              <div class="como-t">Más cosas</div>
+              <p>La música <b>nunca se frena</b>: todo pasa al ritmo de la canción.</p>
+              <p>Si perdés, volvés al principio de <b>esa parte</b>. Desde <b>Jugar → Elegir parte</b> podés practicar cualquier parte.</p>
+              <p class="como-keys"><b>Esc</b> o <b>❚❚</b> pausa · <b>⚙</b> volumen y pantalla completa</p>
+            </div>
+            <div class="como-nav">
+              <button class="c-btn c-sec" id="como-prev" aria-label="Anterior">◀</button>
+              <span id="como-n">1 / 5</span>
+              <button class="c-btn c-sec" id="como-next" aria-label="Siguiente">▶</button>
+            </div>
+            <button class="c-btn c-back" data-back="menu">Volver</button>
+          </div>
+        </div>
+
+        <!-- Cartel: Info (por qué hice el juego) -->
+        <div class="modal-game cartel-info hidden" id="m-info">
+          <div class="cartel-box">
+            <div class="c-title">Info</div>
+            <div class="c-text c-scroll" id="info-texto">
+              <!-- TEXTO PROVISORIO: reemplazar por el de Rey Mago -->
+              <b>Fiesta de la Buena Vecindad</b> es un fan game de El Chavo del Ocho hecho por <b>Rey Mago</b>.<br /><br />
+              Acá va a ir por qué hice este juego y en qué me basé.<br /><br />
+              <small>(texto provisorio)</small>
+            </div>
+            <button class="c-btn c-back" data-back="menu">Volver</button>
+          </div>
+        </div>
+
         <!-- Cartel: Pausa -->
         <div class="modal-game cartel-v hidden" id="m-pause">
           <div class="cartel-box">
@@ -141,24 +222,25 @@
       </div>
     </div>
 
-    <script src="engine2d.js?v=202610140818"></script>
-    <script src="src/sfx.js?v=202610140818"></script>
-    <script src="src/voces.js?v=202610140818"></script>
-    <script src="src/config/characters.js?v=202610140818"></script>
-    <script src="src/config/song.js?v=202610140818"></script>
-    <script src="src/core/conductor.js?v=202610140818"></script>
-    <script src="src/core/camera.js?v=202610140818"></script>
-    <script src="src/core/stage.js?v=202610140818"></script>
-    <script src="src/mechanics/base.js?v=202610140818"></script>
-    <script src="src/core/intro.js?v=202610140818"></script>
-    <script src="src/mechanics/bulletbox.js?v=202610140818"></script>
-    <script src="src/mechanics/rhythm.js?v=202610140818"></script>
-    <script src="src/mechanics/choice.js?v=202610140818"></script>
-    <script src="src/mechanics/blockshoot.js?v=202610140818"></script>
-    <script src="src/mechanics/rescue.js?v=202610140818"></script>
-    <script src="src/game.js?v=202610140818"></script>
-    <script src="src/mobile.js?v=202610140818"></script>
-    <script src="src/menumusic.js?v=202610140818"></script>
-    <script src="src/fxlab.js?v=202610140818"></script>
+    <script src="engine2d.js?v=202610142034"></script>
+    <script src="src/sfx.js?v=202610142034"></script>
+    <script src="src/logros.js?v=202610142034"></script>
+    <script src="src/voces.js?v=202610142034"></script>
+    <script src="src/config/characters.js?v=202610142034"></script>
+    <script src="src/config/song.js?v=202610142034"></script>
+    <script src="src/core/conductor.js?v=202610142034"></script>
+    <script src="src/core/camera.js?v=202610142034"></script>
+    <script src="src/core/stage.js?v=202610142034"></script>
+    <script src="src/mechanics/base.js?v=202610142034"></script>
+    <script src="src/core/intro.js?v=202610142034"></script>
+    <script src="src/mechanics/bulletbox.js?v=202610142034"></script>
+    <script src="src/mechanics/rhythm.js?v=202610142034"></script>
+    <script src="src/mechanics/choice.js?v=202610142034"></script>
+    <script src="src/mechanics/blockshoot.js?v=202610142034"></script>
+    <script src="src/mechanics/rescue.js?v=202610142034"></script>
+    <script src="src/game.js?v=202610142034"></script>
+    <script src="src/mobile.js?v=202610142034"></script>
+    <script src="src/menumusic.js?v=202610142034"></script>
+    <script src="src/fxlab.js?v=202610142034"></script>
   </body>
 </html>

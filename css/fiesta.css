@@ -624,3 +624,303 @@ body {
 .c-scroll::-webkit-scrollbar-button {
   display: none; /* sin flechitas arriba/abajo */
 }
+
+/* ── botones chicos del menú (abajo a la derecha): logros, cómo jugar, info ── */
+.menu-sq {
+  position: absolute;
+  right: 2.5%;
+  bottom: 4%;
+  width: 24%;
+  display: flex;
+  gap: 0.9cqw;
+}
+.menu-sq .img-btn {
+  flex: 1;
+  animation: btn-in-der 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.25) backwards;
+}
+.menu-sq .img-btn:nth-child(1) { animation-delay: 0.45s; }
+.menu-sq .img-btn:nth-child(2) { animation-delay: 0.55s; }
+.menu-sq .img-btn:nth-child(3) { animation-delay: 0.65s; }
+@keyframes btn-in-der {
+  0% { translate: 0 140%; opacity: 0; }
+  70% { translate: 0 -8%; opacity: 1; }
+  100% { translate: 0 0; opacity: 1; }
+}
+.menu-screen #menu-status {
+  bottom: 22%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu-sq .img-btn { animation: none; }
+}
+
+/* ── carteles nuevos ── */
+.modal-game.cartel-lg,
+.modal-game.cartel-como,
+.modal-game.cartel-info {
+  background: rgba(0, 0, 0, 0.45);
+  padding: 0;
+  overflow: hidden;
+}
+/* logros (horizontal con trofeo) */
+.cartel-lg .cartel-box {
+  background-image: url('../src/assets/ui/cartel_logros.webp');
+  width: 76%;
+  aspect-ratio: 1200 / 788;
+  padding: 7.5% 8% 7%;
+  gap: 0.7cqw;
+}
+.lg-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+}
+.lg-cuenta {
+  font-family: 'Luckiest Guy', 'Impact', sans-serif;
+  font-size: 2.4cqw;
+  color: #fff;
+  text-shadow: 0.12cqw 0.12cqw 0 #3a1d08, -0.12cqw 0.12cqw 0 #3a1d08, 0.12cqw -0.12cqw 0 #3a1d08, -0.12cqw -0.12cqw 0 #3a1d08;
+}
+.logros-list {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6cqw 1cqw;
+  align-content: start;
+  padding-right: 0.5cqw;
+}
+.logro {
+  display: flex;
+  align-items: center;
+  gap: 0.8cqw;
+  text-align: left;
+  background: rgba(90, 50, 20, 0.14);
+  border: 0.15cqw solid rgba(58, 29, 8, 0.35);
+  border-radius: 0.7cqw;
+  padding: 0.35cqw 0.7cqw;
+}
+.lg-ico {
+  flex: 0 0 auto;
+  width: 3.3cqw;
+  height: 3.3cqw;
+  border-radius: 0.6cqw;
+  background: #3a1d08 url('../src/assets/ui/btn_logros.webp') center / 125% no-repeat;
+}
+.lg-txt b {
+  display: block;
+  font-family: 'Luckiest Guy', 'Impact', sans-serif;
+  font-weight: normal;
+  letter-spacing: 0.03em;
+  font-size: 1.45cqw;
+  color: #4a2a12;
+}
+.lg-txt small {
+  display: block;
+  font-family: system-ui, sans-serif;
+  font-size: 1.05cqw;
+  line-height: 1.25;
+  color: #5b3a1e;
+}
+/* bloqueado: gris y con candado */
+.logro:not(.ok) {
+  opacity: 0.62;
+}
+.logro:not(.ok) .lg-ico {
+  filter: grayscale(1) brightness(0.55);
+  position: relative;
+}
+.logro:not(.ok) .lg-ico::after {
+  content: '🔒';
+  position: absolute;
+  right: -0.3cqw;
+  bottom: -0.3cqw;
+  font-size: 1.4cqw;
+  filter: none;
+}
+.logro.ok {
+  background: rgba(255, 207, 46, 0.28);
+  border-color: #c98a12;
+}
+.logros-list::-webkit-scrollbar { width: 0.9cqw; min-width: 8px; }
+.logros-list::-webkit-scrollbar-track { background: linear-gradient(90deg, #6b3f1c, #8a5a2c 50%, #6b3f1c); border: 2px solid #3a1d08; border-radius: 999px; }
+.logros-list::-webkit-scrollbar-thumb { background: repeating-linear-gradient(0deg, #8fd14f 0 6px, #3f7d1c 6px 12px); border: 2px solid #1f3d0e; border-radius: 999px; }
+
+/* cómo jugar / info (verticales) */
+.cartel-como .cartel-box,
+.cartel-info .cartel-box {
+  height: 94%;
+  /* en cqw (los % del padding se miden contra el ancho de la pantalla, no del cartel) */
+  padding: 7.2cqw 5.8cqw 6.2cqw;
+  gap: 0.7cqw;
+}
+.cartel-como .cartel-box {
+  background-image: url('../src/assets/ui/cartel_como.webp');
+  aspect-ratio: 760 / 1130;
+}
+.cartel-info .cartel-box {
+  background-image: url('../src/assets/ui/cartel_info.webp');
+  aspect-ratio: 760 / 1148;
+}
+.cartel-info .c-scroll {
+  width: 100%;
+  max-height: none;
+  flex: 1;
+  min-height: 0;
+  font-size: 1.2cqw;
+  text-align: left;
+}
+.como-pag {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow-y: auto;
+  font-family: system-ui, sans-serif;
+  font-size: 1.12cqw;
+  line-height: 1.38;
+  color: #4a2a12;
+}
+.como-pag p {
+  margin: 0 0 0.6cqw;
+}
+.como-t {
+  font-family: 'Luckiest Guy', 'Impact', sans-serif;
+  font-size: 2cqw;
+  color: #b5360f;
+  margin-bottom: 0.4cqw;
+}
+.como-keys {
+  background: rgba(90, 50, 20, 0.15);
+  border-radius: 0.6cqw;
+  padding: 0.4cqw 0.6cqw;
+  font-size: 1cqw;
+}
+.como-demo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6cqw;
+  height: 5.5cqw;
+  margin-bottom: 0.5cqw;
+}
+.cd-box {
+  position: relative;
+  width: 9cqw;
+  height: 5cqw;
+  background: #000;
+  border: 0.35cqw solid #5fae2c;
+  outline: 0.2cqw dashed #2d6b12;
+  outline-offset: -0.35cqw;
+}
+.cd-heart {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  color: #ff1e1e;
+  font-size: 1.8cqw;
+  animation: cd-esquiva 1.6s ease-in-out infinite alternate;
+}
+@keyframes cd-esquiva {
+  from { translate: -170% -50%; }
+  to { translate: 70% -50%; }
+}
+.cd-opt,
+.cd-arr {
+  display: grid;
+  place-items: center;
+  width: 3.2cqw;
+  height: 3.2cqw;
+  border: 0.25cqw solid #3a1d08;
+  border-radius: 0.6cqw;
+  background: linear-gradient(#ffd54a, #f08c12);
+  color: #fff;
+  font-family: 'Luckiest Guy', 'Impact', sans-serif;
+  font-size: 1.8cqw;
+  text-shadow: 0.1cqw 0.1cqw 0 #3a1d08;
+}
+.cd-arr:nth-child(1) { background: linear-gradient(#e46cd8, #a63b9d); }
+.cd-arr:nth-child(2) { background: linear-gradient(#5ed7ff, #1f8fd1); }
+.cd-arr:nth-child(3) { background: linear-gradient(#7ee04f, #2f9a1c); }
+.cd-arr:nth-child(4) { background: linear-gradient(#ff7a6a, #d1321f); }
+.cd-ring {
+  width: 4.5cqw;
+  height: 4.5cqw;
+  border-radius: 50%;
+  border: 0.35cqw solid #ffcf2e;
+  box-shadow: 0 0 0 0.25cqw #3a1d08;
+  animation: cd-anillo 1.2s ease-in infinite;
+}
+@keyframes cd-anillo {
+  from { transform: scale(1.7); opacity: 0.3; }
+  to { transform: scale(0.75); opacity: 1; }
+}
+.como-nav {
+  display: flex;
+  align-items: center;
+  gap: 1cqw;
+  font-family: 'Luckiest Guy', 'Impact', sans-serif;
+  font-size: 1.5cqw;
+  color: #4a2a12;
+}
+.como-nav .c-btn {
+  min-width: 0;
+  padding: 0.3cqw 1.2cqw 0.2cqw;
+  font-size: 1.4cqw;
+}
+.como-nav .c-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* aviso de logro desbloqueado */
+.logro-toast {
+  position: absolute;
+  top: 3%;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.8cqw;
+  padding: 0.6cqw 1.4cqw 0.6cqw 0.7cqw;
+  background: linear-gradient(#ffe08a, #f2b43a);
+  border: 0.25cqw solid #3a1d08;
+  border-radius: 0.9cqw;
+  box-shadow: 0 0.35cqw 0 #3a1d08, 0 0.6cqw 1.6cqw rgba(0, 0, 0, 0.5);
+  color: #3a1d08;
+  pointer-events: none;
+  animation: toast-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+.logro-toast.out {
+  animation: toast-out 0.45s ease-in forwards;
+}
+.logro-toast small {
+  display: block;
+  font-family: system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.95cqw;
+}
+.logro-toast b {
+  display: block;
+  font-family: 'Luckiest Guy', 'Impact', sans-serif;
+  font-weight: normal;
+  font-size: 1.6cqw;
+  letter-spacing: 0.03em;
+}
+.lt-ico {
+  width: 3.2cqw;
+  height: 3.2cqw;
+  border-radius: 0.5cqw;
+  background: url('../src/assets/ui/btn_logros.webp') center / 125% no-repeat;
+}
+@keyframes toast-in {
+  from { translate: -50% -180%; }
+  to { translate: -50% 0; }
+}
+@keyframes toast-out {
+  to { translate: -50% -180%; opacity: 0; }
+}

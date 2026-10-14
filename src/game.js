@@ -134,6 +134,7 @@ FB.Game = class Game {
     if (FB.unlockBgVideos) FB.unlockBgVideos(); // viene de un toque: el celu deja arrancar el video
     if (FB.Voces) FB.Voces.unlock(this.song.events); // gritos / canciones de referencia (se habilitan con este toque)
     this.resetStats();
+    if (FB.Logros) FB.Logros.onStart(this, from);
     if (from === 0 && this.song.intro && !opts.skipIntro) return this.startIntro();
     this.begin(from);
   }
@@ -161,6 +162,7 @@ FB.Game = class Game {
     this.parteIdx = -1;
     if (this.mechanic) this.mechanic.end();
     this.mechanic = null;
+    this._logSnap = null;
     this.camera = new FB.Camera(this);
     if (this.stage && this.stage.setBgVideo) this.stage.setBgVideo(null);
     this.stage = new FB.Stage(this);
@@ -305,6 +307,7 @@ FB.Game = class Game {
   finish() {
     if (this.state !== 'playing') return;
     this.state = 'ending';
+    if (FB.Logros) FB.Logros.onEnding(this);
     if (this.mechanic) this.mechanic.end();
     this.mechanic = null;
     UI.ending(this.stats);
@@ -359,6 +362,8 @@ FB.Game = class Game {
       if (!this._skipSegApply) this.applySegment(seg);
       this._skipSegApply = false;
       const prevBox = boxOf(this.mechanic);
+      if (FB.Logros && this.mechanic && this._logSnap) FB.Logros.onSegmentEnd(this, this.mechanic, this._logSnap);
+      this._logSnap = { ...this.stats, desdeMitad: time - seg.t > 1 };
       if (this.mechanic) this.mechanic.end();
       const M = FB.MECHANICS[(seg.mechanic && seg.mechanic.type) || 'none'] || FB.MECHANICS.none;
       this.mechanic = new M(this, { ...(seg.mechanic || {}) }, seg.t, t1);
@@ -654,6 +659,7 @@ FB.Game = class Game {
     const time = c.time;
     this.syncTimeline(time);
     this.applyTalkPose(time);
+    if (FB.Logros) FB.Logros.check(this, time);
     if (FB.Voces) FB.Voces.tick(time, this._voces || (this._voces = this.song.events.filter((e) => e.type === 'voz')));
 
     const beat = Math.floor(c.beatAt(time));
@@ -915,8 +921,8 @@ const UI = {
   // y al cerrarse se encogen hacia el medio. El menú queda de fondo detrás de sus carteles.
   show(name) {
     const enMenu = this.game && this.game.state === 'menu';
-    const sobreMenu = ['jugar', 'partes', 'ajustes', 'creditos'];
-    for (const id of ['menu', 'jugar', 'partes', 'ajustes', 'creditos', 'pause', 'gameover', 'ending']) {
+    const sobreMenu = ['jugar', 'partes', 'ajustes', 'creditos', 'logros', 'como', 'info'];
+    for (const id of ['menu', 'jugar', 'partes', 'ajustes', 'creditos', 'logros', 'como', 'info', 'pause', 'gameover', 'ending']) {
       const m = this.el('m-' + id);
       if (!m) continue;
       const visible = id === name || (id === 'menu' && enMenu && sobreMenu.includes(name));
@@ -967,6 +973,11 @@ const UI = {
       this.show('ajustes');
     };
     this.el('btn-menu-creditos').onclick = () => this.show('creditos');
+    this.el('btn-menu-logros').onclick = () => (FB.Logros && FB.Logros.render(), this.show('logros'));
+    this.el('btn-menu-como').onclick = () => (this.comoPag(0), this.show('como'));
+    this.el('btn-menu-info').onclick = () => this.show('info');
+    this.el('como-prev').onclick = () => this.comoPag(this._como - 1);
+    this.el('como-next').onclick = () => this.comoPag(this._como + 1);
     document.querySelectorAll('[data-back]').forEach((b) => (b.onclick = () => this.show(b.dataset.back)));
     // en el celu: efecto de apretar (se achica un instante)
     document.addEventListener('mouseover', (e) => {
@@ -1010,6 +1021,16 @@ const UI = {
     this.el('go-parte').textContent = 'Reintentar desde: ' + (parte.n ? 'Parte ' + parte.n + ' — ' : '') + parte.nombre;
     this.show('gameover');
     if (FB.SFX) FB.SFX.play('perdiste');
+  },
+
+  // "Cómo jugar": una página por mecánica, con ◀ ▶
+  comoPag(i) {
+    const pags = [...document.querySelectorAll('#m-como .como-pag')];
+    this._como = Math.max(0, Math.min(pags.length - 1, i));
+    pags.forEach((p, k) => p.classList.toggle('hidden', k !== this._como));
+    this.el('como-n').textContent = this._como + 1 + ' / ' + pags.length;
+    this.el('como-prev').disabled = this._como === 0;
+    this.el('como-next').disabled = this._como === pags.length - 1;
   },
 
   ending(s) {
