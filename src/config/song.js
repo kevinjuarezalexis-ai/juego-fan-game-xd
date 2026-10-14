@@ -1124,10 +1124,10 @@ FB.SONG = {
     { t: 410.53, type: 'face', char: 'ramon', dir: 'right' },
     { t: 410.56, type: 'walk', char: 'quico', from: 400, to: 260, dur: 0.05, end: 'sano' },
     { t: 410.57, type: 'face', char: 'quico', dir: 'right' },
-    { t: 410.55, type: 'voz', src: 'src/assets/music/voces/barriga_grito.mp3?v=3' }, // 6:50.55 (en el drop) el grito del Sr. Barriga (el callo), lento y se aleja
-    { t: 434.5, type: 'voz', src: 'src/assets/music/voces/churi_churin.mp3?v=3' }, // 7:14.5 Churi Churin Fun Flais
-    { t: 445, type: 'voz', src: 'src/assets/music/voces/joven_aun.mp3?v=3' }, // 7:25 Joven aún
-    { t: 458, type: 'voz', src: 'src/assets/music/voces/oyelo.mp3?v=3' }, // 7:38 Óyelo y escúchalo
+    { t: 410, type: 'voz', src: 'src/assets/music/voces/barriga_grito.mp3?v=3' }, // 6:50 (en el drop) el grito del Sr. Barriga (el callo), lento y se aleja
+    { t: 433.84, type: 'voz', src: 'src/assets/music/voces/churi_churin.mp3?v=4' }, // 7:13.84 Churi Churin Fun Flais
+    { t: 445.55, type: 'voz', src: 'src/assets/music/voces/joven_aun.mp3?v=3' }, // 7:25.55 Joven aún
+    { t: 457.03, type: 'voz', src: 'src/assets/music/voces/oyelo.mp3?v=4' }, // 7:37.03 Óyelo y escúchalo (más rápido y agudo, 45%)
     { t: 410.55, type: 'text', text: '¡AAAAAY!', size: 48, x: 760, y: 260, color: '#ff5050', dur: 1.6 },
     // Quico grita "¡ÑOÑOOO!" (7:35, 7:58, 8:21 en la música)
     ...[455, 478, 501].flatMap((t) => [
