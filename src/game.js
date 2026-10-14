@@ -634,7 +634,7 @@ FB.Game = class Game {
     const time = c.time;
     this.syncTimeline(time);
     this.applyTalkPose(time);
-    if (FB.Voces) FB.Voces.tick(time);
+    if (FB.Voces) FB.Voces.tick(time, this._voces || (this._voces = this.song.events.filter((e) => e.type === 'voz')));
 
     const beat = Math.floor(c.beatAt(time));
     if (beat > this.lastBeat) {

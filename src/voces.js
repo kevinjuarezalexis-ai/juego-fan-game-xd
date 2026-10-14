@@ -97,7 +97,14 @@ window.FB = window.FB || {};
     },
 
     // cada frame: volumen al día y corrección si se desfasa de la canción
-    tick(time) {
+    tick(time, events) {
+      // si alguna tenía que estar sonando pero su audio terminó de cargar recién, entra por donde va
+      if (events)
+        for (const e of events) {
+          if (e.type !== 'voz' || time < e.t || activos.some((a) => a.ev === e)) continue;
+          const b = bufs[e.src];
+          if (b instanceof AudioBuffer && time < e.t + b.duration - 0.3) this.start(e, time);
+        }
       if (!activos.length) return;
       const c = ctx();
       if (!c) return;

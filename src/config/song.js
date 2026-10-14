@@ -1024,6 +1024,8 @@ FB.SONG = {
     { t: 269.5, type: 'shake', power: 6, dur: 0.6 },
     { t: 274, type: 'setState', char: 'ramon', state: 'sano' },
     { t: 274, type: 'focus', on: 'center', zoom: 1, dur: 1.5 },
+    // canciones originales de fondo (vol 0.4 = 40% del volumen de la música)
+    { t: 276.18, type: 'voz', src: 'src/assets/music/voces/peluchin_x4.mp3', vol: 0.4 }, // Peluchín chin chin ×4, a 146 BPM: 1 frase = 2 tandas de flechas
 
     // ── 5:04 Chilindrina libre, se juntan los 5 ──
     { t: 299.6, type: 'liberate', char: 'chilindrina', dur: 3 },
@@ -1099,6 +1101,10 @@ FB.SONG = {
     // 6:51 Sr. Barriga (grito del capítulo del callo)
     { t: 411, type: 'flashSprite', char: 'barriga', dur: 0.4, shake: 10 },
     { t: 411, type: 'shake', power: 12, dur: 0.6 },
+    { t: 411, type: 'voz', src: 'src/assets/music/voces/barriga_grito.mp3', vol: 0.4 }, // el grito del Sr. Barriga (el callo)
+    { t: 434.5, type: 'voz', src: 'src/assets/music/voces/churi_churin.mp3', vol: 0.4 }, // 7:14.5 Churi Churin Fun Flais
+    { t: 445, type: 'voz', src: 'src/assets/music/voces/joven_aun.mp3', vol: 0.4 }, // 7:25 Joven aún
+    { t: 458, type: 'voz', src: 'src/assets/music/voces/oyelo.mp3', vol: 0.4 }, // 7:38 Óyelo y escúchalo
     { t: 411, type: 'text', text: '¡AAAAAY!', size: 48, x: 760, y: 260, color: '#ff5050', dur: 1.6 },
     // Quico grita "¡ÑOÑOOO!" (7:35, 7:58, 8:21 en la música)
     ...[455, 478, 501].flatMap((t) => [
