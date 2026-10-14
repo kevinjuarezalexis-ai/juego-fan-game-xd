@@ -1101,7 +1101,7 @@ FB.SONG = {
     // 6:51 Sr. Barriga (grito del capítulo del callo)
     { t: 411, type: 'flashSprite', char: 'barriga', dur: 0.4, shake: 10 },
     { t: 411, type: 'shake', power: 12, dur: 0.6 },
-    { t: 415, type: 'voz', src: 'src/assets/music/voces/barriga_grito.mp3?v=2', vol: 0.4 }, // 6:55 (en el drop) el grito del Sr. Barriga (el callo), lento y se aleja
+    { t: 410.5, type: 'voz', src: 'src/assets/music/voces/barriga_grito.mp3?v=2', vol: 0.4 }, // 6:50.5 (en el drop) el grito del Sr. Barriga (el callo), lento y se aleja
     { t: 434.5, type: 'voz', src: 'src/assets/music/voces/churi_churin.mp3?v=2', vol: 0.4 }, // 7:14.5 Churi Churin Fun Flais
     { t: 445, type: 'voz', src: 'src/assets/music/voces/joven_aun.mp3', vol: 0.4 }, // 7:25 Joven aún
     { t: 458, type: 'voz', src: 'src/assets/music/voces/oyelo.mp3', vol: 0.4 }, // 7:38 Óyelo y escúchalo
