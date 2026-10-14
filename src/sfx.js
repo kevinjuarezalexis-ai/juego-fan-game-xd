@@ -236,6 +236,10 @@ window.FB = window.FB || {};
   const AMBIENTES = { calle: startCalle };
 
   FB.SFX = {
+    // contexto de audio compartido (lo usan también las voces de referencia)
+    context() {
+      return audio();
+    },
     // FB.SFX.ambient('calle', true) prende · FB.SFX.ambient('calle', false) apaga (con fundido)
     ambient(name, on) {
       if (!on) {

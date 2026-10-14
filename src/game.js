@@ -125,6 +125,7 @@ FB.Game = class Game {
   // ── flujo ──
   start(from = 0, opts = {}) {
     if (FB.unlockBgVideos) FB.unlockBgVideos(); // viene de un toque: el celu deja arrancar el video
+    if (FB.Voces) FB.Voces.preload(this.song.events); // gritos / canciones de referencia
     this.resetStats();
     if (from === 0 && this.song.intro && !opts.skipIntro) return this.startIntro();
     this.begin(from);
@@ -162,8 +163,10 @@ FB.Game = class Game {
     this.stopVideo();
     for (const e of this.song.events) if (e.type === 'video') (e._pre = false), (e._fade = false);
     if (this._flashDiv) this._flashDiv.remove(), (this._flashDiv = null);
+    if (FB.Voces) FB.Voces.stopAll();
     this.replayUntil(from);
     this.conductor.play(from);
+    if (FB.Voces) FB.Voces.resumeAt(this.song.events, from);
     this.fadeIn = 0.6; // sale de negro
     this.lastBeat = Math.floor(this.conductor.beatAt(from)) - 1;
     this.state = 'playing';
@@ -247,6 +250,7 @@ FB.Game = class Game {
     if (this.video) this.video.pause(); // el video de escena se pausa con el juego
     this.state = 'paused';
     this.conductor.pause();
+    if (FB.Voces) FB.Voces.stopAll();
     if (FB.Mobile) FB.Mobile.onPause(this);
     UI.show('pause');
   }
@@ -255,6 +259,7 @@ FB.Game = class Game {
     if (this.state !== 'paused') return;
     this.state = 'playing';
     this.conductor.resume();
+    if (FB.Voces) FB.Voces.resumeAt(this.song.events, this.conductor.time);
     if (this.video) {
       try {
         this.video.currentTime = Math.max(0, this.conductor.time - this.videoStart);
@@ -266,6 +271,7 @@ FB.Game = class Game {
 
   toMenu() {
     if (FB.SFX) FB.SFX.ambientOff();
+    if (FB.Voces) FB.Voces.stopAll();
     this.stopVideo();
     this.conductor.stop();
     if (this.mechanic) this.mechanic.end();
@@ -282,6 +288,7 @@ FB.Game = class Game {
 
   gameOver() {
     this.stopVideo();
+    if (FB.Voces) FB.Voces.stopAll();
     this.state = 'gameover';
     this._retryFrom = this.parte.t;
     this.conductor.pause();
@@ -444,6 +451,10 @@ FB.Game = class Game {
           const fa = this.stage.actorOf(ev.char);
           if (fa) fa.alpha = fa.target = 0;
         }
+        break;
+      case 'voz':
+        // grito / canción de referencia encima de la música (al reintentar la retoma begin)
+        if (!instant && FB.Voces) FB.Voces.start(ev, this.conductor.time);
         break;
       case 'video':
         // al entrar a mitad de canción (reintento / ?t=) se guarda y se arranca después, por donde iba
@@ -623,6 +634,7 @@ FB.Game = class Game {
     const time = c.time;
     this.syncTimeline(time);
     this.applyTalkPose(time);
+    if (FB.Voces) FB.Voces.tick(time);
 
     const beat = Math.floor(c.beatAt(time));
     if (beat > this.lastBeat) {
