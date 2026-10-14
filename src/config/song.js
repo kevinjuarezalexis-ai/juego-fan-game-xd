@@ -976,8 +976,6 @@ FB.SONG = {
     // ── 2:47 Chilindrina / 3:00 Don Ramón ──
     { t: 167, type: 'flashSprite', char: 'chilindrina', dur: 0.4, shake: 8 },
     { t: 167, type: 'focus', on: 'chilindrina', zoom: 1.25, dur: 0.4 },
-    // referencias de la v1 (voces separadas de la canción original): suenan encima de la música
-    { t: 167.23, type: 'voz', src: 'src/assets/music/voces/chilindrina_grito.mp3?v=2' }, // grito de la Chilindrina (v1 2:21)
     { t: 168, type: 'setState', char: 'jirafales', state: 'hablando' },
     { t: 173, type: 'focus', on: 'center', zoom: 1, dur: 1 },
     { t: 176, type: 'setState', char: 'jirafales', state: 'asustado' },
@@ -1026,7 +1024,6 @@ FB.SONG = {
     { t: 269.5, type: 'shake', power: 6, dur: 0.6 },
     { t: 274, type: 'setState', char: 'ramon', state: 'sano' },
     { t: 274, type: 'focus', on: 'center', zoom: 1, dur: 1.5 },
-    { t: 275.8, type: 'voz', src: 'src/assets/music/voces/chilindrina_peluchi.mp3?v=2' }, // "peluchi chi chi" con las flechas + grito al curarse (v1 3:39.8 → 4:09.3)
 
     // ── 5:04 Chilindrina libre, se juntan los 5 ──
     { t: 299.6, type: 'liberate', char: 'chilindrina', dur: 3 },
@@ -1102,7 +1099,6 @@ FB.SONG = {
     // 6:51 Sr. Barriga (grito del capítulo del callo)
     { t: 411, type: 'flashSprite', char: 'barriga', dur: 0.4, shake: 10 },
     { t: 411, type: 'shake', power: 12, dur: 0.6 },
-    { t: 410.85, type: 'voz', src: 'src/assets/music/voces/barriga_callo.mp3?v=2' }, // grito del Sr. Barriga, el callo (v1 5:52.6)
     { t: 411, type: 'text', text: '¡AAAAAY!', size: 48, x: 760, y: 260, color: '#ff5050', dur: 1.6 },
     // Quico grita "¡ÑOÑOOO!" (7:35, 7:58, 8:21 en la música)
     ...[455, 478, 501].flatMap((t) => [
