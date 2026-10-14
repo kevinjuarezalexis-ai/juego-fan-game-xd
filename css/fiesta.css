@@ -954,3 +954,9 @@ body {
   text-align: center;
   margin-top: 1.2cqw !important;
 }
+.info-intro {
+  text-align: center;
+  background: rgba(90, 50, 20, 0.14);
+  border-radius: 0.6cqw;
+  padding: 0.5cqw 0.7cqw;
+}
