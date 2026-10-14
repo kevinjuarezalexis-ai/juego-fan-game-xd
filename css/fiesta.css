@@ -561,3 +561,26 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .menu-bg, .menu-btns .img-btn, .menu-logo { animation: none; }
 }
+/* créditos: si no entra todo, se puede bajar */
+.c-scroll {
+  max-height: 26cqw;
+  overflow-y: auto;
+  padding: 0 0.6cqw;
+}
+.c-text a {
+  color: #b5360f;
+  font-weight: 800;
+  text-decoration: underline;
+}
+.c-text a:hover {
+  color: #e2551f;
+}
+.c-scroll {
+  flex-shrink: 0;
+  max-height: 28cqw;
+  font-size: 1.1cqw;
+  line-height: 1.4;
+}
+.c-scroll {
+  width: 112%;
+}
