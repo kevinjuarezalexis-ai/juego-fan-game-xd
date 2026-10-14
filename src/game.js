@@ -10,6 +10,13 @@
 
 window.FB = window.FB || {};
 
+// la caja de combate de una mecánica (bulletbox sola, o la de un rescate)
+function boxOf(m) {
+  if (!m) return null;
+  if (FB.MECHANICS.bulletbox && m instanceof FB.MECHANICS.bulletbox) return m;
+  return m.box instanceof FB.MECHANICS.bulletbox ? m.box : null;
+}
+
 FB.Game = class Game {
   constructor(canvas) {
     this.W = 1280;
@@ -351,9 +358,22 @@ FB.Game = class Game {
       const t1 = idx + 1 < segs.length ? segs[idx + 1].t : this.conductor.length;
       if (!this._skipSegApply) this.applySegment(seg);
       this._skipSegApply = false;
+      const prevBox = boxOf(this.mechanic);
       if (this.mechanic) this.mechanic.end();
       const M = FB.MECHANICS[(seg.mechanic && seg.mechanic.type) || 'none'] || FB.MECHANICS.none;
       this.mechanic = new M(this, { ...(seg.mechanic || {}) }, seg.t, t1);
+      const nb = boxOf(this.mechanic);
+      // keepBox: la caja de combate sigue de la parte anterior (no se cierra y se vuelve a abrir)
+      if (nb && prevBox && seg.mechanic && seg.mechanic.keepBox) {
+        nb.box = prevBox.box;
+        nb.soul = prevBox.soul;
+        nb.bullets = prevBox.bullets;
+        nb.inv = prevBox.inv;
+        nb.noFadeIn = true;
+      }
+      // si la parte que sigue continúa esta caja, ésta no se cierra al final
+      const next = segs[idx + 1];
+      if (nb && next && next.mechanic && next.mechanic.keepBox) nb.noFadeOut = true;
       if (this._pendingMech) Object.assign(this.mechanic.p, this._pendingMech);
       this._pendingMech = null;
     }

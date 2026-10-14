@@ -468,7 +468,7 @@ FB.MECHANICS.bulletbox = class BulletBox extends FB.Mechanic {
   }
 
   onBeat(b, time) {
-    if (time > this.t1 - 0.6) return; // nada nuevo justo antes de terminar
+    if (!this.noFadeOut && time > this.t1 - 0.6) return; // nada nuevo justo antes de terminar (salvo que la caja siga)
     for (const pat of this.p.patterns || []) {
       if (pat.from !== undefined && time < pat.from) continue;
       if (pat.to !== undefined && time > pat.to) continue;

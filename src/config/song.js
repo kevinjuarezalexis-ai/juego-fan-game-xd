@@ -351,7 +351,7 @@ FB.SONG = {
     { n: 5, nombre: 'Monchito al rescate', t: 262 },
     { n: 6, nombre: 'La verdad del Chavo', t: 322.91 },
     { n: 7, nombre: 'Ñoño', t: 375.92 },
-    { n: 8, nombre: 'El Sr. Barriga', t: 410.66 },
+    { n: 8, nombre: 'El Sr. Barriga', t: 410.55 },
     { n: 9, nombre: 'Rescatar a Ñoño', t: 456 },
     { n: 10, nombre: 'La última fiesta', t: 525.7 },
   ],
@@ -622,13 +622,12 @@ FB.SONG = {
       },
       mechanic: { type: 'none' },
     },
-    // 6:39 vuelve el color: Ñoño corrompido → combate
+    // 6:39 vuelve el color: Ñoño corrompido → combate (sólo Quico; Don Ramón se suma cuando sale el Sr. Barriga)
     {
       t: 399,
       stage: {
         opponents: [
           ...BACKROW(['jirafales', 'florinda', 'chilindrina']),
-          P('quico', 'sano', 260, { face: 'right' }),
           P('nono', 'corrupto', 960, { face: 'left' }),
         ],
         tension: 0.55,
@@ -637,6 +636,7 @@ FB.SONG = {
       mechanic: {
         type: 'bulletbox',
         damage: 10,
+        box: { y: 108 }, // misma altura que en el rescate del Sr. Barriga: la caja sigue sin moverse
         patterns: [
           { type: 'lluvia', every: 1, count: 2 },
           { type: 'pelota', every: 4, offset: 2 },
@@ -644,9 +644,9 @@ FB.SONG = {
       },
     },
 
-    // ── Parte 8 (6:51): se suma el Sr. Barriga → primero liberarlo a él ──
+    // ── Parte 8 (6:50.55): sale el Sr. Barriga (y se suma Don Ramón) → primero liberarlo a él ──
     {
-      t: 410.66,
+      t: 410.55,
       stage: {
         opponents: [
           ...BACKROW(['jirafales', 'florinda', 'chilindrina']),
@@ -661,12 +661,16 @@ FB.SONG = {
         type: 'rescue',
         target: 'barriga',
         questions: Q.barriga,
+        keepBox: true, // no se cierra la caja de la pelea con Ñoño: los ataques del Sr. Barriga se suman
         dodge: {
           damage: 10,
           patterns: [
-            { type: 'lluvia', every: 2, count: 3 }, // monedas / recibos de la renta
+            // Ñoño (siguen)
+            { type: 'lluvia', every: 2, count: 2 },
+            { type: 'pelota', every: 4, offset: 2 },
+            // Sr. Barriga (provisorio hasta que tenga ataques propios)
             { type: 'muro', every: 4, offset: 1, gap: 75 },
-            { type: 'pelota', every: 8, offset: 5 },
+            { type: 'lluvia', every: 4, offset: 3, count: 3 }, // monedas / recibos de la renta
           ],
         },
       },
@@ -1024,7 +1028,7 @@ FB.SONG = {
     { t: 274, type: 'setState', char: 'ramon', state: 'sano' },
     { t: 274, type: 'focus', on: 'center', zoom: 1, dur: 1.5 },
     // canciones originales de fondo (el volumen de fondo ya viene en el archivo: Peluchín 50%, el resto 40%)
-    { t: 276.18, type: 'voz', src: 'src/assets/music/voces/peluchin_x4.mp3?v=3' }, // Peluchín chin chin ×4, a 146 BPM: 1 frase = 2 tandas de flechas
+    { t: 276.05, type: 'voz', src: 'src/assets/music/voces/peluchin_x4.mp3?v=3' }, // Peluchín chin chin ×4, a 146 BPM: 1 frase = 2 tandas de flechas
 
     // ── 5:04 Chilindrina libre, se juntan los 5 ──
     { t: 299.6, type: 'liberate', char: 'chilindrina', dur: 3 },
@@ -1087,13 +1091,24 @@ FB.SONG = {
     { t: 393.72, type: 'shake', power: 12, dur: 0.5 },
     { t: 393.72, type: 'propMove', id: 'barril', x: 980, y: 620, dur: 1.3, rot: 2.2 },
     { t: 393.72, type: 'fall', char: 'nono', dur: 1.3 },
+    // diálogos de la escena animada: texto flotante sobre cada uno (sin cuadro de diálogo)
+    ...[
+      [376.38, 'nono', '¿Qué estás haciendo, eh?', 3, 570],
+      [379.11, 'chavo', 'Hay que treparse al bote para bajar los globos.', 3.4, 860],
+      [382.31, 'nono', '¡Sale y vale!', 1.3, 600],
+      [383.5, 'chavo', 'No, Ñoño, tú no lo—', 1.4, 860],
+      [385.96, 'nono', '¡Ay, mi cuerpecito! ¡Ay, mi cuerpecito!', 3.3, 640],
+      [389.15, 'chavo', '¡Por tu culpa se nos fueron los globos!', 3, 860],
+      [391.98, 'nono', 'No, Chavo... ¡NO!', 1.8, 640],
+    ].map(([t, who, text, dur, px], i) => {
+      const size = 20;
+      const w = text.length * size; // fuente de ancho fijo: así nunca se corta en los bordes
+      const x = Math.round(Math.max(w / 2 + 24, Math.min(1280 - w / 2 - 24, px)));
+      return { t, type: 'text', text, dur, size, x, y: who === 'chavo' ? 200 : 228, color: '#ffffff', rot: i % 2 ? 0.03 : -0.03 };
+    }),
     { t: 397.98, type: 'pose', char: 'quico', state: 'gritando', dur: 1.8 },
     { t: 397.98, type: 'text', text: '¡ÑOÑOOOO!', size: 42, x: 380, y: 220, color: '#000', dur: 1.8 },
     // 6:36 Quico se une al combate
-    // 6:39 vuelve el color: Don Ramón vuelve a ser el jugador y Quico pasa a su lado
-    { t: 398.95, type: 'swapPlayer', char: 'ramon' },
-    { t: 398.97, type: 'walk', char: 'ramon', from: 520, to: 400, dur: 0.05, end: 'sano' },
-    { t: 398.98, type: 'face', char: 'ramon', dir: 'right' },
     // 6:39 vuelve el color, Ñoño corrompido
     { t: 399, type: 'ink', on: false, dur: 0.25 },
     { t: 399, type: 'flash', dur: 0.4 },
@@ -1101,13 +1116,19 @@ FB.SONG = {
     { t: 399, type: 'prop', id: 'globos', on: false },
     { t: 399, type: 'flashSprite', char: 'nono', dur: 0.4, shake: 8 },
     // 6:51 Sr. Barriga (grito del capítulo del callo)
-    { t: 410.66, type: 'flashSprite', char: 'barriga', dur: 0.4, shake: 10 },
-    { t: 410.66, type: 'shake', power: 12, dur: 0.6 },
-    { t: 410.66, type: 'voz', src: 'src/assets/music/voces/barriga_grito.mp3?v=3' }, // 6:50.66 (en el drop) el grito del Sr. Barriga (el callo), lento y se aleja
+    { t: 410.55, type: 'flashSprite', char: 'barriga', dur: 0.4, shake: 10 },
+    { t: 410.55, type: 'shake', power: 12, dur: 0.6 },
+    // Don Ramón se suma (pasa a ser el jugador) y Quico se corre a su lado
+    { t: 410.5, type: 'swapPlayer', char: 'ramon' },
+    { t: 410.52, type: 'walk', char: 'ramon', from: 520, to: 400, dur: 0.05, end: 'sano' },
+    { t: 410.53, type: 'face', char: 'ramon', dir: 'right' },
+    { t: 410.56, type: 'walk', char: 'quico', from: 400, to: 260, dur: 0.05, end: 'sano' },
+    { t: 410.57, type: 'face', char: 'quico', dir: 'right' },
+    { t: 410.55, type: 'voz', src: 'src/assets/music/voces/barriga_grito.mp3?v=3' }, // 6:50.55 (en el drop) el grito del Sr. Barriga (el callo), lento y se aleja
     { t: 434.5, type: 'voz', src: 'src/assets/music/voces/churi_churin.mp3?v=3' }, // 7:14.5 Churi Churin Fun Flais
     { t: 445, type: 'voz', src: 'src/assets/music/voces/joven_aun.mp3?v=3' }, // 7:25 Joven aún
     { t: 458, type: 'voz', src: 'src/assets/music/voces/oyelo.mp3?v=3' }, // 7:38 Óyelo y escúchalo
-    { t: 410.66, type: 'text', text: '¡AAAAAY!', size: 48, x: 760, y: 260, color: '#ff5050', dur: 1.6 },
+    { t: 410.55, type: 'text', text: '¡AAAAAY!', size: 48, x: 760, y: 260, color: '#ff5050', dur: 1.6 },
     // Quico grita "¡ÑOÑOOO!" (7:35, 7:58, 8:21 en la música)
     ...[455, 478, 501].flatMap((t) => [
       { t, type: 'pose', char: 'quico', state: 'gritando', dur: 1.2 },
@@ -1215,15 +1236,6 @@ FB.SONG = {
     [343.42, 'El Chavo', 'Me quedé ahí, solito... y algo se metió en mí.', 5.5],
     [349.74, 'El Chavo', 'Fue por su culpa. Por no creerme.', 5],
     [355.52, 'El Chavo', '...ahora les toca a ustedes.', 3],
-    // 6:14 escena del capítulo animado
-    [376.38, 'Ñoño', '¿Qué estás haciendo, eh?', 3],
-    [379.11, 'El Chavo', 'Hay que treparse al bote para bajar los globos.', 3.4],
-    [382.31, 'Ñoño', '¡Sale y vale!', 1.3],
-    [383.5, 'El Chavo', 'No, Ñoño, tú no lo—', 1.4],
-    [385.96, 'Ñoño', '¡Ay, mi cuerpecito! ¡Ay, mi cuerpecito!', 3.3],
-    [389.15, 'El Chavo', '¡Por tu culpa se nos fueron los globos!', 3],
-    [391.98, 'Ñoño', 'No, Chavo... ¡NO!', 1.8],
-    [394.63, 'Quico', '¡ÑOÑOOOO!', 2],
     // 8:22 Ñoño libre
     [502.5, 'Ñoño', '¿Papá...? ¡PAPÁ!', 2.5],
     [505.5, 'Sr. Barriga', '¡Ñoño! ¡Hijo mío!', 3],

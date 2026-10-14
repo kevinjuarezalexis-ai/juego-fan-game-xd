@@ -33,8 +33,8 @@ FB.Mechanic = class Mechanic {
   }
   // 0→1 al entrar, 1→0 en el último medio segundo
   fade(time, inDur = 0.35, outDur = 0.35) {
-    const a = Math.min(1, (time - this.t0) / inDur);
-    const b = Math.min(1, (this.t1 - time) / outDur);
+    const a = this.noFadeIn ? 1 : Math.min(1, (time - this.t0) / inDur);
+    const b = this.noFadeOut ? 1 : Math.min(1, (this.t1 - time) / outDur);
     return Math.max(0, Math.min(a, b));
   }
 };
