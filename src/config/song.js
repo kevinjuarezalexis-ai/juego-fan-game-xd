@@ -758,10 +758,10 @@ FB.SONG = {
         boss: 'chavo',
         startX: 960, // dónde arranca el Chavo
         nearX: 560, // hasta dónde llega (te alcanzó)
-        approach: 0.03, // cuánto se acerca por segundo (sin disparar te alcanza en ~33 s)
+        approach: 0.06, // cuánto se acerca por segundo (sin disparar te alcanza en ~17 s)
         push: 0.15, // cuánto lo aleja cada disparo
         ammoStart: 2,
-        ammoMax: 5,
+        ammoMax: 3, // máximo de cartuchos guardados
         ammoEvery: 6, // cada cuántos beats aparece un cartucho
         attackEvery: 6, // ataque al profesor (bloquear)
         warnBeats: 2,
@@ -1197,7 +1197,7 @@ FB.SONG = {
       t: 572,
       type: 'mech',
       set: {
-        attackEvery: 4, warnBeats: 1.5, damage: 14, approach: 0.04, ammoEvery: 5,
+        attackEvery: 4, warnBeats: 1.5, damage: 14, ammoEvery: 5,
         patterns: [
           { type: 'apuntado', every: 2 },
           { type: 'lluvia', every: 2, count: 3 },
@@ -1206,6 +1206,7 @@ FB.SONG = {
         ],
       },
     },
+    { t: 573, type: 'mech', set: { approach: 0.09 } }, // 9:33 el Chavo va x3 de rápido
     { t: 572, type: 'bump', every: 1, amount: 0.03 },
     { t: 572, type: 'tilt', deg: -3, dur: 0.6 },
     { t: 572, type: 'text', text: '¡ÚLTIMO ESFUERZO!', size: 30, x: 640, y: 330, color: '#ffd23f', dur: 2 },

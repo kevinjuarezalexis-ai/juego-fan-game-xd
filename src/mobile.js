@@ -109,6 +109,7 @@
     init(game) {
       const touch = isTouch();
       document.body.classList.toggle('is-touch', touch);
+      FB.lowPower = touch; // celu: efectos más livianos
 
       // ── controles táctiles ──
       joystick($('t-stick'), $('t-knob'), game);

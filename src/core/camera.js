@@ -231,7 +231,10 @@ FB.Camera = class Camera {
     if (!this.filterOn) return;
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    if (this.gray > 0.005) {
+    // en celu el modo 'saturation' sobre toda la pantalla es muy pesado: si el gris es suave
+    // (filtro oscuro de todo el nivel) se saltea y se oscurece un poquito más en su lugar
+    const lite = FB.lowPower && this.gray < 0.5;
+    if (this.gray > 0.005 && !lite) {
       ctx.globalCompositeOperation = 'saturation';
       ctx.globalAlpha = Math.min(1, this.gray);
       ctx.fillStyle = '#808080';
@@ -251,7 +254,7 @@ FB.Camera = class Camera {
     }
     if (this.dark > 0.005) {
       ctx.globalCompositeOperation = 'source-over';
-      ctx.globalAlpha = this.dark;
+      ctx.globalAlpha = Math.min(1, this.dark + (lite ? this.gray * 0.12 : 0));
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, this.W, this.H);
     }

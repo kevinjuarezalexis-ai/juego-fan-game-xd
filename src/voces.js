@@ -71,6 +71,7 @@ window.FB = window.FB || {};
       const d = dur(ev);
       if (off < 0 || (d && off >= d - 0.05)) return;
       a._enUso = true;
+      a._start = performance.now();
       a.muted = muted();
       a.volume = Math.max(0, Math.min(1, musicVol() * (ev.vol ?? 1)));
       try {
@@ -125,9 +126,14 @@ window.FB = window.FB || {};
           this.stop(ev);
           continue;
         }
-        a.volume = Math.max(0, Math.min(1, v * (ev.vol ?? 1)));
-        a.muted = m;
-        if (!a.paused && Math.abs(a.currentTime - want) > 0.15) {
+        const vol = Math.max(0, Math.min(1, v * (ev.vol ?? 1)));
+        if (Math.abs(a.volume - vol) > 0.01) a.volume = vol;
+        if (a.muted !== m) a.muted = m;
+        // corregir la posición sólo si se fue MUY de tiempo, y no seguido:
+        // en el celu cada salto vuelve a cargar el audio y se escucha cortado
+        const now = performance.now();
+        if (!a.paused && now - (a._fix || 0) > 4000 && now - (a._start || 0) > 1500 && Math.abs(a.currentTime - want) > 0.45) {
+          a._fix = now;
           try {
             a.currentTime = want;
           } catch (e) {}

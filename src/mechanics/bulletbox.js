@@ -845,14 +845,15 @@ FB.MECHANICS.bulletbox = class BulletBox extends FB.Mechanic {
         FB.drawBeachBall(ctx, b.x, b.y, b.r, b.rot, b.square);
         break;
       case 'orb':
-        ctx.save();
-        ctx.shadowColor = '#ff0000';
-        ctx.shadowBlur = 10;
+        // brillo con un círculo transparente (shadowBlur es muy pesado en celu)
+        ctx.fillStyle = 'rgba(255,0,0,0.28)';
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r * 1.9, 0, Math.PI * 2);
+        ctx.fill();
         ctx.fillStyle = '#ff4040';
         ctx.beginPath();
         ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
         break;
       case 'rect':
         ctx.save();
@@ -1036,15 +1037,15 @@ FB.MECHANICS.bulletbox = class BulletBox extends FB.Mechanic {
           const k = Math.min(1, (time - b.hitAt) / 0.07);
           const fade = Math.min(1, (b.until - time) / 0.12);
           ctx.globalAlpha = fade;
-          ctx.shadowColor = '#ff0000';
-          ctx.shadowBlur = 12;
-          ctx.strokeStyle = '#ff2a2a';
-          ctx.lineWidth = b.th;
+          ctx.strokeStyle = 'rgba(255,0,0,0.3)';
+          ctx.lineWidth = b.th * 3;
           ctx.beginPath();
           ctx.moveTo(b.x1, b.y1);
           ctx.lineTo(b.x1 + (b.x2 - b.x1) * k, b.y1 + (b.y2 - b.y1) * k);
           ctx.stroke();
-          ctx.shadowBlur = 0;
+          ctx.strokeStyle = '#ff2a2a';
+          ctx.lineWidth = b.th;
+          ctx.stroke();
           ctx.strokeStyle = '#ffd0d0';
           ctx.lineWidth = Math.max(1, b.th / 3);
           ctx.stroke();

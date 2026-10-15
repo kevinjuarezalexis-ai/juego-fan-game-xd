@@ -424,18 +424,15 @@ FB.MECHANICS.finalfight = class FinalFight extends FB.Mechanic {
     ctx.translate(it.x, it.y);
     if (it.kind === 'cartucho') {
       const s = 1 + 0.12 * Math.sin(time * 8);
-      ctx.shadowColor = '#ffd23a';
-      ctx.shadowBlur = 12;
+      halo(ctx, 17, 'rgba(255,210,58,0.3)');
       ctx.rotate(-0.5);
       drawShell(ctx, 1.25 * s);
     } else if (it.kind === 'cafe') {
-      ctx.shadowColor = '#7dff9a';
-      ctx.shadowBlur = 14;
+      halo(ctx, 22, 'rgba(125,255,154,0.28)');
       ctx.rotate(it.rot * 0.3);
       FB.drawCup(ctx, 34);
     } else if (it.kind === 'paleta') {
-      ctx.shadowColor = '#ff9fd8';
-      ctx.shadowBlur = 14;
+      halo(ctx, 22, 'rgba(255,159,216,0.3)');
       ctx.rotate(it.rot);
       drawLollipop(ctx, 15);
     } else if (it.kind === 'pelota') {
@@ -455,6 +452,14 @@ FB.MECHANICS.finalfight = class FinalFight extends FB.Mechanic {
 
 // proyectiles que la pelota de Quico puede romper
 const ROMPIBLE = { ball: 1, rect: 1, orb: 1, tear: 1, drop: 1, cup: 1, heartb: 1, hand: 1 };
+
+// brillo barato (círculo transparente) en vez de shadowBlur, que es muy pesado en celu
+function halo(ctx, r, color) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  ctx.fill();
+}
 
 // cartucho de escopeta (rojo con base dorada), centrado
 function drawShell(ctx, s) {
