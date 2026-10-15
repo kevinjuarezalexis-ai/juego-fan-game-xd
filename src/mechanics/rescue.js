@@ -36,17 +36,14 @@ FB.MECHANICS.rescue = class Rescue extends FB.Mechanic {
     );
   }
 
+  // (ya no hay barra de liberación: meter sólo sirve para cambiar de pose con hopePose
+  //  a medida que le vas hablando)
   result(r) {
     if (r === 'good') {
       this.meter = Math.min(1, this.meter + (this.p.gain ?? 0.22));
       this.flash = 0.5;
       this.game.stage.flashSprite(this.p.target, 0.25, 4);
-    } else if (r === 'bad' || r === 'timeout') {
-      this.meter = Math.max(0, this.meter - (this.p.loss ?? 0.1));
-      this.game.stage.shake(5, 0.2);
     }
-    this.game.stats.rescue = this.game.stats.rescue || {};
-    this.game.stats.rescue[this.p.target] = this.meter;
   }
 
   update(dt, time) {
@@ -91,25 +88,10 @@ FB.MECHANICS.rescue = class Rescue extends FB.Mechanic {
   draw(ctx, time) {
     if (this.box) this.box.draw(ctx, time);
     this.choice.draw(ctx, time);
-    // barra de liberación sobre el personaje
-    const pos = this.game.stage.posOf(this.p.target);
-    const def = FB.CHARACTERS[this.p.target] || {};
     const f = this.fade(time);
-    const w = 150;
-    const x = pos.x - w / 2;
-    const y = Math.max(this.box ? 312 : 280, pos.top - 34);
     ctx.save();
-    ctx.globalAlpha = f;
-    ctx.fillStyle = 'rgba(0,0,0,0.75)';
-    ctx.fillRect(x - 3, y - 3, w + 6, 16);
-    ctx.fillStyle = '#2a2a3a';
-    ctx.fillRect(x, y, w, 10);
-    ctx.fillStyle = this.flash > 0 ? '#ffffff' : '#7dd8ff';
-    ctx.fillRect(x, y, w * this.shownMeter, 10);
-    ctx.fillStyle = '#fff';
-    ctx.font = '10px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('LIBERAR A ' + (def.nombre || this.p.target).toUpperCase(), pos.x, y - 8);
+    ctx.fillStyle = '#fff';
     if (this.box) {
       ctx.globalAlpha = f * 0.75;
       ctx.font = '11px "Press Start 2P", monospace';

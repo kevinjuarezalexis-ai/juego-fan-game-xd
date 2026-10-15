@@ -11,15 +11,15 @@ window.FB = window.FB || {};
 (function () {
   // 'pronto': la mecánica todavía no existe (se muestra igual, bloqueado)
   const LISTA = [
-    { id: 'fiesta', titulo: 'La Fiesta de la Buena Vecindad', desc: 'Sobreviví a la Fiesta de la Buena Vecindad.' },
-    { id: 'finmalo', titulo: 'No hubo Fiesta de la Buena Vecindad', desc: 'Conseguí el final malo.' },
-    { id: 'finbueno', titulo: 'Liberaste al Chavo', desc: 'Conseguí el final bueno.' },
+    { id: 'fiesta', titulo: 'La Fiesta de la Buena Vecindad', desc: 'Sobreviví a la Fiesta de la Buena Vecindad (derrotá al Chavo).' },
+    { id: 'finmalo', titulo: 'No hubo Fiesta de la Buena Vecindad', desc: 'Conseguí el final malo: perdé la batalla final.' },
+    { id: 'finbueno', titulo: 'Liberaste al Chavo', desc: 'Conseguí el final bueno: elegí la respuesta justa en cada diálogo.' },
     { id: 'teniaque', titulo: 'Tenía que ser el Chavo...', desc: 'Perdé contra el Chavo al principio.' },
     { id: 'escudo', titulo: 'Mi escudo es un corazón', desc: 'Completá el juego sin perder.' },
     { id: 'peluchin', titulo: 'Peluchín chin chin', desc: 'Completá el rescate de la Chilindrina con todas las notas en ¡PERFECTO!.' },
     { id: 'tatata', titulo: 'TA TA TAAA', desc: 'Perdé 10 veces seguidas en una parte.' },
     { id: 'pelota', titulo: 'Mi Pelota Cuadrada', desc: 'Tené la suerte de que aparezca la Pelota Cuadrada de Quico.' },
-    { id: 'pipipi', titulo: 'PIPIPIPI', desc: 'Lográ que el Chavo no se te acerque mucho.', pronto: true },
+    { id: 'pipipi', titulo: 'PIPIPIPI', desc: 'Lográ que el Chavo no se te acerque mucho (ganá la pelea final sin que pase la mitad del camino).' },
     { id: 'cinco', titulo: '¡Eso, eso, eso!', desc: 'Completá el juego 5 veces.' },
     { id: 'vecino', titulo: 'Verdadero Vecino de la Vecindad', desc: 'Completá los 10 logros.' },
   ];
@@ -128,13 +128,15 @@ window.FB = window.FB || {};
       }
     },
 
-    // final de la canción
-    onEnding(game) {
+    // finales: 'normal' (derrotaste al Chavo), 'bueno' (además todas las respuestas clave), 'malo' (perdiste la pelea final)
+    onEnding(game, tipo = 'normal') {
       if (game.testMode) return;
       const s = game.stats;
+      if (tipo === 'malo') return this.unlock('finmalo');
       this.unlock('fiesta');
-      this.unlock(s.bossDefeated ? 'finbueno' : 'finmalo');
+      if (tipo === 'bueno') this.unlock('finbueno');
       if (run && run.full && s.retries === 0) this.unlock('escudo');
+      if (s.maxClose !== undefined && s.maxClose < 0.5) this.unlock('pipipi');
       // cuántas veces lo terminaste (en este navegador)
       const n = completados() + 1;
       try {

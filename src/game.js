@@ -134,6 +134,7 @@ FB.Game = class Game {
     if (FB.unlockBgVideos) FB.unlockBgVideos(); // viene de un toque: el celu deja arrancar el video
     if (FB.Voces) FB.Voces.unlock(this.song.events); // gritos / canciones de referencia (se habilitan con este toque)
     this.resetStats();
+    this.claves = {}; // respuestas clave elegidas (final bueno)
     if (FB.Logros) FB.Logros.onStart(this, from);
     if (from === 0 && this.song.intro && !opts.skipIntro) return this.startIntro();
     this.begin(from);
@@ -296,6 +297,8 @@ FB.Game = class Game {
   }
 
   gameOver() {
+    // perder en la batalla final no es "Perdiste": es el final malo
+    if (this.mechanic && FB.MECHANICS.finalfight && this.mechanic instanceof FB.MECHANICS.finalfight) return this.badEnding('vida');
     this.stopVideo();
     if (FB.Voces) FB.Voces.stopAll();
     this.state = 'gameover';
@@ -305,13 +308,41 @@ FB.Game = class Game {
     UI.gameOver(this.parte);
   }
 
+  // ¿eligió la respuesta clave en TODOS los diálogos del juego? → final bueno
+  todasLasClaves() {
+    const qs = [];
+    for (const seg of this.song.segments) for (const q of (seg.mechanic && seg.mechanic.questions) || []) qs.push(q.t);
+    const c = this.claves || {};
+    return qs.length > 0 && qs.every((t) => c[t] === true);
+  }
+
+  // fin de la canción: final (derrotaste al Chavo) o final bueno (además, todas las respuestas clave)
   finish() {
     if (this.state !== 'playing') return;
     this.state = 'ending';
-    if (FB.Logros) FB.Logros.onEnding(this);
+    const tipo = this.todasLasClaves() ? 'bueno' : 'normal';
+    this.stats.final = tipo;
+    if (FB.Logros) FB.Logros.onEnding(this, tipo);
     if (this.mechanic) this.mechanic.end();
     this.mechanic = null;
-    UI.ending(this.stats);
+    UI.ending(this.stats, tipo);
+  }
+
+  // final malo: perdiste la batalla final (sin vida, o el Chavo te alcanzó)
+  badEnding(como) {
+    if (this.state !== 'playing') return;
+    this.state = 'ending';
+    this.stats.final = 'malo';
+    this._retryFrom = this.parte.t; // "volver a intentar" arranca la batalla final de nuevo
+    this.stopVideo();
+    if (FB.Voces) FB.Voces.stopAll();
+    this.conductor.pause();
+    this.stage.flash(0.9, '#ff1a1a', 0.95);
+    this.camera.shake && this.camera.shake(16, 0.8);
+    if (FB.Logros) FB.Logros.onEnding(this, 'malo');
+    if (this.mechanic) this.mechanic.end();
+    this.mechanic = null;
+    setTimeout(() => this.state === 'ending' && UI.ending(this.stats, 'malo', como), 900);
   }
 
   hurt(n) {
@@ -1016,6 +1047,7 @@ const UI = {
     this.el('btn-reintentar').onclick = () => g.retry();
     this.el('btn-go-menu').onclick = () => g.toMenu();
     this.el('btn-fin-menu').onclick = () => g.toMenu();
+    this.el('btn-fin-retry').onclick = () => g.retry();
   },
 
   gameOver(parte) {
@@ -1034,19 +1066,31 @@ const UI = {
     this.el('como-next').disabled = this._como === pags.length - 1;
   },
 
-  ending(s) {
+  // 3 finales: 'normal' (derrotaste al Chavo), 'bueno' (además, todas las respuestas clave), 'malo' (perdiste la pelea final)
+  ending(s, tipo = 'normal', como) {
     const total = s.notesHit + s.notesMiss;
+    const titulo = { normal: 'Fin de la fiesta', bueno: '¡Final bueno!', malo: 'Final malo' }[tipo];
+    const frase = {
+      normal: 'Derrotaste al Chavo... pero algo quedó sin decir.',
+      bueno: 'Liberaste al Chavo. La vecindad vuelve a estar unida.',
+      malo: como === 'alcanzado' ? 'El Chavo te alcanzó. No hubo Fiesta de la Buena Vecindad.' : 'Caíste en la pelea final. No hubo Fiesta de la Buena Vecindad.',
+    }[tipo];
     this.el('fin-stats').textContent =
+      frase + '\n\n' +
       'Golpes recibidos: ' + s.hits +
       '\nFlechas: ' + s.notesHit + '/' + total +
-      '\nRespuestas buenas: ' + s.answersGood + ' · malas: ' + s.answersBad +
+      '\nRespuestas clave: ' + (s.answersKey || 0) + '/' + s.answersGood +
       '\nBloqueos: ' + s.blocks +
-      '\nReintentos: ' + s.retries +
-      '\n\n' + (s.bossDefeated ? 'El Chavo descansa en paz.' : 'El espíritu sigue en la vecindad...');
-    this.el('m-ending').querySelector('.c-title').textContent = s.bossDefeated ? '¡Ganaste!' : 'Fin de la fiesta';
+      '\nReintentos: ' + s.retries;
+    const t = this.el('m-ending').querySelector('.c-title');
+    t.textContent = titulo;
+    t.classList.toggle('c-win', tipo !== 'malo');
+    t.classList.toggle('c-lose', tipo === 'malo');
+    this.el('btn-fin-retry').classList.toggle('hidden', tipo !== 'malo');
     this.show('ending');
-    if (FB.SFX) FB.SFX.play(s.bossDefeated ? 'ganaste' : 'perdiste');
+    if (FB.SFX) FB.SFX.play(tipo === 'malo' ? 'perdiste' : 'ganaste');
   },
+
 };
 
 window.addEventListener('DOMContentLoaded', () => {

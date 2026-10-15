@@ -750,16 +750,31 @@ FB.SONG = {
         tension: 1,
         bumpEvery: 2,
       },
+      // caja + escopeta: juntás cartuchos en la caja, disparás para alejar al Chavo (no tiene vida,
+      // se acerca solo), bloqueás sus ataques al profesor y los vecinos tiran ayudas.
+      // Si te alcanza o te quedás sin vida → final malo. Aguantando hasta 10:20 → lo derrotás.
       mechanic: {
-        type: 'blockshoot',
+        type: 'finalfight',
         boss: 'chavo',
-        bossName: 'El Chavo (forma final)',
-        bossHp: 100,
-        attackEvery: 4,
+        startX: 960, // dónde arranca el Chavo
+        nearX: 560, // hasta dónde llega (te alcanzó)
+        approach: 0.03, // cuánto se acerca por segundo (sin disparar te alcanza en ~33 s)
+        push: 0.15, // cuánto lo aleja cada disparo
+        ammoStart: 2,
+        ammoMax: 5,
+        ammoEvery: 6, // cada cuántos beats aparece un cartucho
+        attackEvery: 6, // ataque al profesor (bloquear)
         warnBeats: 2,
         damage: 12,
-        shootDamage: 5,
-        minHpUntil: 619.5, // no cae antes de 10:20
+        boxDamage: 10,
+        cafeEvery: 16, // Doña Florinda: taza de café (cura)
+        pelotaEvery: 20, // Quico: pelota que rompe proyectiles
+        paletaEvery: 24, // la Chilindrina: paleta (cura poquito + velocidad)
+        patterns: [
+          { type: 'apuntado', every: 2 }, // le apunta al corazón
+          { type: 'lluvia', every: 4, count: 3 },
+          { type: 'lagrimas', every: 4, offset: 2 },
+        ],
       },
     },
     // 10:20 derrotado → final
@@ -1178,7 +1193,19 @@ FB.SONG = {
     { t: 525.7, type: 'walk', char: 'quico', from: 260, to: 110, dur: 0.8, end: 'sano' },
     // 9:32 clímax: últimos segundos para ganar
     { t: 572, type: 'flash', dur: 0.4 },
-    { t: 572, type: 'mech', set: { attackEvery: 2, warnBeats: 1.5, damage: 15 } },
+    {
+      t: 572,
+      type: 'mech',
+      set: {
+        attackEvery: 4, warnBeats: 1.5, damage: 14, approach: 0.04, ammoEvery: 5,
+        patterns: [
+          { type: 'apuntado', every: 2 },
+          { type: 'lluvia', every: 2, count: 3 },
+          { type: 'lagrimas', every: 4, offset: 2 },
+          { type: 'corte', every: 8, offset: 5 },
+        ],
+      },
+    },
     { t: 572, type: 'bump', every: 1, amount: 0.03 },
     { t: 572, type: 'tilt', deg: -3, dur: 0.6 },
     { t: 572, type: 'text', text: '¡ÚLTIMO ESFUERZO!', size: 30, x: 640, y: 330, color: '#ffd23f', dur: 2 },

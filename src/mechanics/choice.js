@@ -1,12 +1,14 @@
 // ══════════════════════════════════════
 //   Diálogo con 3 opciones + cronómetro
 // ══════════════════════════════════════
-// La música no se frena: si no elegís a tiempo, cuenta como respuesta mala.
+// Los diálogos son lore + curación: las 3 respuestas son buenas y todas curan.
+// Una es la CLAVE (key: true): cura el doble y cuenta para el final bueno
+// (hay que elegir la clave en todos los diálogos). Si no elegís a tiempo, no pasa nada.
 // Controles: 1/2/3 directo, o ↑↓ + Z/Enter, o click/toque.
 // params:
-//   questions: [{ t, time, speaker, prompt, options: [{ text, ok, reply }] }]
-//     ok: true (cura) | false (daña) | 'neutral' (nada)
-//   healOk, wrongDamage, timeoutDamage
+//   questions: [{ t, time, speaker, prompt, options: [{ text, key, reply }] }]
+//     key: true → respuesta clave (por compatibilidad, ok: true también cuenta como clave)
+//   heal          cuánto cura una respuesta normal (la clave cura el doble) · healOk = lo mismo (viejo)
 //   panelY        altura del cuadro (default 14 = arriba)
 //   stripY        altura de la franja (default 8 = arriba)
 //   numbersOnly   solo 1/2/3 o click (para usar mientras esquivás con las flechas)
@@ -55,28 +57,25 @@ FB.MECHANICS.choice = class Choice extends FB.Mechanic {
       if (a && (!L.from || a.state === L.from)) this.game.stage.setState(L.char, L.state);
     }
     const time = this.cond.time;
+    // para el final bueno: qué respuesta se eligió en cada diálogo (por su segundo)
+    const claves = (this.game.claves = this.game.claves || {});
     if (i < 0) {
-      this.game.hurt(this.p.timeoutDamage || 12);
-      this.game.stats.answersBad++;
-      if (FB.SFX) FB.SFX.play('mal');
-      this.feedback = { speaker: '', text: '...se acabó el tiempo.', color: '#ff6060', until: time + 1.8 };
+      claves[q.t] = false;
+      this.feedback = { speaker: '', text: '...no dijiste nada.', color: '#bbbbbb', until: time + 1.8 };
       if (this.p.onResult) this.p.onResult('timeout', q, null);
       return;
     }
     const o = q.options[i];
-    if (o.ok === true) {
-      this.game.heal(this.p.healOk || 6);
-      this.game.stats.answersGood++;
-      if (FB.SFX) FB.SFX.play('bien');
-    } else if (o.ok === false) {
-      this.game.hurt(this.p.wrongDamage || 10);
-      this.game.stats.answersBad++;
-      if (FB.SFX) FB.SFX.play('mal');
-    }
-    const color = o.ok === true ? '#7dff9a' : o.ok === false ? '#ff6060' : '#dddddd';
+    const key = o.key === true || (o.key === undefined && o.ok === true);
+    claves[q.t] = key;
+    const base = this.p.heal ?? this.p.healOk ?? 6;
+    this.game.heal(key ? base * 2 : base);
+    this.game.stats.answersGood++;
+    if (key) this.game.stats.answersKey = (this.game.stats.answersKey || 0) + 1;
+    if (FB.SFX) FB.SFX.play('bien');
     const who = q.speaker === 'Prof. Jirafales' ? '' : q.speaker;
-    this.feedback = { speaker: who, text: o.reply || '...', color, until: time + (this.p.replyTime ?? 2.2) };
-    if (this.p.onResult) this.p.onResult(o.ok === true ? 'good' : o.ok === false ? 'bad' : 'neutral', q, o);
+    this.feedback = { speaker: who, text: o.reply || '...', color: '#7dff9a', until: time + (this.p.replyTime ?? 2.2) };
+    if (this.p.onResult) this.p.onResult('good', q, o);
   }
 
   onAction(a) {

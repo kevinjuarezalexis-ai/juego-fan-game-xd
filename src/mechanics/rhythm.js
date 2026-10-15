@@ -248,7 +248,7 @@ FB.MECHANICS.rhythm = class Rhythm extends FB.Mechanic {
         ctx.fillText('x' + this.combo, this.cx, this.recY + 155);
       }
     }
-    if (this.p.target) {
+    if (this.p.target && this.p.showBar) {
       const pos = this.game.stage.posOf(this.p.target);
       const def = FB.CHARACTERS[this.p.target] || {};
       const w = 150;

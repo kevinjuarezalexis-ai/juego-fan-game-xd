@@ -6,8 +6,8 @@
     <title>Fiesta de la Buena Vecindad</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Luckiest+Guy&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="ui-components.css?v=202610150440" />
-    <link rel="stylesheet" href="css/fiesta.css?v=202610150440" />
+    <link rel="stylesheet" href="ui-components.css?v=202610150523" />
+    <link rel="stylesheet" href="css/fiesta.css?v=202610150523" />
   </head>
   <body>
     <div id="wrap">
@@ -122,9 +122,10 @@
               <p class="como-keys"><b>PC:</b> flechas o WASD · <b>Celu:</b> joystick</p>
             </div>
             <div class="como-pag hidden">
-              <div class="como-t">Rescate</div>
+              <div class="como-t">Diálogos</div>
               <div class="como-demo"><span class="cd-opt">1</span><span class="cd-opt">2</span><span class="cd-opt">3</span></div>
-              <p>Hablale al vecino corrompido. Las <b>respuestas buenas</b> llenan su barra de <b>Liberar</b> y te curan; las malas te sacan vida. Si tardás mucho, cuenta como mala.</p>
+              <p>Los vecinos te hablan y vos elegís qué decirles. Las <b>3 respuestas curan</b>, pero una es la <b>justa</b>: cura el doble.</p>
+              <p>Dicen que si elegís siempre la justa... la fiesta termina distinto.</p>
               <p>A veces tenés que contestar <b>mientras esquivás</b> en la caja.</p>
               <p class="como-keys"><b>PC:</b> 1 2 3 (o ↑↓ + Z) · <b>Celu:</b> tocá la respuesta</p>
             </div>
@@ -136,11 +137,12 @@
               <p class="como-keys"><b>PC:</b> flechas / WASD (y Enter si aparece) · <b>Celu:</b> tocá los carriles</p>
             </div>
             <div class="como-pag hidden">
-              <div class="como-t">Bloquear y disparar</div>
-              <div class="como-demo"><span class="cd-ring"></span></div>
-              <p>Antes de cada ataque aparece un <b>anillo</b> que se cierra: <b>bloqueá</b> justo cuando llega al círculo.</p>
-              <p>Si bloqueás bien, queda <b>aturdido</b> un momento: ahí <b>disparale</b> para hacerle mucho daño.</p>
-              <p class="como-keys"><b>PC:</b> X bloquear · Z disparar · <b>Celu:</b> botones BLOQUEAR / DISPARAR</p>
+              <div class="como-t">La pelea final</div>
+              <div class="como-demo"><span class="cd-box"><span class="cd-heart">♥</span></span><span class="cd-ring"></span></div>
+              <p>El Chavo <b>se te va acercando</b>. Juntá los <b>cartuchos</b> que aparecen en la caja y <b>disparale</b> para alejarlo. Si te alcanza... final malo.</p>
+              <p>Cuando aparece el <b>anillo rojo</b> sobre el profesor, <b>bloqueá</b> justo cuando llega al círculo.</p>
+              <p>Los vecinos te ayudan: <b>café</b> (cura), <b>paleta</b> (cura y te hace más rápido) y la <b>pelota de Quico</b> rompe los ataques del Chavo.</p>
+              <p class="como-keys"><b>PC:</b> flechas mover · Z disparar · X bloquear · <b>Celu:</b> joystick + DISPARAR / BLOQUEAR</p>
             </div>
             <div class="como-pag hidden">
               <div class="como-t">Más cosas</div>
@@ -227,6 +229,7 @@
             <div class="c-title c-big c-win">¡Ganaste!</div>
             <div class="c-sub" id="fin-stats"></div>
             <div class="c-row">
+              <button class="c-btn hidden" id="btn-fin-retry">Volver a intentar</button>
               <button class="c-btn" id="btn-fin-menu">Salir al menú</button>
             </div>
           </div>
@@ -248,25 +251,26 @@
       </div>
     </div>
 
-    <script src="engine2d.js?v=202610150440"></script>
-    <script src="src/sfx.js?v=202610150440"></script>
-    <script src="src/logros.js?v=202610150440"></script>
-    <script src="src/voces.js?v=202610150440"></script>
-    <script src="src/config/characters.js?v=202610150440"></script>
-    <script src="src/config/song.js?v=202610150440"></script>
-    <script src="src/core/conductor.js?v=202610150440"></script>
-    <script src="src/core/camera.js?v=202610150440"></script>
-    <script src="src/core/stage.js?v=202610150440"></script>
-    <script src="src/mechanics/base.js?v=202610150440"></script>
-    <script src="src/core/intro.js?v=202610150440"></script>
-    <script src="src/mechanics/bulletbox.js?v=202610150440"></script>
-    <script src="src/mechanics/rhythm.js?v=202610150440"></script>
-    <script src="src/mechanics/choice.js?v=202610150440"></script>
-    <script src="src/mechanics/blockshoot.js?v=202610150440"></script>
-    <script src="src/mechanics/rescue.js?v=202610150440"></script>
-    <script src="src/game.js?v=202610150440"></script>
-    <script src="src/mobile.js?v=202610150440"></script>
-    <script src="src/menumusic.js?v=202610150440"></script>
-    <script src="src/fxlab.js?v=202610150440"></script>
+    <script src="engine2d.js?v=202610150523"></script>
+    <script src="src/sfx.js?v=202610150523"></script>
+    <script src="src/logros.js?v=202610150523"></script>
+    <script src="src/voces.js?v=202610150523"></script>
+    <script src="src/config/characters.js?v=202610150523"></script>
+    <script src="src/config/song.js?v=202610150523"></script>
+    <script src="src/core/conductor.js?v=202610150523"></script>
+    <script src="src/core/camera.js?v=202610150523"></script>
+    <script src="src/core/stage.js?v=202610150523"></script>
+    <script src="src/mechanics/base.js?v=202610150523"></script>
+    <script src="src/core/intro.js?v=202610150523"></script>
+    <script src="src/mechanics/bulletbox.js?v=202610150523"></script>
+    <script src="src/mechanics/rhythm.js?v=202610150523"></script>
+    <script src="src/mechanics/choice.js?v=202610150523"></script>
+    <script src="src/mechanics/blockshoot.js?v=202610150523"></script>
+    <script src="src/mechanics/finalfight.js?v=202610150523"></script>
+    <script src="src/mechanics/rescue.js?v=202610150523"></script>
+    <script src="src/game.js?v=202610150523"></script>
+    <script src="src/mobile.js?v=202610150523"></script>
+    <script src="src/menumusic.js?v=202610150523"></script>
+    <script src="src/fxlab.js?v=202610150523"></script>
   </body>
 </html>

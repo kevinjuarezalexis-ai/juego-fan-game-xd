@@ -81,6 +81,7 @@
     if (game.state !== 'playing' || !game.mechanic) return 'none';
     const M = FB.MECHANICS;
     const m = game.mechanic;
+    if (M.finalfight && m instanceof M.finalfight) return 'both';
     if (M.blockshoot && m instanceof M.blockshoot) return 'fight';
     if (M.rhythm && m instanceof M.rhythm) return 'lanes';
     if (M.bulletbox && m instanceof M.bulletbox) return 'stick';
@@ -132,9 +133,9 @@
         const key = mode + playing + game.testMode;
         if (key === last) return;
         last = key;
-        $('t-stick').classList.toggle('hidden', mode !== 'stick');
+        $('t-stick').classList.toggle('hidden', mode !== 'stick' && mode !== 'both');
         $('t-lanes').classList.toggle('hidden', mode !== 'lanes');
-        $('t-fight').classList.toggle('hidden', mode !== 'fight');
+        $('t-fight').classList.toggle('hidden', mode !== 'fight' && mode !== 'both');
         $('t-pause').classList.toggle('hidden', !(touch && playing));
         $('t-mark').classList.toggle('hidden', !(game.testMode && playing));
         // el ⚙ sólo en los menús (jugando se entra desde la pausa)
