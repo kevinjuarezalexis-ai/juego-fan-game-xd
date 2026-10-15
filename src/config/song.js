@@ -1206,7 +1206,7 @@ FB.SONG = {
         ],
       },
     },
-    { t: 573, type: 'mech', set: { approach: 0.09 } }, // 9:33 el Chavo va x3 de rápido
+    { t: 573, type: 'mech', set: { approach: 0.0825 } }, // 9:33 el Chavo va x2.75 de rápido
     { t: 572, type: 'bump', every: 1, amount: 0.03 },
     { t: 572, type: 'tilt', deg: -3, dur: 0.6 },
     { t: 572, type: 'text', text: '¡ÚLTIMO ESFUERZO!', size: 30, x: 640, y: 330, color: '#ffd23f', dur: 2 },

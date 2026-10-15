@@ -124,6 +124,7 @@ FB.Game = class Game {
       update: (dt) => this.update(dt / 1000),
       draw: () => this.draw(),
       maxFps: 0,
+      maxDt: 70, // si el celu va a ~15-20 fps, que el corazón no se mueva en cámara lenta
     });
   }
 
@@ -156,6 +157,28 @@ FB.Game = class Game {
       this.conductor.load(this.song.music).finally(tick),
     ]);
     this.loop.start();
+  }
+
+  // prepara de antemano las siluetas blancas de las poses de daño (así el primer golpe no traba)
+  precalentar() {
+    const st = this.stage;
+    if (!st || !st._silueta) return;
+    const tareas = [];
+    for (const id of ['jirafales', 'ramon', 'quico', 'barriga']) {
+      const def = FB.CHARACTERS[id];
+      for (const pose of ['dano', 'dano_escopeta', 'asustado']) {
+        const spr = def && def.sprites && def.sprites[pose];
+        if (spr && spr.frame !== undefined) tareas.push(spr);
+      }
+    }
+    const paso = () => {
+      const spr = tareas.shift();
+      if (!spr) return;
+      const img = this.img(spr.src);
+      if (img) st._silueta(img, spr.frame, img.width / (spr.cols || 1), '#fff');
+      setTimeout(paso, 60);
+    };
+    setTimeout(paso, 500);
   }
 
   // cambiar la calidad desde Opciones: recarga los personajes en la otra versión
@@ -222,6 +245,7 @@ FB.Game = class Game {
     if (FB.Voces) FB.Voces.stopAll();
     this.replayUntil(from);
     this.conductor.play(from);
+    this.precalentar();
     if (FB.Voces) FB.Voces.resumeAt(this.song.events, from);
     this.fadeIn = 0.6; // sale de negro
     this.lastBeat = Math.floor(this.conductor.beatAt(from)) - 1;
