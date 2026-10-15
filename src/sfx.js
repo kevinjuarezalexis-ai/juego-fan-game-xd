@@ -27,7 +27,7 @@ window.FB = window.FB || {};
   }
 
   function volume() {
-    const A = window.Engine2D && Engine2D.Audio;
+    const A = typeof Engine2D !== 'undefined' && Engine2D.Audio;
     if (!A) return 0.6;
     if (A.isMuted && A.isMuted()) return 0;
     const sfx = A.getSfxVolume ? A.getSfxVolume() : 0.8;
@@ -169,7 +169,7 @@ window.FB = window.FB || {};
   // 'calle': rumor de ciudad, autos que pasan de vez en cuando y pajaritos
   const amb = {};
   function ambVolume() {
-    const A = window.Engine2D && Engine2D.Audio;
+    const A = typeof Engine2D !== 'undefined' && Engine2D.Audio;
     if (!A) return 0.5;
     if (A.isMuted && A.isMuted()) return 0;
     return A.getVolume() * (A.getSfxVolume ? A.getSfxVolume() : 0.8);

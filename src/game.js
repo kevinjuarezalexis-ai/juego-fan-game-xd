@@ -10,6 +10,38 @@
 
 window.FB = window.FB || {};
 
+// ── Calidad (Opciones): 'alta' | 'baja' ──
+// baja: personajes en versión más liviana (2/3 del tamaño, se ven igual en pantalla),
+// menos partículas, filtros más simples y sin el video de fondo. Pensado para celus y PCs flojas.
+FB.Calidad = {
+  KEY: 'fiesta-calidad',
+  get() {
+    let v = null;
+    try {
+      v = localStorage.getItem(this.KEY);
+    } catch (e) {}
+    if (v === 'alta' || v === 'baja') return v;
+    // por defecto: baja en celulares/tablets, alta en PC
+    return window.matchMedia && matchMedia('(pointer: coarse)').matches ? 'baja' : 'alta';
+  },
+  save(v) {
+    try {
+      localStorage.setItem(this.KEY, v);
+    } catch (e) {}
+  },
+  // ruta del sprite según la calidad (la clave en game.images sigue siendo la original)
+  src(src) {
+    return this.get() === 'baja' && /_sheet\.png$/.test(src) ? src.replace(/_sheet\.png$/, '_sheet_sd.webp') : src;
+  },
+  aplicar() {
+    const baja = this.get() === 'baja';
+    FB.lowPower = baja;
+    try {
+      if (typeof Engine2D !== 'undefined' && Engine2D.Quality) Engine2D.Quality.set(baja ? 'low' : 'high', { user: true });
+    } catch (e) {}
+  },
+};
+
 // la caja de combate de una mecánica (bulletbox sola, o la de un rescate)
 function boxOf(m) {
   if (!m) return null;
@@ -113,9 +145,10 @@ FB.Game = class Game {
     let done = 0;
     const total = list.length + 1;
     const tick = () => onProgress && onProgress(++done / total);
+    FB.Calidad.aplicar();
     await Promise.all([
       ...list.map((src) =>
-        Engine2D.loadImage(src)
+        Engine2D.loadImage(FB.Calidad.src(src))
           .then((img) => (this.images[src] = img))
           .catch(() => {}) // sin arte todavía → placeholder
           .finally(tick),
@@ -123,6 +156,19 @@ FB.Game = class Game {
       this.conductor.load(this.song.music).finally(tick),
     ]);
     this.loop.start();
+  }
+
+  // cambiar la calidad desde Opciones: recarga los personajes en la otra versión
+  setCalidad(v) {
+    FB.Calidad.save(v);
+    FB.Calidad.aplicar();
+    for (const src of Object.keys(this.images)) {
+      if (!/_sheet\.png$/.test(src)) continue;
+      Engine2D.loadImage(FB.Calidad.src(src))
+        .then((img) => (this.images[src] = img))
+        .catch(() => {});
+    }
+    if (v === 'baja' && this.stage && this.stage.setBgVideo) this.stage.setBgVideo(null);
   }
 
   img(src) {
@@ -441,7 +487,8 @@ FB.Game = class Game {
         break;
       case 'bgVideo':
         // { t, type: 'bgVideo', src, alpha } prende · { t, type: 'bgVideo', off: true } apaga
-        this.stage.setBgVideo(ev.off ? null : ev);
+        // (en calidad baja no se usa: decodificar video es pesado)
+        this.stage.setBgVideo(ev.off || FB.lowPower ? null : ev);
         break;
       case 'vignette':
         // { t, type: 'vignette', to: 0.6, dur } bordes oscuros (0 = nada, 1 = muy oscuro)

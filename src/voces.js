@@ -15,12 +15,12 @@ window.FB = window.FB || {};
   const activos = new Set(); // eventos sonando
 
   function musicVol() {
-    const A = window.Engine2D && Engine2D.Audio;
+    const A = typeof Engine2D !== 'undefined' && Engine2D.Audio;
     if (!A) return 0.8;
     return Math.min(1, A.getVolume() * A.getMusicVolume() * 1.6);
   }
   function muted() {
-    const A = window.Engine2D && Engine2D.Audio;
+    const A = typeof Engine2D !== 'undefined' && Engine2D.Audio;
     return !!(A && A.isMuted && A.isMuted());
   }
 

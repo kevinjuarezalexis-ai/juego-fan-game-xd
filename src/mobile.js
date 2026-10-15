@@ -109,7 +109,6 @@
     init(game) {
       const touch = isTouch();
       document.body.classList.toggle('is-touch', touch);
-      FB.lowPower = touch; // celu: efectos más livianos
 
       // ── controles táctiles ──
       joystick($('t-stick'), $('t-knob'), game);
@@ -183,6 +182,14 @@
         } catch (e) {
           $('aj-msg').textContent = 'Tu navegador no deja usar pantalla completa (en iPhone: Compartir → Agregar a inicio).';
         }
+      };
+      // calidad alta / baja
+      const calBtn = $('aj-calidad');
+      const calTxt = () => (calBtn.textContent = 'Calidad: ' + (FB.Calidad.get() === 'baja' ? 'Baja (más fluido)' : 'Alta'));
+      calTxt();
+      calBtn.onclick = () => {
+        game.setCalidad(FB.Calidad.get() === 'baja' ? 'alta' : 'baja');
+        calTxt();
       };
       let from = null;
       $('btn-ajustes').onclick = () => {
