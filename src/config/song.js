@@ -407,8 +407,8 @@ FB.SONG = {
         dodge: {
           damage: 9,
           patterns: [
-            { type: 'pelota', every: 2 }, // pelotas de Quico
-            { type: 'pelota', every: 4, invert: true }, // ahora también al revés (sube y rebota en el techo); puede salir junto con la normal
+            { type: 'pelota', every: 2, cuadrada: 0.01 }, // pelotas de Quico (1% de que salga la Pelota Cuadrada → logro)
+            { type: 'pelota', every: 4, invert: true, cuadrada: 0.01 }, // ahora también al revés (sube y rebota en el techo); puede salir junto con la normal
             { type: 'lagrimas', every: 4, offset: 1, count: 3 }, // lágrimas de Quico (caen en diagonal)
             { type: 'autito', every: 8, offset: 3, warn: 1 }, // autito de juguete de Quico por arriba o abajo
           ],

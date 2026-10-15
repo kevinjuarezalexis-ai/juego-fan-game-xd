@@ -301,6 +301,7 @@ FB.Game = class Game {
     this.state = 'gameover';
     this._retryFrom = this.parte.t;
     this.conductor.pause();
+    if (FB.Logros) FB.Logros.onGameOver(this);
     UI.gameOver(this.parte);
   }
 

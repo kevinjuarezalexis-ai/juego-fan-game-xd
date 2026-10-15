@@ -84,12 +84,23 @@ FB.drawCheckerFrame = function (ctx, x, y, w, h, t = 8) {
 };
 
 // pelota de playa (gajos blanco / amarillo / azul y tapita naranja), girando
-FB.drawBeachBall = function (ctx, x, y, r, rot) {
+// square: la Pelota Cuadrada de Quico (sale muy de vez en cuando)
+function ballPath(ctx, r, square) {
+  ctx.beginPath();
+  if (!square) return ctx.arc(0, 0, r, 0, Math.PI * 2);
+  const k = r * 0.92, q = r * 0.28;
+  ctx.moveTo(-k + q, -k);
+  ctx.arcTo(k, -k, k, k, q);
+  ctx.arcTo(k, k, -k, k, q);
+  ctx.arcTo(-k, k, -k, -k, q);
+  ctx.arcTo(-k, -k, k, -k, q);
+  ctx.closePath();
+}
+FB.drawBeachBall = function (ctx, x, y, r, rot, square) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(rot || 0);
-  ctx.beginPath();
-  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  ballPath(ctx, r, square);
   ctx.fillStyle = '#ffffff';
   ctx.fill();
   ctx.save();
@@ -128,8 +139,7 @@ FB.drawBeachBall = function (ctx, x, y, r, rot) {
   ctx.strokeStyle = '#1b1b22';
   ctx.stroke();
   // contorno
-  ctx.beginPath();
-  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  ballPath(ctx, r, square);
   ctx.lineWidth = 2;
   ctx.strokeStyle = '#1b1b22';
   ctx.stroke();
@@ -495,7 +505,9 @@ FB.MECHANICS.bulletbox = class BulletBox extends FB.Mechanic {
           r: pat.r || 13,
           rot: Math.random() * 6,
           bounces: 0,
+          square: !!(pat.cuadrada && Math.random() < pat.cuadrada),
         });
+        if (this.bullets[this.bullets.length - 1].square && FB.Logros) FB.Logros.unlock('pelota');
         break;
       }
       case 'cachetada': {
@@ -830,7 +842,7 @@ FB.MECHANICS.bulletbox = class BulletBox extends FB.Mechanic {
   drawBullet(ctx, b, time) {
     switch (b.kind) {
       case 'ball':
-        FB.drawBeachBall(ctx, b.x, b.y, b.r, b.rot);
+        FB.drawBeachBall(ctx, b.x, b.y, b.r, b.rot, b.square);
         break;
       case 'orb':
         ctx.save();

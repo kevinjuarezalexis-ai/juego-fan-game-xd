@@ -117,6 +117,7 @@ FB.MECHANICS.rhythm = class Rhythm extends FB.Mechanic {
     this.glow[lane] = 0.2;
     this.game.heal(d < 0.09 ? 2 : 1);
     this.game.stats.notesHit++;
+    if (d < 0.045) this.game.stats.notesPerfect = (this.game.stats.notesPerfect || 0) + 1;
     if (this.total) this.meter = Math.min(1, this.meter + 1.25 / this.total);
     this.rating = { text: label, t: 0.6, color: d < 0.045 ? '#ffe14d' : '#ffffff' };
     this.danceMove(this.p.dancer, a);

@@ -9,17 +9,19 @@
 window.FB = window.FB || {};
 
 (function () {
+  // 'pronto': la mecánica todavía no existe (se muestra igual, bloqueado)
   const LISTA = [
-    { id: 'empezar', titulo: '¡Bienvenido a la vecindad!', desc: 'Empezá la fiesta.' },
-    { id: 'ratero', titulo: '¡Ratero!', desc: 'Sobreviví al encuentro con el Chavo.' },
-    { id: 'peluchin', titulo: 'Peluchín chin chin', desc: 'Bailá con la Chilindrina sin fallar ninguna flecha.' },
-    { id: 'eso', titulo: '¡Eso, eso, eso!', desc: 'Contestá bien 10 preguntas seguidas.' },
-    { id: 'intocable', titulo: 'Intocable', desc: 'Terminá una pelea en la caja sin recibir ni un golpe.' },
-    { id: 'rescate', titulo: 'Rescate perfecto', desc: 'Liberá a un vecino con la barra llena.' },
-    { id: 'unidos', titulo: 'La vecindad unida', desc: 'Liberá a todos los vecinos con la barra llena en una misma partida.' },
-    { id: 'fin', titulo: 'Fin de la fiesta', desc: 'Llegá al final de la canción.' },
-    { id: 'descansa', titulo: 'Descansa en paz', desc: 'Derrotá al espíritu que poseía al Chavo.' },
-    { id: 'sinperder', titulo: 'Sin perder ni una', desc: 'Terminá el juego desde el principio sin perder ninguna vez.' },
+    { id: 'fiesta', titulo: 'La Fiesta de la Buena Vecindad', desc: 'Sobreviví a la Fiesta de la Buena Vecindad.' },
+    { id: 'finmalo', titulo: 'No hubo Fiesta de la Buena Vecindad', desc: 'Conseguí el final malo.' },
+    { id: 'finbueno', titulo: 'Liberaste al Chavo', desc: 'Conseguí el final bueno.' },
+    { id: 'teniaque', titulo: 'Tenía que ser el Chavo...', desc: 'Perdé contra el Chavo al principio.' },
+    { id: 'escudo', titulo: 'Mi escudo es un corazón', desc: 'Completá el juego sin perder.' },
+    { id: 'peluchin', titulo: 'Peluchín chin chin', desc: 'Completá el rescate de la Chilindrina con todas las notas en ¡PERFECTO!.' },
+    { id: 'tatata', titulo: 'TA TA TAAA', desc: 'Perdé 10 veces seguidas en una parte.' },
+    { id: 'pelota', titulo: 'Mi Pelota Cuadrada', desc: 'Tené la suerte de que aparezca la Pelota Cuadrada de Quico.' },
+    { id: 'pipipi', titulo: 'PIPIPIPI', desc: 'Lográ que el Chavo no se te acerque mucho.', pronto: true },
+    { id: 'cinco', titulo: '¡Eso, eso, eso!', desc: 'Completá el juego 5 veces.' },
+    { id: 'vecino', titulo: 'Verdadero Vecino de la Vecindad', desc: 'Completá los 10 logros.' },
   ];
   const KEY = 'fiesta-logros';
 
@@ -60,8 +62,16 @@ window.FB = window.FB || {};
     if (FB.SFX) FB.SFX.play('ganaste', { vol: 0.6 });
   }
 
-  // estado de la partida actual (para los logros que miran cosas de toda la partida)
+  // estado de la partida actual
   let run = null;
+  const KEY_FIN = 'fiesta-completados';
+  function completados() {
+    try {
+      return +localStorage.getItem(KEY_FIN) || 0;
+    } catch (e) {
+      return 0;
+    }
+  }
 
   FB.Logros = {
     lista: LISTA,
@@ -77,60 +87,60 @@ window.FB = window.FB || {};
       hechos[id] = Date.now();
       guardar();
       aviso(l);
+      // el último: todos los demás
+      if (id !== 'vecino' && LISTA.every((x) => x.id === 'vecino' || hechos[x.id])) this.unlock('vecino');
       this.render();
     },
 
     // al arrancar una partida (from = segundo de inicio)
     onStart(game, from) {
-      run = { full: from === 0 && !game.testMode, racha: 0, good: 0, bad: 0, ratero: from > 166 };
+      run = { full: from === 0 && !game.testMode, parte: -1, seguidas: 0 };
     },
 
     // cada frame mientras se juega
     check(game, time) {
       if (!run || game.testMode) return;
-      const s = game.stats;
-      if (time > 0.5) this.unlock('empezar');
-      if (!run.ratero && time >= 167) (run.ratero = true), this.unlock('ratero');
-      // racha de respuestas buenas
-      if (s.answersBad > run.bad) (run.racha = 0), (run.bad = s.answersBad);
-      if (s.answersGood > run.good) {
-        run.racha += s.answersGood - run.good;
-        run.good = s.answersGood;
-        if (run.racha >= 10) this.unlock('eso');
-      }
+      // si pasaste a otra parte, se corta la racha de derrotas
+      const n = game.parte ? game.parte.n : -1;
+      if (run.parte !== -1 && n !== run.parte) (run.parte = -1), (run.seguidas = 0);
+    },
+
+    onGameOver(game) {
+      if (!run || game.testMode) return;
+      const n = game.parte ? game.parte.n : -1;
+      // perder contra el Chavo en su primera aparición (parte 3)
+      if (game.parte && /chavo/i.test(game.parte.nombre) && game.parte.t < 200) this.unlock('teniaque');
+      run.seguidas = run.parte === n ? run.seguidas + 1 : 1;
+      run.parte = n;
+      if (run.seguidas >= 10) this.unlock('tatata');
     },
 
     // cuando termina una parte con mecánica: snap = cómo estaban las estadísticas al empezar
     onSegmentEnd(game, mech, snap) {
       if (!mech || !snap || game.testMode) return;
       const s = game.stats;
-      const dur = (mech.t1 || 0) - (mech.t0 || 0);
       const R = FB.MECHANICS;
-      // baile sin fallar (el de la Chilindrina)
+      // el baile de la Chilindrina con todas las notas en PERFECTO (jugado entero)
       if (R.rhythm && mech instanceof R.rhythm && mech.p.target === 'chilindrina' && !snap.desdeMitad) {
-        if (s.notesHit > snap.notesHit && s.notesMiss === snap.notesMiss) this.unlock('peluchin');
+        const hits = s.notesHit - snap.notesHit;
+        const perf = (s.notesPerfect || 0) - (snap.notesPerfect || 0);
+        if (hits > 0 && perf === hits && s.notesMiss === snap.notesMiss) this.unlock('peluchin');
       }
-      // pelea en caja sin recibir golpes (que dure algo, y jugada desde el principio)
-      const conCaja = (R.bulletbox && mech instanceof R.bulletbox) || (R.rescue && mech instanceof R.rescue && mech.box);
-      if (conCaja && !mech.noFadeOut && dur >= 8 && !snap.desdeMitad && s.hits === snap.hits) {
-        this.unlock('intocable');
-      }
-      // rescate con la barra llena
-      if (R.rescue && mech instanceof R.rescue && mech.meter >= 0.999) this.unlock('rescate');
     },
 
     // final de la canción
     onEnding(game) {
       if (game.testMode) return;
       const s = game.stats;
-      this.unlock('fin');
-      if (s.bossDefeated) this.unlock('descansa');
-      if (run && run.full && s.retries === 0) this.unlock('sinperder');
-      // todos los rescates con la barra llena
-      const objetivos = new Set();
-      for (const seg of game.song.segments) if (seg.mechanic && seg.mechanic.type === 'rescue') objetivos.add(seg.mechanic.target);
-      const r = s.rescue || {};
-      if (run && run.full && objetivos.size && [...objetivos].every((id) => (r[id] || 0) >= 0.999)) this.unlock('unidos');
+      this.unlock('fiesta');
+      this.unlock(s.bossDefeated ? 'finbueno' : 'finmalo');
+      if (run && run.full && s.retries === 0) this.unlock('escudo');
+      // cuántas veces lo terminaste (en este navegador)
+      const n = completados() + 1;
+      try {
+        localStorage.setItem(KEY_FIN, String(n));
+      } catch (e) {}
+      if (n >= 5) this.unlock('cinco');
     },
 
     // arma la lista del cartel de logros
@@ -145,7 +155,7 @@ window.FB = window.FB || {};
         it.className = 'logro' + (hechos[l.id] ? ' ok' : '');
         it.innerHTML = '<span class="lg-ico"></span><span class="lg-txt"><b></b><small></small></span>';
         it.querySelector('b').textContent = l.titulo;
-        it.querySelector('small').textContent = l.desc;
+        it.querySelector('small').textContent = l.desc + (l.pronto ? ' (próximamente)' : '');
         if (l.icon) it.querySelector('.lg-ico').style.backgroundImage = 'url(' + l.icon + ')';
         list.appendChild(it);
       }
