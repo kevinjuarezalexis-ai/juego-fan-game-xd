@@ -615,7 +615,19 @@ FB.Stage = class Stage {
     }
 
     const dim = back && !a.ghost ? 0.3 : 0; // los de atrás, un poco más oscuros
-    if (a.whiteT > 0 || a.sil > 0.001 || libWhite > 0 || dim > 0 || a.ghost || inkSil > 0.001) {
+    const tinte = a.whiteT > 0 || a.sil > 0.001 || libWhite > 0 || dim > 0 || inkSil > 0.001;
+    const sprNow = this._spriteFor(def, a.tempState || a.state);
+    if (tinte && !a.ghost && sprNow && this.game.img(sprNow.src)) {
+      // camino rápido: se dibuja el sprite y encima su silueta (blanca / negra) guardada en caché,
+      // con transparencia. Antes se pasaba por un canvas aparte de 900×700 en cada cuadro
+      // (los vecinos de atrás siempre, y todos al parpadear): eso era lo que trababa el celu.
+      const black = Math.max(a.sil || 0, dim, inkSil);
+      const white = Math.max(a.whiteT > 0 ? Math.min(1, (a.whiteT / a.whiteDur) * 1.3) : 0, libWhite);
+      const tints = [];
+      if (black > 0.001) tints.push(['#000', Math.min(1, black)]);
+      if (white > 0) tints.push(['#fff', Math.min(1, white)]);
+      this._drawBody(ctx, a, def, t, tints);
+    } else if (tinte || a.ghost) {
       // se dibuja en un canvas aparte, se tiñe de blanco y se pega
       const B = this._whiteBuffer();
       const bx = B.ctx;
@@ -666,8 +678,28 @@ FB.Stage = class Stage {
     return this._buf;
   }
 
+  // silueta de un cuadro del sprite pintada de un color (se calcula una vez y queda guardada)
+  _silueta(img, idx, fw, color) {
+    const cache = img._sil || (img._sil = {});
+    const key = color + '|' + idx;
+    let c = cache[key];
+    if (!c) {
+      c = document.createElement('canvas');
+      c.width = Math.ceil(fw);
+      c.height = img.height;
+      const x = c.getContext('2d');
+      x.drawImage(img, idx * fw, 0, fw, img.height, 0, 0, fw, img.height);
+      x.globalCompositeOperation = 'source-in';
+      x.fillStyle = color;
+      x.fillRect(0, 0, c.width, c.height);
+      cache[key] = c;
+    }
+    return c;
+  }
+
   // cuerpo del personaje con el bop, parado en (0,0)
-  _drawBody(ctx, a, def, t) {
+  // tints: [[color, alpha], ...] → siluetas encima (parpadeo blanco, oscurecido, silueta negra)
+  _drawBody(ctx, a, def, t, tints) {
     ctx.save();
     const sx = 1 + 0.035 * a.bop;
     const ph = a.id.length * 1.7; // fase fija por personaje
@@ -692,6 +724,14 @@ FB.Stage = class Stage {
       const want = a.face || (a === this.player ? 'left' : 'right');
       if ((nat !== want) !== !!def.flip !== !!(spr && spr.mirror)) ctx.scale(-1, 1);
       ctx.drawImage(img, idx * fw, 0, fw, img.height, -w / 2, -h, w, h);
+      if (tints)
+        for (const [color, al] of tints) {
+          const sil = this._silueta(img, idx, fw, color);
+          const ga = ctx.globalAlpha;
+          ctx.globalAlpha = ga * al;
+          ctx.drawImage(sil, 0, 0, fw, img.height, -w / 2, -h, w, h);
+          ctx.globalAlpha = ga;
+        }
     } else {
       this._drawPlaceholder(ctx, def, a.tempState || a.state, t);
     }
