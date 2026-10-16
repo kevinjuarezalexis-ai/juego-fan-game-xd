@@ -35,10 +35,10 @@
 <body>
 <div class="wrap">
   <div>
-    <h1>Editor de posiciones</h1>
+    <h1>Editor de posiciones <small id="aviso" style="font-size:12px;font-weight:400">cargando…</small></h1>
     <p>Elegí un momento de la canción, arrastrá a los personajes con el mouse (o cambiá los números a la derecha) y probá con <b>Pre-ver</b>. Abajo a la derecha se arma la lista de cambios para pasármela.</p>
     <div class="juego">
-      <iframe id="f" src="index.html?editor" allow="autoplay; fullscreen"></iframe>
+      <iframe id="f" allow="autoplay; fullscreen"></iframe>
       <div class="capa" id="capa" title="Arrastrá un personaje para moverlo"></div>
     </div>
     <div class="row">
@@ -66,6 +66,9 @@
 <script>
   const $ = (id) => document.getElementById(id);
   const f = $('f');
+  // siempre la versión más nueva del juego (sin caché)
+  f.src = 'index.html?editor&nc=' + Date.now();
+  const VERSION_EDITOR = 3;
   const W = () => f.contentWindow;
   const G = () => W() && W().game;
   let cambios = []; // { t, char, x?, face?, back?, state? }
@@ -82,6 +85,12 @@
     if (!g || !g.images || Object.keys(g.images).length < 5) return;
     clearInterval(espera);
     listo = true;
+    // si el juego cargado es viejo (no sabe subir/bajar personajes), avisar
+    const viejo = !String(W().FB.Stage.prototype._drawActor).includes('dy');
+    $('aviso').textContent = viejo
+      ? '⚠ El juego cargado es una versión vieja (no deja subir/bajar). Esperá 1-2 minutos y recargá con Ctrl+F5.'
+      : 'editor v' + VERSION_EDITOR + ' · listo';
+    $('aviso').style.color = viejo ? '#ff8080' : '#7dff9a';
     for (const p of g.song.partes) {
       const o = document.createElement('option');
       o.value = p.t;
