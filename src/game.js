@@ -610,6 +610,16 @@ FB.Game = class Game {
       case 'face':
         this.stage.face(ev.char, ev.dir);
         break;
+      case 'pos': {
+        // { t, type: 'pos', char, x, face, back, state } acomodar un personaje al toque (lo arma editor.html)
+        const a = this.stage.actorOf(ev.char);
+        if (!a) break;
+        if (ev.x !== undefined) (a.x = ev.x), (a.homeX = ev.x);
+        if (ev.face) a.face = ev.face;
+        if (ev.back !== undefined && a !== this.stage.player) a.back = !!ev.back;
+        if (ev.state) a.state = ev.state;
+        break;
+      }
       case 'swapPlayer':
         this.stage.swapPlayer(ev.char);
         break;
@@ -1231,6 +1241,7 @@ const UI = {
 window.addEventListener('DOMContentLoaded', () => {
   const game = new FB.Game(document.getElementById('game'));
   window.game = game; // para la consola
+  window.UI = UI; // lo usa editor.html
   UI.init(game);
   if (FB.Mobile) FB.Mobile.init(game);
   const status = UI.el('menu-status');

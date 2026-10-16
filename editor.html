@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Editor de posiciones</title>
+<style>
+  :root { --bg: #15110e; --panel: #241b15; --line: #5a4636; --text: #f3e6d6; --muted: #b7a48f; --acc: #ffd23f; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, sans-serif; }
+  .wrap { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 12px; padding: 12px; max-width: 1500px; margin: 0 auto; }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+  h1 { font-size: 18px; margin: 0 0 4px; color: var(--acc); }
+  p { margin: 2px 0 8px; color: var(--muted); }
+  .juego { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 8px; overflow: hidden; }
+  .juego iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .capa { position: absolute; inset: 0; cursor: grab; }
+  .capa.arrastrando { cursor: grabbing; }
+  .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0; }
+  input, select, button, textarea { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; }
+  input[type=number] { width: 86px; }
+  input[type=range] { flex: 1; min-width: 120px; accent-color: var(--acc); }
+  button { cursor: pointer; background: #3a2a1d; }
+  button.main { background: var(--acc); color: #2a1a08; font-weight: 700; border-color: #c99b10; }
+  .panel { background: #1c1510; border: 1px solid #3a2c22; border-radius: 8px; padding: 10px; }
+  .pj { border-top: 1px solid #3a2c22; padding: 8px 0; }
+  .pj.sel { background: rgba(255, 210, 63, 0.08); }
+  .pj b { color: var(--acc); }
+  .pj .row { margin: 4px 0; }
+  textarea { width: 100%; height: 150px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .info { font-family: ui-monospace, monospace; color: var(--acc); }
+  .lista { max-height: 52vh; overflow: auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <h1>Editor de posiciones</h1>
+    <p>Elegí un momento de la canción, arrastrá a los personajes con el mouse (o cambiá los números a la derecha) y probá con <b>Pre-ver</b>. Abajo a la derecha se arma la lista de cambios para pasármela.</p>
+    <div class="juego">
+      <iframe id="f" src="index.html?editor" allow="autoplay; fullscreen"></iframe>
+      <div class="capa" id="capa" title="Arrastrá un personaje para moverlo"></div>
+    </div>
+    <div class="row">
+      <label>Momento (seg) <input id="t" type="number" step="0.01" value="167" /></label>
+      <button id="ir" class="main">Ir</button>
+      <button data-d="-1">−1 s</button><button data-d="-0.1">−0.1</button><button data-d="0.1">+0.1</button><button data-d="1">+1 s</button>
+      <select id="parte"><option value="">Ir a una parte…</option></select>
+      <span class="info" id="hora"></span>
+    </div>
+    <div class="row">
+      <button id="prever" class="main">▶ Pre-ver (desde 2 s antes)</button>
+      <button id="frenar">⏸ Frenar acá</button>
+      <label><input id="sinmusica" type="checkbox" /> sin música</label>
+    </div>
+  </div>
+  <div class="panel">
+    <b>Personajes en escena</b>
+    <p>x = posición de izquierda (0) a derecha (1280). "Atrás" = fila de atrás (más chiquitos).</p>
+    <div class="lista" id="lista"></div>
+    <div class="row"><b>Cambios</b> (copiá y pasámelo)</div>
+    <textarea id="out" readonly></textarea>
+    <div class="row"><button class="main" id="copiar">Copiar</button><button id="deshacer">Deshacer último</button><button id="borrar">Borrar todo</button><span id="msg"></span></div>
+  </div>
+</div>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const f = $('f');
+  const W = () => f.contentWindow;
+  const G = () => W() && W().game;
+  let cambios = []; // { t, char, x?, face?, back?, state? }
+  let tAhora = 167;
+  let sel = null;
+  let listo = false;
+
+  const fmt = (t) => Math.floor(t / 60) + ':' + (t % 60).toFixed(2).padStart(5, '0');
+  const nombre = (id) => (W().FB.CHARACTERS[id] || {}).nombre || id;
+
+  // espera a que el juego cargue (personajes y música)
+  const espera = setInterval(() => {
+    const g = G();
+    if (!g || !g.images || Object.keys(g.images).length < 5) return;
+    clearInterval(espera);
+    listo = true;
+    for (const p of g.song.partes) {
+      const o = document.createElement('option');
+      o.value = p.t;
+      o.textContent = 'Parte ' + p.n + ' · ' + p.nombre + ' (' + fmt(p.t) + ')';
+      $('parte').appendChild(o);
+    }
+    ir(tAhora);
+  }, 300);
+
+  // los cambios entran al juego como eventos 'pos' (así Pre-ver los muestra en su momento)
+  function aplicarAlJuego() {
+    const g = G();
+    g.song.events = g.song.events.filter((e) => !e._editor);
+    for (const c of cambios) g.song.events.push({ ...c, type: 'pos', _editor: true });
+    g.song.events.sort((a, b) => a.t - b.t);
+  }
+
+  // congelar el juego en el momento t
+  function ir(t) {
+    if (!listo) return;
+    const g = G();
+    tAhora = Math.max(0, Math.min(g.conductor.length - 0.5, +t || 0));
+    $('t').value = tAhora.toFixed(2);
+    aplicarAlJuego();
+    W().UI.show(null);
+    g.testMode = true; // inmortal mientras editás
+    g.start(tAhora, { skipIntro: true });
+    // un cuadro corriendo (arma la mecánica y el escenario) y se congela
+    setTimeout(() => {
+      g.conductor.pause();
+      if (W().FB.Voces) W().FB.Voces.stopAll();
+      g.state = 'editor';
+      // que terminen de aparecer y la cámara llegue a su lugar (sin que avance la canción)
+      for (let i = 0; i < 60; i++) {
+        g.stage.update(1 / 30);
+        g.camera.update(1 / 30);
+      }
+      for (const a of actores()) a.alpha = a.target ?? 1;
+      g.banner = null; // sin el cartel de "PARTE N" tapando
+      armarLista();
+    }, 120);
+  }
+
+  function prever() {
+    if (!listo) return;
+    const g = G();
+    aplicarAlJuego();
+    W().UI.show(null);
+    g.testMode = true;
+    if (g.conductor.audio) g.conductor.audio.muted = $('sinmusica').checked;
+    g.start(Math.max(0, tAhora - 2), { skipIntro: true });
+  }
+  function frenar() {
+    const g = G();
+    if (g.state === 'playing') ir(g.conductor.time);
+  }
+
+  function actores() {
+    const st = G().stage;
+    const out = [st.player, ...Object.values(st.actors).filter((a) => a.target > 0)];
+    return out;
+  }
+
+  // registra (o actualiza) un cambio en el momento actual
+  function anotar(id, props) {
+    let c = cambios.find((x) => x.char === id && Math.abs(x.t - tAhora) < 0.005);
+    if (!c) cambios.push((c = { t: +tAhora.toFixed(2), char: id }));
+    Object.assign(c, props);
+    salida();
+  }
+
+  function armarLista() {
+    const g = G();
+    const lista = $('lista');
+    lista.innerHTML = '';
+    for (const a of actores()) {
+      const def = W().FB.CHARACTERS[a.id] || {};
+      const esJugador = a === g.stage.player;
+      const div = document.createElement('div');
+      div.className = 'pj' + (sel === a.id ? ' sel' : '');
+      div.innerHTML =
+        '<b></b> <small class="est"></small>' +
+        '<div class="row"><span>x</span><input type="range" min="0" max="1280" step="1"><input type="number" step="1"></div>' +
+        '<div class="row"><label>mira <select class="cara"><option value="left">izquierda</option><option value="right">derecha</option></select></label>' +
+        (esJugador ? '' : '<label><input type="checkbox" class="atras"> atrás</label>') +
+        '<label>pose <select class="pose"></select></label></div>';
+      div.querySelector('b').textContent = nombre(a.id) + (esJugador ? ' (jugador)' : '');
+      div.querySelector('.est').textContent = a.state;
+      const rng = div.querySelector('input[type=range]');
+      const num = div.querySelector('input[type=number]');
+      rng.value = num.value = Math.round(a.x);
+      const mover = (v) => {
+        v = Math.round(+v);
+        a.x = a.homeX = v;
+        rng.value = num.value = v;
+        anotar(a.id, { x: v });
+      };
+      rng.oninput = () => mover(rng.value);
+      num.onchange = () => mover(num.value);
+      const cara = div.querySelector('.cara');
+      cara.value = a.face || (esJugador ? 'left' : 'right');
+      cara.onchange = () => ((a.face = cara.value), anotar(a.id, { face: cara.value }));
+      const at = div.querySelector('.atras');
+      if (at) {
+        at.checked = !!a.back;
+        at.onchange = () => ((a.back = at.checked), anotar(a.id, { back: at.checked }));
+      }
+      const pose = div.querySelector('.pose');
+      for (const k of Object.keys(def.sprites || {})) {
+        const o = document.createElement('option');
+        o.value = o.textContent = k;
+        pose.appendChild(o);
+      }
+      pose.value = a.state;
+      pose.onchange = () => ((a.state = pose.value), (a.tempState = null), (a.tempT = 0), anotar(a.id, { state: pose.value }));
+      div.onclick = () => marcar(a.id);
+      div._actor = a;
+      div._sync = () => (rng.value = num.value = Math.round(a.x));
+      lista.appendChild(div);
+    }
+  }
+  function marcar(id) {
+    sel = id;
+    for (const d of $('lista').children) d.classList.toggle('sel', d._actor && d._actor.id === id);
+  }
+
+  // ── arrastrar en la pantalla del juego ──
+  const capa = $('capa');
+  let drag = null;
+  function aEscenario(ev) {
+    const g = G();
+    // dónde está el canvas del juego dentro del iframe
+    const cr = f.contentDocument.getElementById('game').getBoundingClientRect();
+    const fr = f.getBoundingClientRect();
+    const r = { left: fr.left + cr.left, top: fr.top + cr.top, width: cr.width, height: cr.height };
+    const sx = ((ev.clientX - r.left) / r.width) * g.W;
+    const sy = ((ev.clientY - r.top) / r.height) * g.H;
+    const cam = g.camera;
+    const z = cam.totalZoom, c = cam.center;
+    return { x: c.x + (sx - g.W / 2) / z, y: c.y + (sy - g.H / 2) / z };
+  }
+  capa.addEventListener('pointerdown', (ev) => {
+    if (!listo || G().state !== 'editor') return;
+    const p = aEscenario(ev);
+    const st = G().stage;
+    let mejor = null, d = 1e9;
+    for (const a of actores()) {
+      const def = W().FB.CHARACTERS[a.id] || { height: 300 };
+      const h = def.height * (a.back ? 0.82 : 1);
+      if (p.y < st.floorY - h - 30 || p.y > st.floorY + 30) continue;
+      const dist = Math.abs(p.x - a.x);
+      if (dist < d && dist < 140) (d = dist), (mejor = a);
+    }
+    if (!mejor) return;
+    drag = { a: mejor, dx: mejor.x - p.x };
+    marcar(mejor.id);
+    capa.classList.add('arrastrando');
+    capa.setPointerCapture(ev.pointerId);
+  });
+  capa.addEventListener('pointermove', (ev) => {
+    if (!drag) return;
+    const p = aEscenario(ev);
+    drag.a.x = drag.a.homeX = Math.round(Math.max(0, Math.min(1280, p.x + drag.dx)));
+    for (const d of $('lista').children) if (d._actor === drag.a) d._sync();
+  });
+  capa.addEventListener('pointerup', () => {
+    if (!drag) return;
+    anotar(drag.a.id, { x: Math.round(drag.a.x) });
+    drag = null;
+    capa.classList.remove('arrastrando');
+  });
+
+  // ── salida ──
+  function salida() {
+    cambios.sort((a, b) => a.t - b.t);
+    $('out').value = cambios
+      .map((c) => {
+        const partes = ['t: ' + c.t, "type: 'pos'", "char: '" + c.char + "'"];
+        if (c.x !== undefined) partes.push('x: ' + c.x);
+        if (c.face) partes.push("face: '" + c.face + "'");
+        if (c.back !== undefined) partes.push('back: ' + c.back);
+        if (c.state) partes.push("state: '" + c.state + "'");
+        return '{ ' + partes.join(', ') + ' }, // ' + fmt(c.t) + ' ' + nombre(c.char);
+      })
+      .join('\n');
+  }
+  $('copiar').onclick = async () => {
+    try { await navigator.clipboard.writeText($('out').value); $('msg').textContent = '¡Copiado!'; }
+    catch (e) { $('out').select(); document.execCommand('copy'); $('msg').textContent = 'Copiado'; }
+    setTimeout(() => ($('msg').textContent = ''), 1500);
+  };
+  $('deshacer').onclick = () => { cambios.pop(); salida(); ir(tAhora); };
+  $('borrar').onclick = () => { if (confirm('¿Borrar todos los cambios?')) { cambios = []; salida(); ir(tAhora); } };
+
+  $('ir').onclick = () => ir($('t').value);
+  $('t').addEventListener('keydown', (e) => e.key === 'Enter' && ir($('t').value));
+  document.querySelectorAll('[data-d]').forEach((b) => (b.onclick = () => ir(tAhora + +b.dataset.d)));
+  $('parte').onchange = () => $('parte').value && ir(+$('parte').value + 0.5);
+  $('prever').onclick = prever;
+  $('frenar').onclick = frenar;
+  setInterval(() => {
+    const g = G();
+    if (g && g.conductor) $('hora').textContent = fmt(g.state === 'editor' ? tAhora : g.conductor.time) + (g.state === 'playing' ? '  ▶' : '');
+  }, 200);
+</script>
+</body>
+</html>
