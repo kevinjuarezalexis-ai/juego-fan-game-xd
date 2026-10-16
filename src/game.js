@@ -611,10 +611,11 @@ FB.Game = class Game {
         this.stage.face(ev.char, ev.dir);
         break;
       case 'pos': {
-        // { t, type: 'pos', char, x, face, back, state } acomodar un personaje al toque (lo arma editor.html)
+        // { t, type: 'pos', char, x, y, face, back, state } acomodar un personaje al toque (lo arma editor.html)
         const a = this.stage.actorOf(ev.char);
         if (!a) break;
         if (ev.x !== undefined) (a.x = ev.x), (a.homeX = ev.x);
+        if (ev.y !== undefined) a.dy = ev.y; // + baja, − sube (desde el piso)
         if (ev.face) a.face = ev.face;
         if (ev.back !== undefined && a !== this.stage.player) a.back = !!ev.back;
         if (ev.state) a.state = ev.state;

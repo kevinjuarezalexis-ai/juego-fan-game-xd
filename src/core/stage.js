@@ -165,7 +165,8 @@ FB.Stage = class Stage {
     const a = this.actorOf(id);
     const def = FB.CHARACTERS[id] || { height: 280 };
     if (!a) return { x: 320, y: this.floorY - def.height / 2, top: this.floorY - def.height };
-    return { x: a.x, y: this.floorY - def.height / 2, top: this.floorY - def.height };
+    const dy = a.dy || 0;
+    return { x: a.x, y: this.floorY - def.height / 2 + dy, top: this.floorY - def.height + dy };
   }
 
   beat() {
@@ -597,7 +598,7 @@ FB.Stage = class Stage {
     ctx.globalAlpha = a.alpha * (a.hit > 0 && Math.floor(a.hit * 20) % 2 ? 0.55 : 1);
     // fila de atrás: más arriba en el piso (más lejos) y más chica
     const bgDef = FB.BACKGROUNDS[this.bgId] || {};
-    ctx.translate(a.x + ox, this.floorY + oy - back * (bgDef.backDepth ?? 22));
+    ctx.translate(a.x + ox, this.floorY + oy + (a.dy || 0) - back * (bgDef.backDepth ?? 22)); // dy: subir/bajar (editor.html)
     if (back) ctx.scale(0.82, 0.82);
     if (a.lean) ctx.rotate(a.lean * 0.12);
     if (fallRot) ctx.rotate(fallRot);

@@ -56,7 +56,7 @@
   </div>
   <div class="panel">
     <b>Personajes en escena</b>
-    <p>x = posición de izquierda (0) a derecha (1280). "Atrás" = fila de atrás (más chiquitos).</p>
+    <p>x = de izquierda (0) a derecha (1280) · y = cuánto lo subís (−) o bajás (+) desde el piso. "Atrás" = fila de atrás (más chiquitos).</p>
     <div class="lista" id="lista"></div>
     <div class="row"><b>Cambios</b> (copiá y pasámelo)</div>
     <textarea id="out" readonly></textarea>
@@ -170,23 +170,33 @@
       div.className = 'pj' + (sel === a.id ? ' sel' : '');
       div.innerHTML =
         '<b></b> <small class="est"></small>' +
-        '<div class="row"><span>x</span><input type="range" min="0" max="1280" step="1"><input type="number" step="1"></div>' +
+        '<div class="row"><span>x</span><input class="rx" type="range" min="0" max="1280" step="1"><input class="nx" type="number" step="1"></div>' +
+        '<div class="row"><span>y</span><input class="ry" type="range" min="-300" max="300" step="1"><input class="ny" type="number" step="1"></div>' +
         '<div class="row"><label>mira <select class="cara"><option value="left">izquierda</option><option value="right">derecha</option></select></label>' +
         (esJugador ? '' : '<label><input type="checkbox" class="atras"> atrás</label>') +
         '<label>pose <select class="pose"></select></label></div>';
       div.querySelector('b').textContent = nombre(a.id) + (esJugador ? ' (jugador)' : '');
       div.querySelector('.est').textContent = a.state;
-      const rng = div.querySelector('input[type=range]');
-      const num = div.querySelector('input[type=number]');
+      const rng = div.querySelector('.rx'), num = div.querySelector('.nx');
+      const rngY = div.querySelector('.ry'), numY = div.querySelector('.ny');
       rng.value = num.value = Math.round(a.x);
+      rngY.value = numY.value = Math.round(a.dy || 0);
       const mover = (v) => {
         v = Math.round(+v);
         a.x = a.homeX = v;
         rng.value = num.value = v;
         anotar(a.id, { x: v });
       };
+      const moverY = (v) => {
+        v = Math.round(+v);
+        a.dy = v;
+        rngY.value = numY.value = v;
+        anotar(a.id, { y: v });
+      };
       rng.oninput = () => mover(rng.value);
       num.onchange = () => mover(num.value);
+      rngY.oninput = () => moverY(rngY.value);
+      numY.onchange = () => moverY(numY.value);
       const cara = div.querySelector('.cara');
       cara.value = a.face || (esJugador ? 'left' : 'right');
       cara.onchange = () => ((a.face = cara.value), anotar(a.id, { face: cara.value }));
@@ -205,7 +215,7 @@
       pose.onchange = () => ((a.state = pose.value), (a.tempState = null), (a.tempT = 0), anotar(a.id, { state: pose.value }));
       div.onclick = () => marcar(a.id);
       div._actor = a;
-      div._sync = () => (rng.value = num.value = Math.round(a.x));
+      div._sync = () => ((rng.value = num.value = Math.round(a.x)), (rngY.value = numY.value = Math.round(a.dy || 0)));
       lista.appendChild(div);
     }
   }
@@ -237,12 +247,13 @@
     for (const a of actores()) {
       const def = W().FB.CHARACTERS[a.id] || { height: 300 };
       const h = def.height * (a.back ? 0.82 : 1);
-      if (p.y < st.floorY - h - 30 || p.y > st.floorY + 30) continue;
+      const piso = st.floorY + (a.dy || 0);
+      if (p.y < piso - h - 30 || p.y > piso + 30) continue;
       const dist = Math.abs(p.x - a.x);
       if (dist < d && dist < 140) (d = dist), (mejor = a);
     }
     if (!mejor) return;
-    drag = { a: mejor, dx: mejor.x - p.x };
+    drag = { a: mejor, dx: mejor.x - p.x, dy0: (mejor.dy || 0) - p.y };
     marcar(mejor.id);
     capa.classList.add('arrastrando');
     capa.setPointerCapture(ev.pointerId);
@@ -251,11 +262,12 @@
     if (!drag) return;
     const p = aEscenario(ev);
     drag.a.x = drag.a.homeX = Math.round(Math.max(0, Math.min(1280, p.x + drag.dx)));
+    drag.a.dy = Math.round(Math.max(-300, Math.min(300, p.y + drag.dy0)));
     for (const d of $('lista').children) if (d._actor === drag.a) d._sync();
   });
   capa.addEventListener('pointerup', () => {
     if (!drag) return;
-    anotar(drag.a.id, { x: Math.round(drag.a.x) });
+    anotar(drag.a.id, { x: Math.round(drag.a.x), y: Math.round(drag.a.dy || 0) });
     drag = null;
     capa.classList.remove('arrastrando');
   });
@@ -267,6 +279,7 @@
       .map((c) => {
         const partes = ['t: ' + c.t, "type: 'pos'", "char: '" + c.char + "'"];
         if (c.x !== undefined) partes.push('x: ' + c.x);
+        if (c.y !== undefined) partes.push('y: ' + c.y);
         if (c.face) partes.push("face: '" + c.face + "'");
         if (c.back !== undefined) partes.push('back: ' + c.back);
         if (c.state) partes.push("state: '" + c.state + "'");
