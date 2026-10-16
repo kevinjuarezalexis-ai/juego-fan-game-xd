@@ -11,17 +11,17 @@ window.FB = window.FB || {};
 (function () {
   // 'pronto': la mecánica todavía no existe (se muestra igual, bloqueado)
   const LISTA = [
-    { id: 'fiesta', titulo: 'La Fiesta de la Buena Vecindad', desc: 'Sobreviví a la Fiesta de la Buena Vecindad (derrotá al Chavo).' },
-    { id: 'finmalo', titulo: 'No hubo Fiesta de la Buena Vecindad', desc: 'Conseguí el final malo: perdé la batalla final.' },
-    { id: 'finbueno', titulo: 'Liberaste al Chavo', desc: 'Conseguí el final bueno: elegí la respuesta justa en cada diálogo.' },
-    { id: 'teniaque', titulo: 'Tenía que ser el Chavo...', desc: 'Perdé contra el Chavo al principio.' },
-    { id: 'escudo', titulo: 'Mi escudo es un corazón', desc: 'Completá el juego sin perder.' },
-    { id: 'peluchin', titulo: 'Peluchín chin chin', desc: 'Completá el rescate de la Chilindrina con todas las notas en ¡PERFECTO!.' },
-    { id: 'tatata', titulo: 'TA TA TAAA', desc: 'Perdé 10 veces seguidas en una parte.' },
-    { id: 'pelota', titulo: 'Mi Pelota Cuadrada', desc: 'Tené la suerte de que aparezca la Pelota Cuadrada de Quico.' },
-    { id: 'pipipi', titulo: 'PIPIPIPI', desc: 'Lográ que el Chavo no se te acerque mucho (ganá la pelea final sin que pase la mitad del camino).' },
-    { id: 'cinco', titulo: '¡Eso, eso, eso!', desc: 'Completá el juego 5 veces.' },
-    { id: 'vecino', titulo: 'Verdadero Vecino de la Vecindad', desc: 'Completá los 10 logros.' },
+    { id: 'fiesta', icon: 'src/assets/ui/logros/fiesta.webp', titulo: 'La Fiesta de la Buena Vecindad', desc: 'Sobreviví a la Fiesta de la Buena Vecindad (derrotá al Chavo).' },
+    { id: 'finmalo', icon: 'src/assets/ui/logros/finmalo.webp', titulo: 'No hubo Fiesta de la Buena Vecindad', desc: 'Conseguí el final malo: perdé la batalla final.' },
+    { id: 'finbueno', icon: 'src/assets/ui/logros/finbueno.webp', titulo: 'Liberaste al Chavo', desc: 'Conseguí el final bueno: elegí la respuesta justa en cada diálogo.' },
+    { id: 'teniaque', icon: 'src/assets/ui/logros/teniaque.webp', titulo: 'Tenía que ser el Chavo...', desc: 'Perdé contra el Chavo al principio.' },
+    { id: 'escudo', icon: 'src/assets/ui/logros/escudo.webp', titulo: 'Mi escudo es un corazón', desc: 'Completá el juego sin perder.' },
+    { id: 'peluchin', icon: 'src/assets/ui/logros/peluchin.webp', titulo: 'Peluchín chin chin', desc: 'Completá el rescate de la Chilindrina con todas las notas en ¡PERFECTO!.' },
+    { id: 'tatata', icon: 'src/assets/ui/logros/tatata.webp', titulo: 'TA TA TAAA', desc: 'Perdé 10 veces seguidas en una parte.' },
+    { id: 'pelota', icon: 'src/assets/ui/logros/pelota.webp', titulo: 'Mi Pelota Cuadrada', desc: 'Tené la suerte de que aparezca la Pelota Cuadrada de Quico.' },
+    { id: 'pipipi', icon: 'src/assets/ui/logros/pipipi.webp', titulo: 'PIPIPIPI', desc: 'Lográ que el Chavo no se te acerque mucho (ganá la pelea final sin que pase la mitad del camino).' },
+    { id: 'cinco', icon: 'src/assets/ui/logros/cinco.webp', titulo: '¡Eso, eso, eso!', desc: 'Completá el juego 5 veces.' },
+    { id: 'vecino', icon: 'src/assets/ui/logros/vecino.webp', titulo: 'Verdadero Vecino de la Vecindad', desc: 'Completá los 10 logros.' },
   ];
   const KEY = 'fiesta-logros';
 
@@ -55,7 +55,7 @@ window.FB = window.FB || {};
     d.innerHTML = '<span class="lt-ico"></span><span><small>¡Logro desbloqueado!</small><b></b></span>';
     d.querySelector('b').textContent = l.titulo;
     const ico = d.querySelector('.lt-ico');
-    if (l.icon) ico.style.backgroundImage = 'url(' + l.icon + ')';
+    if (l.icon) (ico.style.backgroundImage = 'url(' + l.icon + ')'), (ico.style.backgroundSize = 'cover');
     box.appendChild(d);
     setTimeout(() => d.classList.add('out'), 3200);
     setTimeout(() => d.remove(), 3700);
@@ -158,7 +158,11 @@ window.FB = window.FB || {};
         it.innerHTML = '<span class="lg-ico"></span><span class="lg-txt"><b></b><small></small></span>';
         it.querySelector('b').textContent = l.titulo;
         it.querySelector('small').textContent = l.desc + (l.pronto ? ' (próximamente)' : '');
-        if (l.icon) it.querySelector('.lg-ico').style.backgroundImage = 'url(' + l.icon + ')';
+        if (l.icon) {
+          const ic = it.querySelector('.lg-ico');
+          ic.style.backgroundImage = 'url(' + l.icon + ')';
+          ic.style.backgroundSize = 'cover';
+        }
         list.appendChild(it);
       }
     },

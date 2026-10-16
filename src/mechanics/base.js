@@ -74,6 +74,9 @@ FB.wrapText = function (ctx, text, maxW) {
 };
 
 // ── Diálogo flotante (como los "¡RATERO!"): texto con borde negro sobre la cabeza del que habla ──
+// estados en los que el personaje está sano (puede usar su pose 'hablando')
+FB.ESTADOS_SANOS = ['sano', 'normal', 'curado', 'curada', 'seguro'];
+
 // color de cada uno (el profe amarillo, el Chavo rojo, el resto blanco)
 FB.speechColor = function (id) {
   return { jirafales: '#ffd23f', chavo: '#ff6a6a' }[id] || '#ffffff';

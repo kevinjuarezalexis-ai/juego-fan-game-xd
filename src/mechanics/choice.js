@@ -62,8 +62,10 @@ FB.MECHANICS.choice = class Choice extends FB.Mechanic {
     if (!a || !def || !def.sprites) return null;
     const state = a.state;
     if (def.talkPose && def.talkPose[state]) return def.talkPose[state];
-    if (state === 'corrupto' && def.sprites.corrupto_hablando) return 'corrupto_hablando';
-    if (state !== 'corrupto' && def.sprites.hablando) return 'hablando';
+    if (def.sprites[state + '_hablando']) return state + '_hablando'; // ej. corrupto_hablando
+    // 'hablando' es la pose de hablar SANO: sólo si está sano (los corrompidos no tienen,
+    // y si no se quedan con su sprite)
+    if (FB.ESTADOS_SANOS.includes(state) && def.sprites.hablando) return 'hablando';
     return null;
   }
 
