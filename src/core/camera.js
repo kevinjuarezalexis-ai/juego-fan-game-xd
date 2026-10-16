@@ -283,6 +283,8 @@ FB.Camera = class Camera {
       case 'focus':
         this.focus(ev.on || 'center', d(ev.dur ?? 0.6), ev.ease, ev.follow);
         if (ev.zoom !== undefined) this.zoomTo(ev.zoom, d(ev.dur ?? 0.6), ev.ease);
+        // y: bajar/subir la vista (px) para que con zoom no se corten los pies
+        if (ev.y !== undefined) this.tween('panY', ev.y, d(ev.dur ?? 0.6), ev.ease || 'inOut');
         return true;
       case 'pan':
         this.panTo(ev.x || 0, ev.y || 0, d(ev.dur ?? 0.6), ev.ease);

@@ -516,7 +516,8 @@ FB.SONG = {
           P('ramon', 'curando', 840, { face: 'left' }),
         ],
         tension: 0.4,
-        bumpEvery: 0,
+        bumpEvery: 4,
+        bumpAmount: 0.05,
       },
       mechanic: { type: 'choice', healOk: 8, questions: Q.motivar, onLast: { char: 'ramon', state: 'casi', from: 'curando' } },
     },
@@ -531,7 +532,8 @@ FB.SONG = {
           P('chavo', 'alma', 330, { ghost: true, back: true, face: 'right' }), // su alma lo ayuda
         ],
         tension: 0.2,
-        bumpEvery: 0, // sigue el zoom progresivo (eventos) hasta el baile
+        bumpEvery: 4,
+        bumpAmount: 0.05,
       },
       mechanic: { type: 'none' },
     },
@@ -861,12 +863,12 @@ FB.SONG = {
     { t: 18.5, type: 'focus', on: 'quico', zoom: 1.3, dur: 0.8 },
     // 0:22.21 Quico grita "¡MAMÁAA!": zoom a Quico temblando
     { t: 22.21, type: 'setState', char: 'quico', state: 'grito' },
-    { t: 22.21, type: 'focus', on: 'quico', zoom: 1.4, dur: 2.6, ease: 'in' }, // se va acercando de a poco (sin cortarle los pies)
-    { t: 22.21, type: 'shake', power: 7, dur: 2.7 },
+    { t: 22.21, type: 'focus', on: 'quico', zoom: 1.75, y: 120, dur: 2.6, ease: 'in' }, // se va acercando de a poco (la vista baja para no cortarle los pies)
+    { t: 22.21, type: 'shake', power: 10, dur: 2.7 },
     { t: 22.21, type: 'flashSprite', char: 'quico', dur: 0.3, shake: 10 },
     { t: 24.9, type: 'setState', char: 'quico', state: 'corrupto' },
     { t: 24.9, type: 'bump', every: 2 }, // arranca el zoom rítmico (estilo terremoto)
-    { t: 25.5, type: 'focus', on: 'center', zoom: 1, dur: 1.5 },
+    { t: 25.5, type: 'focus', on: 'center', zoom: 1, y: 0, dur: 1.5 },
     { t: 30.83, type: 'setState', char: 'quico', state: 'enojado' },
     // 0:30.8 → 0:37 se gritan (tiempos marcados con M)
     ...[
@@ -887,7 +889,7 @@ FB.SONG = {
       // posición en pantalla con el zoom puesto (Jirafales queda corrido a la derecha por el borde)
       // Quico es más bajito: su grito sale arriba de su cabeza (más abajo que el del profe)
       { t, type: 'text', text: grito, size: 46, x: char === 'quico' ? 470 : 860, y: char === 'quico' ? 300 : 120, color: char === 'quico' ? '#4aa3ff' : '#ffd23f', dur },
-      { t, type: 'focus', on: char, zoom: 1.45, dur: 0.12, ease: 'out' },
+      { t, type: 'focus', on: char, zoom: 1.36, dur: 0.12, ease: 'out' },
       { t, type: 'shake', power: 6, dur: 0.25 },
     ]),
     { t: 37.25, type: 'flash', dur: 0.35, alpha: 0.85 },
@@ -914,7 +916,7 @@ FB.SONG = {
     // 1:41.84 y 1:55.93 Quico grita "¡MAMÁAA!": zoom a Quico temblando
     ...[101.84, 115.93].flatMap((t) => [
       { t, type: 'pose', char: 'quico', state: 'grito', dur: 1.8 },
-      { t, type: 'focus', on: 'quico', zoom: 1.4, dur: 0.2, ease: 'out' },
+      { t, type: 'focus', on: 'quico', zoom: 1.32, dur: 0.2, ease: 'out' },
       { t: t + 1.8, type: 'focus', on: 'center', zoom: 1, dur: 0.6 },
       { t, type: 'shake', power: 8, dur: 1.4 },
       { t, type: 'bump', amount: 0.07 },
@@ -1050,26 +1052,8 @@ FB.SONG = {
     { t: 208.16, type: 'bump', every: 0 },
     ...[209.96, 211.62, 213.31, 214.19, 214.51, 214.79, 215.08, 216.77, 218.45, 220.2, 222.03, 223.66, 225.31,
       227.0, 227.91, 228.22, 228.53, 228.81, 230.42, 232.16, 233.91].map((t) => ({ t, type: 'bump', amount: 0.05 })),
-    // 3:55.62 → 4:32 la cámara se acerca y se aleja de a poco (sin zoom de beat).
-    // Se puede reemplazar por una curva marcada con marcar-zoom.html (modo "Zoom de la cámara")
-    {
-      t: 235.62,
-      type: 'curva',
-      modo: 'cam',
-      max: 0.22,
-      pts: (() => {
-        const crochet = 60 / 146;
-        const out = [[235.62, 0]];
-        let t = 235.62, sube = true;
-        while (t < 270) {
-          t += (sube ? 6 : 7) * crochet;
-          out.push([+Math.min(t, 271).toFixed(2), sube ? 1 : 0]);
-          sube = !sube;
-        }
-        out.push([272, 0]);
-        return out.map((p) => p.join(',')).join(' ');
-      })(),
-    },
+    // 3:55.62 → 4:32 zoom de beat normal (cada 4)
+    { t: 235.62, type: 'bump', every: 4, amount: 0.05 },
     // 4:00 Don Ramón libre
     { t: 235.8, type: 'flash', dur: 0.4 },
     { t: 235.8, type: 'flashSprite', char: 'ramon', dur: 0.6, shake: 4 },
