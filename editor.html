@@ -108,12 +108,16 @@
     aplicarAlJuego();
     W().UI.show(null);
     g.testMode = true; // inmortal mientras editás
+    // congelado: el reloj interno manda (si no, el audio todavía buscando el segundo lo mandaba al 0:00)
+    if (g.conductor.audio) g.conductor.audio.pause();
+    g.conductor.hasAudio = false;
     g.start(tAhora, { skipIntro: true });
     // un cuadro corriendo (arma la mecánica y el escenario) y se congela
     setTimeout(() => {
       g.conductor.pause();
       if (W().FB.Voces) W().FB.Voces.stopAll();
       g.state = 'editor';
+      g.conductor.time = tAhora;
       // que terminen de aparecer y la cámara llegue a su lugar (sin que avance la canción)
       for (let i = 0; i < 60; i++) {
         g.stage.update(1 / 30);
@@ -131,7 +135,9 @@
     aplicarAlJuego();
     W().UI.show(null);
     g.testMode = true;
-    if (g.conductor.audio) g.conductor.audio.muted = $('sinmusica').checked;
+    const conMusica = g.conductor.audio && !$('sinmusica').checked;
+    g.conductor.hasAudio = !!conMusica;
+    if (g.conductor.audio && !conMusica) g.conductor.audio.pause();
     g.start(Math.max(0, tAhora - 2), { skipIntro: true });
   }
   function frenar() {
