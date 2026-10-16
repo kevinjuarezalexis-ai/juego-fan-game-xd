@@ -763,6 +763,8 @@ FB.Game = class Game {
     this.syncTimeline(time);
     this.applyTalkPose(time);
     if (FB.Logros) FB.Logros.check(this, time);
+    const cz = this.curvaEn('cam', time);
+    this.camera.curveZoom = cz ? (cz.max ?? 0.5) * cz.v : 0;
     if (FB.Voces) FB.Voces.tick(time, this._voces || (this._voces = this.song.events.filter((e) => e.type === 'voz')));
 
     const beat = Math.floor(c.beatAt(time));
@@ -791,9 +793,30 @@ FB.Game = class Game {
     }
   }
 
+  // curvas marcadas con marcar-zoom.html: 'beat' = fuerza del zoom de cada beat, 'cam' = zoom de cámara
+  // evento: { t, type: 'curva', modo: 'beat'|'cam', max, pts: 't,v t,v ...' } (v de 0 a 1)
+  curvaEn(modo, time) {
+    for (const ev of this.song.events) {
+      if (ev.type !== 'curva' || (ev.modo || 'beat') !== modo) continue;
+      const pts = ev._pts || (ev._pts = String(ev.pts).trim().split(/\s+/).map((x) => x.split(',').map(Number)));
+      if (!pts.length || time < pts[0][0] || time > pts[pts.length - 1][0]) continue;
+      for (let i = 1; i < pts.length; i++) {
+        if (time <= pts[i][0]) {
+          const [t0, v0] = pts[i - 1];
+          const [t1, v1] = pts[i];
+          const k = t1 > t0 ? (time - t0) / (t1 - t0) : 1;
+          return { v: v0 + (v1 - v0) * k, max: ev.max };
+        }
+      }
+    }
+    return null;
+  }
+
   onBeat(b, time) {
     this.stage.beat(b);
     this.camera.onBeat(b);
+    const cb = this.curvaEn('beat', time);
+    if (cb) this.camera.bump((cb.max ?? 0.08) * cb.v);
     if (this.mechanic) this.mechanic.onBeat(b, time);
   }
 

@@ -861,9 +861,8 @@ FB.SONG = {
     { t: 18.5, type: 'focus', on: 'quico', zoom: 1.3, dur: 0.8 },
     // 0:22.21 Quico grita "¡MAMÁAA!": zoom a Quico temblando
     { t: 22.21, type: 'setState', char: 'quico', state: 'grito' },
-    { t: 22.21, type: 'focus', on: 'quico', zoom: 1.65, dur: 0.25, ease: 'out' },
-    { t: 22.21, type: 'shake', power: 9, dur: 2.6 },
-    { t: 22.21, type: 'bump', amount: 0.08 },
+    { t: 22.21, type: 'focus', on: 'quico', zoom: 1.4, dur: 2.6, ease: 'in' }, // se va acercando de a poco (sin cortarle los pies)
+    { t: 22.21, type: 'shake', power: 7, dur: 2.7 },
     { t: 22.21, type: 'flashSprite', char: 'quico', dur: 0.3, shake: 10 },
     { t: 24.9, type: 'setState', char: 'quico', state: 'corrupto' },
     { t: 24.9, type: 'bump', every: 2 }, // arranca el zoom rítmico (estilo terremoto)

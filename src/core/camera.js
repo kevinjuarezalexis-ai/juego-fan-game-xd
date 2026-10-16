@@ -185,7 +185,7 @@ FB.Camera = class Camera {
   }
 
   get totalZoom() {
-    return Math.max(0.5, this.zoom + this.bumpZoom);
+    return Math.max(0.5, this.zoom + this.bumpZoom + (this.curveZoom || 0));
   }
 
   // centro de la vista, limitado para no mostrar fuera del fondo
