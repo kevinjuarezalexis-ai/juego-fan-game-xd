@@ -465,7 +465,7 @@ FB.SONG = {
       stage: { opponents: [...ATRAS, P('chilindrina', 'corrupto', 1080, { face: 'left' })], tension: 0.6 },
       mechanic: { type: 'none' },
     },
-    // 2:59.3 → 4:00 hablarle a Don Ramón mientras esquivás sus ataques
+    // 2:59.3 sale Don Ramón: "Esta calavera significa PE-LI-GRO" (sin caja, la pantalla es para la calavera)
     {
       t: 179.3,
       stage: {
@@ -475,7 +475,22 @@ FB.SONG = {
           P('ramon', 'corrupto', 840, { face: 'left' }),
         ],
         tension: 0.6,
-        bumpEvery: 4,
+        bumpEvery: 0,
+      },
+      mechanic: { type: 'none' },
+    },
+    // 3:02.56 termina el PELIGRO → hablarle a Don Ramón mientras esquivás (zoom en cada beat)
+    {
+      t: 182.56,
+      stage: {
+        opponents: [
+          ...ATRAS,
+          P('chilindrina', 'corrupto', 1080, { face: 'left' }),
+          P('ramon', 'corrupto', 840, { face: 'left' }),
+        ],
+        tension: 0.6,
+        bumpEvery: 1,
+        bumpAmount: 0.045,
       },
       mechanic: {
         type: 'rescue',
@@ -516,7 +531,7 @@ FB.SONG = {
           P('chavo', 'alma', 330, { ghost: true, back: true, face: 'right' }), // su alma lo ayuda
         ],
         tension: 0.2,
-        bumpEvery: 4,
+        bumpEvery: 0, // sigue el zoom progresivo (eventos) hasta el baile
       },
       mechanic: { type: 'none' },
     },
@@ -844,10 +859,12 @@ FB.SONG = {
     { t: 13, type: 'setState', char: 'jirafales', state: 'hablando' },
     { t: 18.5, type: 'setState', char: 'jirafales', state: 'asustado' },
     { t: 18.5, type: 'focus', on: 'quico', zoom: 1.3, dur: 0.8 },
-    // 0:22.4 Quico grita
-    { t: 22.43, type: 'setState', char: 'quico', state: 'grito' },
-    { t: 22.43, type: 'shake', power: 7, dur: 2.4 },
-    { t: 22.43, type: 'bump', amount: 0.05 },
+    // 0:22.21 Quico grita "¡MAMÁAA!": zoom a Quico temblando
+    { t: 22.21, type: 'setState', char: 'quico', state: 'grito' },
+    { t: 22.21, type: 'focus', on: 'quico', zoom: 1.65, dur: 0.25, ease: 'out' },
+    { t: 22.21, type: 'shake', power: 9, dur: 2.6 },
+    { t: 22.21, type: 'bump', amount: 0.08 },
+    { t: 22.21, type: 'flashSprite', char: 'quico', dur: 0.3, shake: 10 },
     { t: 24.9, type: 'setState', char: 'quico', state: 'corrupto' },
     { t: 24.9, type: 'bump', every: 2 }, // arranca el zoom rítmico (estilo terremoto)
     { t: 25.5, type: 'focus', on: 'center', zoom: 1, dur: 1.5 },
@@ -895,6 +912,15 @@ FB.SONG = {
       { t, type: 'text', text: '¡AAAAH!', size: 30, x: 210, y: 250, color: '#4aa3ff', dur: 1.3 },
     ]),
 
+    // 1:41.84 y 1:55.93 Quico grita "¡MAMÁAA!": zoom a Quico temblando
+    ...[101.84, 115.93].flatMap((t) => [
+      { t, type: 'pose', char: 'quico', state: 'grito', dur: 1.8 },
+      { t, type: 'focus', on: 'quico', zoom: 1.4, dur: 0.2, ease: 'out' },
+      { t: t + 1.8, type: 'focus', on: 'center', zoom: 1, dur: 0.6 },
+      { t, type: 'shake', power: 8, dur: 1.4 },
+      { t, type: 'bump', amount: 0.07 },
+      { t, type: 'flashSprite', char: 'quico', dur: 0.3, shake: 8 },
+    ]),
     // ── 1:27 → 1:30 Florinda se está liberando (parpadeo + temblor) ──
     { t: 87, type: 'liberate', char: 'florinda', dur: 3 },
     // ── 1:30 Florinda liberada → se pone atrás de Jirafales ──
@@ -997,14 +1023,23 @@ FB.SONG = {
     { t: 167, type: 'focus', on: 'chilindrina', zoom: 1.25, dur: 0.4 },
     { t: 168, type: 'setState', char: 'jirafales', state: 'hablando' },
     { t: 173, type: 'focus', on: 'center', zoom: 1, dur: 1 },
+    { t: 168.76, type: 'bump', every: 4, amount: 0.05 }, // zona de la Chilindrina: ritmo normal
     { t: 176, type: 'setState', char: 'jirafales', state: 'asustado' },
     { t: 179.3, type: 'filter', mode: 'none', dur: 0.6 },
     // 3:00 referencia al capítulo del maestro: "Esta calavera significa PE-LI-GRO" (tiempos aprox.)
-    { t: 179.6, type: 'text', text: '☠', size: 90, x: 640, y: 470, color: '#ffffff', dur: 3.2 },
-    // PE-LI-GRO más rápido (más pegado a la música)
-    { t: 181.08, type: 'text', text: 'PE', size: 46, x: 520, y: 550, color: '#ff4040', dur: 1.8 },
-    { t: 181.43, type: 'text', text: 'LI', size: 46, x: 640, y: 550, color: '#ff4040', dur: 1.45 },
-    { t: 181.78, type: 'text', text: 'GRO', size: 46, x: 770, y: 550, color: '#ff4040', dur: 1.1 },
+    // la calavera aparece grande en el medio (todavía no hay caja) y late con cada sílaba
+    { t: 179.6, type: 'text', text: '☠', size: 130, x: 640, y: 250, color: '#ffffff', dur: 1.5 },
+    ...[
+      [181.08, 'PE', 470, 150],
+      [181.43, 'LI', 640, 175],
+      [181.78, 'GRO', 820, 200],
+    ].flatMap(([t, txt, x, sk], i) => [
+      { t, type: 'text', text: '☠', size: sk, x: 640, y: 260, color: i === 2 ? '#ff4040' : '#ffffff', dur: i === 2 ? 1.0 : 0.36 },
+      { t, type: 'text', text: txt, size: 78, x, y: 470, color: '#ff4040', dur: 1.8 - i * 0.35 },
+      { t, type: 'bump', amount: 0.16 + i * 0.04 }, // mega zoom en cada sílaba
+      { t, type: 'shake', power: 10 + i * 3, dur: 0.25 },
+      { t, type: 'flash', dur: 0.15, color: '#ff1a1a', alpha: 0.35 },
+    ]),
     { t: 182.56, type: 'shake', power: 8, dur: 0.4 },
     { t: 182.56, type: 'bump', amount: 0.06 },
     { t: 182.56, type: 'tension', to: 0.7, dur: 0.5 },
@@ -1012,6 +1047,22 @@ FB.SONG = {
     { t: 179.45, type: 'pose', char: 'ramon', state: 'grito', dur: 3.2 }, // "Esta calavera significa PE-LI-GRO" (después queda enojado)
     { t: 179.3, type: 'shake', power: 12, dur: 0.5 },
     { t: 182.6, type: 'setState', char: 'jirafales', state: 'normal' },
+    // 3:28.16 la música se pone chill: se apaga el zoom de cada beat y sólo salta en los golpes marcados
+    { t: 208.16, type: 'bump', every: 0 },
+    ...[209.96, 211.62, 213.31, 214.19, 214.51, 214.79, 215.08, 216.77, 218.45, 220.2, 222.03, 223.66, 225.31,
+      227.0, 227.91, 228.22, 228.53, 228.81, 230.42, 232.16, 233.91].map((t) => ({ t, type: 'bump', amount: 0.05 })),
+    // 3:55.62 → baile de la Chilindrina: zoom progresivo en cada beat (sube 6, baja 7, sube...)
+    ...(() => {
+      const crochet = 60 / 146;
+      const out = [];
+      const b0 = Math.ceil((235.62 - 0.36) / crochet);
+      for (let b = b0, i = 0; 0.36 + b * crochet < 272; b++, i++) {
+        const k = i % 13; // 0..5 sube, 6..12 baja
+        const f = k < 6 ? (k + 1) / 6 : 1 - (k - 5) / 7;
+        out.push({ t: +(0.36 + b * crochet).toFixed(3), type: 'bump', amount: +(0.008 + f * 0.05).toFixed(4) });
+      }
+      return out;
+    })(),
     // 4:00 Don Ramón libre
     { t: 235.8, type: 'flash', dur: 0.4 },
     { t: 235.8, type: 'flashSprite', char: 'ramon', dur: 0.6, shake: 4 },
