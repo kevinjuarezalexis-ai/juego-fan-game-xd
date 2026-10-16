@@ -1050,18 +1050,26 @@ FB.SONG = {
     { t: 208.16, type: 'bump', every: 0 },
     ...[209.96, 211.62, 213.31, 214.19, 214.51, 214.79, 215.08, 216.77, 218.45, 220.2, 222.03, 223.66, 225.31,
       227.0, 227.91, 228.22, 228.53, 228.81, 230.42, 232.16, 233.91].map((t) => ({ t, type: 'bump', amount: 0.05 })),
-    // 3:55.62 → baile de la Chilindrina: zoom progresivo en cada beat (sube 6, baja 7, sube...)
-    ...(() => {
-      const crochet = 60 / 146;
-      const out = [];
-      const b0 = Math.ceil((235.62 - 0.36) / crochet);
-      for (let b = b0, i = 0; 0.36 + b * crochet < 272; b++, i++) {
-        const k = i % 13; // 0..5 sube, 6..12 baja
-        const f = k < 6 ? (k + 1) / 6 : 1 - (k - 5) / 7;
-        out.push({ t: +(0.36 + b * crochet).toFixed(3), type: 'bump', amount: +(0.008 + f * 0.05).toFixed(4) });
-      }
-      return out;
-    })(),
+    // 3:55.62 → 4:32 la cámara se acerca y se aleja de a poco (sin zoom de beat).
+    // Se puede reemplazar por una curva marcada con marcar-zoom.html (modo "Zoom de la cámara")
+    {
+      t: 235.62,
+      type: 'curva',
+      modo: 'cam',
+      max: 0.22,
+      pts: (() => {
+        const crochet = 60 / 146;
+        const out = [[235.62, 0]];
+        let t = 235.62, sube = true;
+        while (t < 270) {
+          t += (sube ? 6 : 7) * crochet;
+          out.push([+Math.min(t, 271).toFixed(2), sube ? 1 : 0]);
+          sube = !sube;
+        }
+        out.push([272, 0]);
+        return out.map((p) => p.join(',')).join(' ');
+      })(),
+    },
     // 4:00 Don Ramón libre
     { t: 235.8, type: 'flash', dur: 0.4 },
     { t: 235.8, type: 'flashSprite', char: 'ramon', dur: 0.6, shake: 4 },

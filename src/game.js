@@ -804,7 +804,8 @@ FB.Game = class Game {
         if (time <= pts[i][0]) {
           const [t0, v0] = pts[i - 1];
           const [t1, v1] = pts[i];
-          const k = t1 > t0 ? (time - t0) / (t1 - t0) : 1;
+          let k = t1 > t0 ? (time - t0) / (t1 - t0) : 1;
+          k = k * k * (3 - 2 * k); // suave al llegar y al salir
           return { v: v0 + (v1 - v0) * k, max: ev.max };
         }
       }
