@@ -1095,7 +1095,7 @@ FB.SONG = {
     { t: 274, type: 'setState', char: 'ramon', state: 'sano' },
     { t: 274, type: 'focus', on: 'center', zoom: 1, dur: 1.5 },
     // canciones originales de fondo (el volumen de fondo ya viene en el archivo: Peluchín 50%, el resto 40%)
-    { t: 276.05, type: 'voz', src: 'src/assets/music/voces/peluchin_x4.mp3?v=3' }, // Peluchín chin chin ×4, a 146 BPM: 1 frase = 2 tandas de flechas
+    // (sacado por ahora, se mejora después) { t: 276.05, type: 'voz', src: 'src/assets/music/voces/peluchin_x4.mp3?v=3' }, // Peluchín chin chin ×4, a 146 BPM: 1 frase = 2 tandas de flechas
 
     // ── 5:04 Chilindrina libre, se juntan los 5 ──
     { t: 299.6, type: 'liberate', char: 'chilindrina', dur: 3 },
@@ -1191,7 +1191,7 @@ FB.SONG = {
     { t: 410.53, type: 'face', char: 'ramon', dir: 'right' },
     { t: 410.56, type: 'walk', char: 'quico', from: 400, to: 260, dur: 0.05, end: 'sano' },
     { t: 410.57, type: 'face', char: 'quico', dir: 'right' },
-    { t: 410, type: 'voz', src: 'src/assets/music/voces/barriga_grito.mp3?v=3' }, // 6:50 (en el drop) el grito del Sr. Barriga (el callo), lento y se aleja
+    // (sacado por ahora, se mejora después) { t: 410, type: 'voz', src: 'src/assets/music/voces/barriga_grito.mp3?v=3' }, // 6:50 (en el drop) el grito del Sr. Barriga (el callo), lento y se aleja
     { t: 433.84, type: 'voz', src: 'src/assets/music/voces/churi_churin.mp3?v=4' }, // 7:13.84 Churi Churin Fun Flais
     { t: 445.55, type: 'voz', src: 'src/assets/music/voces/joven_aun.mp3?v=3' }, // 7:25.55 Joven aún
     { t: 457.03, type: 'voz', src: 'src/assets/music/voces/oyelo.mp3?v=4' }, // 7:37.03 Óyelo y escúchalo (más rápido y agudo, 45%)
