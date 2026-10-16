@@ -900,6 +900,14 @@ FB.SONG = {
     { t: 37.3, type: 'setState', char: 'quico', state: 'corrupto' },
     { t: 37.3, type: 'filter', mode: 'none', dur: 0.6 },
     { t: 37.3, type: 'flashSprite', char: 'florinda', dur: 0.4, shake: 8 },
+    // posiciones de la pelea con Doña Florinda (marcadas en editor.html)
+    { t: 37.31, type: 'pos', char: 'florinda', x: 404, y: -3 },
+    { t: 37.31, type: 'pos', char: 'quico', x: 282, y: 63, back: false },
+    { t: 37.31, type: 'pos', char: 'jirafales', x: 1017, y: 14 },
+    // 1:30 vuelven a la altura normal (la parte de Quico tiene sus propias posiciones)
+    { t: 90, type: 'pos', char: 'florinda', y: 0 },
+    { t: 90, type: 'pos', char: 'quico', y: 0 },
+    { t: 90, type: 'pos', char: 'jirafales', y: 0 },
     { t: 37.3, type: 'shake', power: 10, dur: 0.4 },
     { t: 39, type: 'setState', char: 'jirafales', state: 'normal' },
     { t: 37.35, type: 'bump', every: 1, amount: 0.059, shake: 4, tilt: 1.2, sway: 10 }, // zoom seguido (cada beat)
@@ -925,8 +933,9 @@ FB.SONG = {
     // ── 1:27 → 1:30 Florinda se está liberando (parpadeo + temblor) ──
     { t: 87, type: 'liberate', char: 'florinda', dur: 3 },
     // ── 1:30 Florinda liberada → se pone atrás de Jirafales ──
-    { t: 91.5, type: 'face', char: 'florinda', dir: 'left' },
-    { t: 91.5, type: 'walk', char: 'florinda', from: 450, to: 1150, dur: 2.5, end: 'sano' }, // en la pelea / atrás: pose normal
+    { t: 90.2, type: 'face', char: 'florinda', dir: 'right' }, // recién curada, todavía al lado de Quico: mira a la derecha
+    { t: 91.5, type: 'face', char: 'florinda', dir: 'left' }, // ya se va con el profe: mira a la izquierda
+    { t: 91.5, type: 'walk', char: 'florinda', from: 404, to: 1150, dur: 2.5, end: 'sano' }, // en la pelea / atrás: pose normal
     { t: 94.1, type: 'face', char: 'florinda', dir: 'left' },
     { t: 90, type: 'flash', dur: 0.4 },
     { t: 90, type: 'flashSprite', char: 'florinda', dur: 0.6, shake: 4 },
