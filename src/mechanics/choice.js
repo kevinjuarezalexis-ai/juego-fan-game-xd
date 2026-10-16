@@ -22,8 +22,7 @@ FB.MECHANICS.choice = class Choice extends FB.Mechanic {
     this.questions = (p.questions || []).map((q) => ({ ...q, state: 'pending' }));
     this.active = null;
     this.sel = 0;
-    this.feedback = null; // { speaker, text, color, until }
-    this.panel = { x: p.panelX ?? 150, y: p.panelY ?? 14, w: 780, h: 250 }; // arriba a la izquierda: no tapa a Jirafales
+    this.speech = []; // frases flotantes: { id, text, t0, t1, posed }
     this.optRects = [];
   }
 
@@ -36,14 +35,41 @@ FB.MECHANICS.choice = class Choice extends FB.Mechanic {
           this.active = q;
           q.state = 'active';
           this.sel = 0;
-          this.feedback = null;
+          // si quedaba alguna frase de antes, se corta: empieza la pregunta nueva
+          for (const sp of this.speech) sp.t1 = Math.min(sp.t1, time);
         }
       }
     }
     if (this.active && time >= this.active.t + (this.active.time || 6)) {
       this.resolve(-1);
     }
-    if (this.feedback && time > this.feedback.until) this.feedback = null;
+    // cada frase: el que la dice usa su sprite de hablar mientras dura
+    for (const sp of this.speech) {
+      if (!sp.posed && time >= sp.t0 && time < sp.t1) {
+        sp.posed = true;
+        const pose = this.talkPose(sp.id);
+        if (pose) this.game.stage.pose(sp.id, pose, sp.t1 - time);
+      }
+    }
+    this.speech = this.speech.filter((sp) => time < sp.t1 + 0.3);
+  }
+
+  // pose de hablar del personaje en su estado actual (si tiene)
+  talkPose(id) {
+    const st = this.game.stage;
+    const a = st.actorOf(id);
+    const def = FB.CHARACTERS[id];
+    if (!a || !def || !def.sprites) return null;
+    const state = a.state;
+    if (def.talkPose && def.talkPose[state]) return def.talkPose[state];
+    if (state === 'corrupto' && def.sprites.corrupto_hablando) return 'corrupto_hablando';
+    if (state !== 'corrupto' && def.sprites.hablando) return 'hablando';
+    return null;
+  }
+
+  // cuánto dura una frase en pantalla según lo larga que es
+  durFrase(text) {
+    return Math.max(1.6, Math.min(3.8, 0.9 + String(text).length * 0.055));
   }
 
   resolve(i) {
@@ -57,11 +83,12 @@ FB.MECHANICS.choice = class Choice extends FB.Mechanic {
       if (a && (!L.from || a.state === L.from)) this.game.stage.setState(L.char, L.state);
     }
     const time = this.cond.time;
+    const yo = this.game.stage.player.id;
     // para el final bueno: qué respuesta se eligió en cada diálogo (por su segundo)
     const claves = (this.game.claves = this.game.claves || {});
     if (i < 0) {
       claves[q.t] = false;
-      this.feedback = { speaker: '', text: '...no dijiste nada.', color: '#bbbbbb', until: time + 1.8 };
+      this.speech.push({ id: yo, text: '...', t0: time, t1: time + 1.3, silent: true });
       if (this.p.onResult) this.p.onResult('timeout', q, null);
       return;
     }
@@ -73,8 +100,13 @@ FB.MECHANICS.choice = class Choice extends FB.Mechanic {
     this.game.stats.answersGood++;
     if (key) this.game.stats.answersKey = (this.game.stats.answersKey || 0) + 1;
     if (FB.SFX) FB.SFX.play('bien');
-    const who = q.speaker === 'Prof. Jirafales' ? '' : q.speaker;
-    this.feedback = { speaker: who, text: o.reply || '...', color: '#7dff9a', until: time + (this.p.replyTime ?? 2.2) };
+    // el que elegiste lo dice el profe (con su sprite de hablar) y después contesta el vecino
+    const d1 = this.durFrase(o.text);
+    this.speech.push({ id: yo, text: o.text, t0: time, t1: time + d1 });
+    if (o.reply) {
+      const quien = this.game.speakerId(q.speaker);
+      this.speech.push({ id: quien, text: o.reply, t0: time + d1, t1: time + d1 + this.durFrase(o.reply) });
+    }
     if (this.p.onResult) this.p.onResult('good', q, o);
   }
 
@@ -90,77 +122,8 @@ FB.MECHANICS.choice = class Choice extends FB.Mechanic {
     else if (a === 'opt3' && n > 2) this.resolve(2);
   }
 
-  // franja de arriba: la pregunta en una línea y las 3 opciones lado a lado
-  // (para usar junto con la caja de combate, que baja un poco).
-  drawStrip(ctx, time) {
-    const W = this.game.W;
-    const x = 40;
-    const w = W - 80;
-    const y = this.p.stripY ?? 8;
-    const h = 88;
-    if (this.active) {
-      const q = this.active;
-      const total = q.time || 6;
-      const left = Math.max(0, q.t + total - time);
-      const appear = Math.min(1, (time - q.t) / 0.2);
-      ctx.save();
-      ctx.globalAlpha = appear;
-      ctx.fillStyle = 'rgba(8,8,12,0.92)';
-      ctx.beginPath();
-      FB.roundRect(ctx, x, y, w, h, 10);
-      ctx.fill();
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      ctx.fillStyle = left < 2 ? (Math.floor(time * 8) % 2 ? '#ff3030' : '#ff8080') : '#ffd23f';
-      ctx.fillRect(x + 10, y + 6, (w - 20) * (left / total), 4);
-      ctx.textAlign = 'left';
-      ctx.fillStyle = '#ffd23f';
-      ctx.font = 'bold 12px "Press Start 2P", monospace';
-      const who = q.speaker ? q.speaker + ': ' : '';
-      ctx.fillText(who, x + 14, y + 30);
-      const ww = ctx.measureText(who).width;
-      ctx.fillStyle = '#fff';
-      ctx.font = '19px monospace';
-      ctx.fillText(q.prompt, x + 14 + ww, y + 31);
-      this.optRects = [];
-      const n = q.options.length;
-      const cw = (w - 20 - (n - 1) * 8) / n;
-      q.options.forEach((o, i) => {
-        const r = { x: x + 10 + i * (cw + 8), y: y + 42, w: cw, h: 38 };
-        this.optRects.push(r);
-        ctx.fillStyle = 'rgba(255,255,255,0.08)';
-        ctx.fillRect(r.x, r.y, r.w, r.h);
-        ctx.strokeStyle = 'rgba(255,210,63,0.6)';
-        ctx.lineWidth = 1.5;
-        ctx.strokeRect(r.x, r.y, r.w, r.h);
-        ctx.fillStyle = '#ffd23f';
-        ctx.font = 'bold 14px "Press Start 2P", monospace';
-        ctx.fillText(String(i + 1), r.x + 10, r.y + 26);
-        ctx.fillStyle = '#eee';
-        ctx.font = '16px monospace';
-        const lines = FB.wrapText(ctx, o.text, r.w - 44);
-        lines.slice(0, 2).forEach((l, k) => ctx.fillText(l, r.x + 34, r.y + (lines.length > 1 ? 16 + k * 17 : 25)));
-      });
-      ctx.restore();
-    } else if (this.feedback) {
-      const fb = this.feedback;
-      ctx.save();
-      ctx.globalAlpha = Math.min(1, (fb.until - time) * 3);
-      ctx.fillStyle = 'rgba(8,8,12,0.85)';
-      ctx.beginPath();
-      FB.roundRect(ctx, W / 2 - 360, y + 14, 720, 56, 10);
-      ctx.fill();
-      ctx.textAlign = 'center';
-      ctx.fillStyle = fb.color;
-      ctx.font = 'italic 20px monospace';
-      ctx.fillText((fb.speaker ? fb.speaker + ': ' : '') + fb.text, W / 2, y + 49);
-      ctx.restore();
-    }
-  }
-
   get busy() {
-    return !!(this.active || this.feedback);
+    return !!this.active;
   }
 
   onPointer(x, y) {
@@ -170,85 +133,67 @@ FB.MECHANICS.choice = class Choice extends FB.Mechanic {
     });
   }
 
+  // todo flotante (como los "¡RATERO!"): la pregunta sobre el vecino, las opciones sobre el profe,
+  // y después la frase elegida y la respuesta, cada una sobre quien la dice
   draw(ctx, time) {
-    if (this.p.layout === 'strip') return this.drawStrip(ctx, time);
-    const P = this.panel;
+    const g = this.game;
     if (this.active) {
       const q = this.active;
       const total = q.time || 6;
       const left = Math.max(0, q.t + total - time);
-      const appear = Math.min(1, (time - q.t) / 0.25);
+      const appear = Math.min(1, (time - q.t) / 0.2);
+      // la pregunta, sobre el que habla
+      const quien = g.speakerId(q.speaker);
+      const mq = FB.measureSpeech(ctx, q.prompt, 16, 440);
+      const pq = g.speechSpot(quien, mq);
+      FB.drawSpeech(ctx, mq, pq.x, pq.y, FB.speechColor(quien), appear, (time - q.t) * 6);
+      // las opciones, sobre el profe (lo que va a decir)
       ctx.save();
       ctx.globalAlpha = appear;
-      ctx.translate(0, -(1 - appear) * 30);
-      // panel
-      ctx.fillStyle = 'rgba(8,8,12,0.92)';
-      ctx.beginPath();
-      FB.roundRect(ctx, P.x, P.y, P.w, P.h, 12);
-      ctx.fill();
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 3;
-      ctx.stroke();
-      // cronómetro
-      const frac = left / total;
-      ctx.fillStyle = 'rgba(255,255,255,0.12)';
-      ctx.fillRect(P.x + 16, P.y + 12, P.w - 32, 8);
+      ctx.font = '17px monospace';
+      const W = 400;
+      const items = q.options.map((o) => FB.wrapText(ctx, o.text, W - 50));
+      const hs = items.map((ls) => ls.length * 19 + 12);
+      const tot = hs.reduce((a, b) => a + b, 0) + (items.length - 1) * 6 + 10;
+      const spot = g.speechSpot(g.stage.player.id, { w: W, h: tot });
+      const x0 = spot.x - W / 2;
+      let y = spot.y - tot;
+      // cronómetro (barrita arriba de las opciones)
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillRect(x0, y - 2, W, 6);
       ctx.fillStyle = left < 2 ? (Math.floor(time * 8) % 2 ? '#ff3030' : '#ff8080') : '#ffd23f';
-      ctx.fillRect(P.x + 16, P.y + 12, (P.w - 32) * frac, 8);
-      // quien habla + pregunta
-      ctx.textAlign = 'left';
-      let ty = P.y + 46;
-      if (q.speaker) {
-        ctx.fillStyle = '#ffd23f';
-        ctx.font = 'bold 15px "Press Start 2P", monospace';
-        ctx.fillText(q.speaker, P.x + 20, ty);
-        ty += 26;
-      }
-      ctx.fillStyle = '#fff';
-      ctx.font = '20px monospace';
-      for (const line of FB.wrapText(ctx, q.prompt, P.w - 40)) {
-        ctx.fillText(line, P.x + 20, ty);
-        ty += 24;
-      }
-      // opciones
-      ty += 6;
+      ctx.fillRect(x0, y - 2, W * (left / total), 6);
+      y += 10;
       this.optRects = [];
-      q.options.forEach((o, i) => {
-        const r = { x: P.x + 16, y: ty, w: P.w - 32, h: 36 };
+      items.forEach((ls, i) => {
+        const r = { x: x0, y, w: W, h: hs[i] };
         this.optRects.push(r);
-        const on = i === this.sel;
-        ctx.fillStyle = on ? 'rgba(255,210,63,0.18)' : 'rgba(255,255,255,0.05)';
-        ctx.fillRect(r.x, r.y, r.w, r.h);
-        if (on) {
-          ctx.strokeStyle = '#ffd23f';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(r.x, r.y, r.w, r.h);
-          FB.drawHeart(ctx, r.x + 18, r.y + 19, 16, '#ff1e1e');
-        }
-        ctx.fillStyle = on ? '#ffe680' : '#ddd';
-        ctx.font = '18px monospace';
-        ctx.fillText(i + 1 + '. ' + o.text, r.x + 36, r.y + 24);
-        ty += 41;
+        const on = i === this.sel && !this.p.numbersOnly;
+        ctx.fillStyle = on ? 'rgba(60,40,0,0.78)' : 'rgba(0,0,0,0.6)';
+        ctx.beginPath();
+        FB.roundRect(ctx, r.x, r.y, r.w, r.h, 8);
+        ctx.fill();
+        ctx.strokeStyle = on ? '#ffd23f' : 'rgba(255,255,255,0.35)';
+        ctx.lineWidth = on ? 2.5 : 1.2;
+        ctx.stroke();
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#ffd23f';
+        ctx.font = 'bold 14px "Press Start 2P", monospace';
+        ctx.fillText(String(i + 1), r.x + 12, r.y + 24);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '17px monospace';
+        ls.forEach((l, k) => ctx.fillText(l, r.x + 38, r.y + 22 + k * 19));
+        y += hs[i] + 6;
       });
       ctx.restore();
-    } else if (this.feedback) {
-      const fb = this.feedback;
-      ctx.save();
-      ctx.globalAlpha = Math.min(1, (fb.until - time) * 3);
-      ctx.fillStyle = 'rgba(8,8,12,0.85)';
-      ctx.beginPath();
-      FB.roundRect(ctx, P.x + 90, P.y + 130, P.w - 180, 80, 10);
-      ctx.fill();
-      ctx.textAlign = 'center';
-      if (fb.speaker) {
-        ctx.fillStyle = '#ffd23f';
-        ctx.font = 'bold 13px "Press Start 2P", monospace';
-        ctx.fillText(fb.speaker, P.x + P.w / 2, P.y + 160);
-      }
-      ctx.fillStyle = fb.color;
-      ctx.font = 'italic 20px monospace';
-      ctx.fillText(fb.text, P.x + P.w / 2, P.y + (fb.speaker ? 192 : 178));
-      ctx.restore();
+    }
+    // frases ya elegidas / respuestas
+    for (const sp of this.speech) {
+      if (time < sp.t0 || time > sp.t1 + 0.25) continue;
+      const m = FB.measureSpeech(ctx, sp.text, 16, 440);
+      const p = g.speechSpot(sp.id, m);
+      const alpha = Math.min(1, (sp.t1 + 0.25 - time) * 4, (time - sp.t0) * 8);
+      FB.drawSpeech(ctx, m, p.x, p.y, sp.silent ? '#bbbbbb' : FB.speechColor(sp.id), alpha, (time - sp.t0) * 6);
     }
   }
 };

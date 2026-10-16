@@ -16,7 +16,9 @@
 //   boss, patterns (ataques en la caja), boxDamage, box
 //   approach   cuánto se acerca por segundo (0..1 del camino)   push   cuánto lo aleja cada disparo
 //   startX / nearX   dónde arranca el Chavo y dónde "te alcanza"
-//   attackEvery / warnBeats / damage   ataques al profesor (bloquear)
+//   blockAt    [segundos] ataques al profesor que hay que bloquear (pocos y marcados)
+//   attackEvery / warnBeats / damage   (sin blockAt: un ataque cada tantos beats)
+//   blockSprite  imagen opcional del ataque que tira el Chavo (si no, una bola roja)
 //   ammoEvery, ammoStart, ammoMax      cartuchos
 //   cafeEvery, pelotaEvery, paletaEvery  (beats; 0 = no sale)
 
@@ -30,7 +32,8 @@ FB.MECHANICS.finalfight = class FinalFight extends FB.Mechanic {
     this.ammo = p.ammoStart ?? 2;
     this.items = []; // cartuchos, café, paletas, pelota amiga
     this.attacks = [];
-    this.blockWindow = p.blockWindow || 0.16;
+    this.blockWindow = p.blockWindow || 0.22;
+    this.blockQueue = (p.blockAt || []).filter((t) => t > t0 + 0.5).sort((a, b) => a - b);
     this.blockLock = 0;
     this.blockPose = 0;
     this.shootCd = 0;
@@ -56,7 +59,7 @@ FB.MECHANICS.finalfight = class FinalFight extends FB.Mechanic {
     const P = this.p;
     const every = (n, off = 0) => n > 0 && (((b - off) % n) + n) % n === 0;
     // ataque al profesor (bloquear)
-    if (every(P.attackEvery || 6, 3)) {
+    if (!P.blockAt && every(P.attackEvery || 6, 3)) {
       const warn = P.warnBeats || 2;
       this.attacks.push({ warnStart: time, hitAt: this.cond.timeOfBeat(b + warn), done: false });
     }
@@ -179,6 +182,16 @@ FB.MECHANICS.finalfight = class FinalFight extends FB.Mechanic {
     this.speedT = Math.max(0, this.speedT - dt);
 
     if (this.p.patterns && this.box.p.patterns !== this.p.patterns) this.box.p.patterns = this.p.patterns; // evento 'mech'
+    // ataques marcados (blockAt): salen unos beats antes para que se vea venir
+    if (!this.defeated && !this.lost && this.blockQueue.length) {
+      const warn = (P.warnBeats || 3) * this.cond.crochet;
+      while (this.blockQueue.length && time >= this.blockQueue[0] - warn) {
+        const at = this.blockQueue.shift();
+        // cae justo en un beat (el más cercano al segundo marcado)
+        const hitAt = this.cond.timeOfBeat(Math.round(this.cond.beatAt(at)));
+        if (hitAt > time + 0.3) this.attacks.push({ warnStart: time, hitAt, done: false });
+      }
+    }
     if (!this.defeated && !this.lost) {
       this.box.speed = this.baseSpeed * (this.speedT > 0 ? 1.5 : 1);
       this.box.update(dt, time);
@@ -350,6 +363,34 @@ FB.MECHANICS.finalfight = class FinalFight extends FB.Mechanic {
       }
     }
 
+    // el ataque que tira el Chavo: vuela en arco hasta el profesor y llega justo al bloquear
+    for (const k of this.attacks) {
+      const u = Math.max(0, Math.min(1, (time - k.warnStart) / (k.hitAt - k.warnStart)));
+      const x = bp.x + (pp.x + 60 - bp.x) * u;
+      const y = bp.y - 40 + (pp.y - bp.y + 40) * u - Math.sin(u * Math.PI) * 140;
+      const img = this.p.blockSprite && this.game.img(this.p.blockSprite);
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(time * 9);
+      if (img) ctx.drawImage(img, -40, -40, 80, 80);
+      else {
+        const r = 16 + u * 12;
+        ctx.fillStyle = 'rgba(255,0,0,0.25)';
+        ctx.beginPath();
+        ctx.arc(0, 0, r * 1.8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#7a0000';
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ff3a3a';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(0, 0, r * 0.65, 0.4, 4.6);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
     // avisos de ataque al profesor: anillo que se cierra
     ctx.textAlign = 'center';
     for (const k of this.attacks) {

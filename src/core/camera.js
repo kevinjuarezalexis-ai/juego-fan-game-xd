@@ -222,6 +222,13 @@ FB.Camera = class Camera {
     ctx.translate(-c.x, -c.y);
   }
 
+  // de coordenadas del escenario a la pantalla (para poner textos sobre las cabezas)
+  toScreen(x, y) {
+    const z = this.totalZoom;
+    const c = this.center;
+    return { x: this.W / 2 + (x - c.x) * z, y: this.H / 2 + (y - c.y) * z, z };
+  }
+
   get filterOn() {
     return this.sepia > 0.005 || this.gray > 0.005 || this.contrast > 0.005 || this.dark > 0.005;
   }

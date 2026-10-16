@@ -763,8 +763,9 @@ FB.SONG = {
         ammoStart: 2,
         ammoMax: 3, // máximo de cartuchos guardados
         ammoEvery: 6, // cada cuántos beats aparece un cartucho
-        attackEvery: 6, // ataque al profesor (bloquear)
-        warnBeats: 2,
+        // ataques al profesor que hay que bloquear (X): 6 en toda la pelea, se ven venir
+        blockAt: [540, 556, 569, 584, 598, 611],
+        warnBeats: 3,
         damage: 12,
         boxDamage: 10,
         cafeEvery: 16, // Doña Florinda: taza de café (cura)
@@ -1197,7 +1198,7 @@ FB.SONG = {
       t: 572,
       type: 'mech',
       set: {
-        attackEvery: 4, warnBeats: 1.5, damage: 14, ammoEvery: 5,
+        damage: 14, ammoEvery: 5,
         patterns: [
           { type: 'apuntado', every: 2 },
           { type: 'lluvia', every: 2, count: 3 },

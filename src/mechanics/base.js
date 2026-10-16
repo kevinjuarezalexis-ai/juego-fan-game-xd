@@ -73,6 +73,45 @@ FB.wrapText = function (ctx, text, maxW) {
   return lines;
 };
 
+// ── Diálogo flotante (como los "¡RATERO!"): texto con borde negro sobre la cabeza del que habla ──
+// color de cada uno (el profe amarillo, el Chavo rojo, el resto blanco)
+FB.speechColor = function (id) {
+  return { jirafales: '#ffd23f', chavo: '#ff6a6a' }[id] || '#ffffff';
+};
+
+// mide un texto flotante ya cortado en líneas (para ubicarlo antes de dibujar)
+FB.measureSpeech = function (ctx, text, size = 16, maxW = 440) {
+  ctx.save();
+  ctx.font = 'bold ' + size + 'px "Press Start 2P", monospace';
+  const lines = FB.wrapText(ctx, text, maxW);
+  const w = Math.max(...lines.map((l) => ctx.measureText(l).width)) + 12;
+  ctx.restore();
+  return { lines, w, h: lines.length * (size + 8) + 6, size };
+};
+
+// dibuja el texto con su parte de abajo en (x, y). k = 0..1 de la animación de entrada
+FB.drawSpeech = function (ctx, m, x, y, color, alpha = 1, k = 1) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.font = 'bold ' + m.size + 'px "Press Start 2P", monospace';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = Math.max(4, m.size / 3.2);
+  ctx.strokeStyle = '#000';
+  ctx.fillStyle = color;
+  const sc = 0.7 + 0.3 * Math.min(1, k);
+  ctx.translate(x, y);
+  ctx.scale(sc, sc);
+  const lh = m.size + 8;
+  m.lines.forEach((l, i) => {
+    const ly = -(m.lines.length - 1 - i) * lh;
+    ctx.strokeText(l, 0, ly);
+    ctx.fillText(l, 0, ly);
+  });
+  ctx.restore();
+};
+
 // RNG con semilla: el mismo patrón de notas en cada intento
 FB.rng = function (seed = 1) {
   let s = seed >>> 0 || 1;

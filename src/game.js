@@ -829,6 +829,7 @@ FB.Game = class Game {
     }
 
     // capa de juego (sin zoom)
+    this._speechRects = []; // textos flotantes de este cuadro (para que no se pisen)
     if (this.mechanic) this.mechanic.draw(ctx, time);
     Engine2D.Particles.draw(ctx);
     this.drawCaption(ctx, time);
@@ -859,34 +860,73 @@ FB.Game = class Game {
     }
   }
 
+  // id del personaje a partir del nombre que se usa en los diálogos ('Doña Florinda' → 'florinda')
+  speakerId(nombre) {
+    if (!this._nombres) {
+      this._nombres = {};
+      for (const id in FB.CHARACTERS) this._nombres[FB.CHARACTERS[id].nombre] = id;
+      this._nombres['Prof. Jirafales'] = 'jirafales';
+      this._nombres['Profesor'] = 'jirafales';
+    }
+    return this._nombres[nombre] || null;
+  }
+
+  // dónde va un texto flotante de `id` (abajo-centro del texto), arriba de su cabeza,
+  // sin salirse de la pantalla y sin tapar la caja de combate
+  speechSpot(id, m, extraUp = 0) {
+    const st = this.stage;
+    const a = id && st.actorOf(id);
+    let x, y;
+    if (a && (a.alpha ?? 1) > 0.3) {
+      const pos = st.posOf(id);
+      const sc = this.camera.toScreen(pos.x, pos.top + (a.back ? 40 : 0));
+      x = sc.x;
+      y = sc.y - 14 - extraUp;
+    } else {
+      x = this.W / 2; // no está en escena: abajo al medio
+      y = 600 - extraUp;
+    }
+    const half = m.w / 2;
+    const bx = boxOf(this.mechanic);
+    if (bx && !bx.defeated) {
+      const B = bx.box;
+      const top = y - m.h;
+      // si se cruza con la caja, se corre al costado que le toca
+      if (top < B.y + B.h + 6 && y > B.y - 6 && x + half > B.x - 8 && x - half < B.x + B.w + 8) {
+        if (x >= B.x + B.w / 2) x = Math.max(x, B.x + B.w + 10 + half);
+        else x = Math.min(x, B.x - 10 - half);
+      }
+    }
+    x = Math.max(half + 10, Math.min(this.W - half - 10, x));
+    y = Math.max(m.h + 6, Math.min(this.H - 40, y));
+    // si ya hay otro texto en ese lugar (dos hablando a la vez), éste se sube
+    const usados = (this._speechRects = this._speechRects || []);
+    for (let tries = 0; tries < 6; tries++) {
+      const r = usados.find((u) => x - half < u.x + u.w && x + half > u.x && y - m.h < u.y + u.h && y > u.y);
+      if (!r) break;
+      y = r.y - 6;
+      if (y - m.h < 4) {
+        y = r.y + r.h + m.h + 6; // no entra arriba: abajo
+        break;
+      }
+    }
+    usados.push({ x: x - half, y: y - m.h, w: m.w, h: m.h });
+    return { x, y };
+  }
+
+  // diálogos con tiempo (song.dialogue): texto flotante sobre quien habla
   drawTimedDialogue(ctx, time) {
     const list = this.song.dialogue || [];
-    let d = null;
-    for (const x of list) if (time >= x[0] && time < x[0] + (x[3] || 3)) d = x;
-    if (!d) return;
-    const [t0, who, text, dur = 3] = d;
-    const free = !this.mechanic || !this.mechanic.busy;
-    const alpha = Math.min(1, (t0 + dur - time) * 5, (time - t0) * 8);
-    const big = /^[^a-záéíóúñ]*$/.test(text) && text.length > 3; // GRITOS en mayúscula más grandes
-    if (free) {
-      FB.drawDialogue(ctx, this.W, who, text, (time - t0) * 45, { alpha, y: 506, big });
-      return;
+    for (const d of list) {
+      const [t0, who, text, dur = 3] = d;
+      if (time < t0 || time >= t0 + dur) continue;
+      const id = this.speakerId(who);
+      const big = /^[^a-záéíóúñ]*$/.test(text) && text.length > 3; // GRITOS en mayúscula más grandes
+      const m = FB.measureSpeech(ctx, text, big ? 24 : 16, big ? 520 : 440);
+      const p = this.speechSpot(id, m);
+      const alpha = Math.min(1, (t0 + dur - time) * 5, (time - t0) * 8);
+      FB.drawSpeech(ctx, m, p.x, p.y, FB.speechColor(id), alpha, (time - t0) * 6);
     }
-    // hay mecánica en pantalla: franja baja compacta (no tapa la caja ni a los personajes)
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = 'rgba(8,8,12,0.88)';
-    ctx.beginPath();
-    FB.roundRect(ctx, 140, 618, this.W - 280, 60, 10);
-    ctx.fill();
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#ffd23f';
-    ctx.font = 'bold 12px "Press Start 2P", monospace';
-    ctx.fillText(who + ':', 160, 643);
-    ctx.fillStyle = '#fff';
-    ctx.font = (big ? 'bold 22px' : '19px') + ' monospace';
-    ctx.fillText(String(text).slice(0, Math.floor((time - t0) * 45)), 160, 667);
-    ctx.restore();
   }
 
   drawCaption(ctx, time) {
