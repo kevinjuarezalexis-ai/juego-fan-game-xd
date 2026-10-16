@@ -54,7 +54,7 @@ const RATERO = (() => {
 // fila de atrás (aliados ya salvados) repartida detrás del jugador
 // Desde que se cura Quico: el jugador y los salvados a la IZQUIERDA, los corrompidos salen por la DERECHA.
 const BACKROW = (ids) =>
-  ids.map((id, i) => P(id, 'sano', [290, 200, 110, 245, 155, 65][i], { back: true, face: 'right' }));
+  ids.map((id, i) => P(id, id === 'jirafales' ? 'asustado' : 'sano', [290, 200, 110, 245, 155, 65][i], { back: true, face: 'right' }));
 
 // back: true = capa de atrás (más chico y oscuro, con distancia). Para los ya salvados (atrás de Jirafales, a la izquierda).
 const ATRAS = BACKROW(['florinda', 'quico']);
@@ -909,7 +909,7 @@ FB.SONG = {
     { t: 90, type: 'pos', char: 'quico', y: 0 },
     { t: 90, type: 'pos', char: 'jirafales', y: 0 },
     { t: 37.3, type: 'shake', power: 10, dur: 0.4 },
-    { t: 39, type: 'setState', char: 'jirafales', state: 'normal' },
+    { t: 39, type: 'setState', char: 'jirafales', state: 'asustado' }, // en batalla siempre asustado
     { t: 37.35, type: 'bump', every: 1, amount: 0.059, shake: 4, tilt: 1.2, sway: 10 }, // zoom seguido (cada beat)
     { t: 63.76, type: 'bump', every: 4 }, // 1er grito de Quico: vuelve al ritmo normal
     { t: 77.26, type: 'bump', every: 1, amount: 0.059, shake: 4, tilt: 1.2, sway: 10 }, // 2do grito: seguido otra vez
@@ -951,12 +951,12 @@ FB.SONG = {
     { t: 117, type: 'liberate', char: 'quico', dur: 3 },
     { t: 120.5, type: 'face', char: 'florinda', dir: 'left' },
     { t: 121, type: 'walk', char: 'florinda', from: 1150, to: 420, dur: 3, end: 'hablando' },
-    { t: 122, type: 'walk', char: 'jirafales', from: 1010, to: 560, dur: 2.5, end: 'normal' },
+    { t: 122, type: 'walk', char: 'jirafales', from: 1010, to: 560, dur: 2.5, end: 'asustado' },
     { t: 126, type: 'setState', char: 'florinda', state: 'sano' },
     // se quedan a la izquierda: Jirafales adelante, Quico y Florinda atrás de él (a la derecha va a salir el Chavo)
     { t: 127, type: 'walk', char: 'quico', from: 300, to: 200, dur: 1.2, end: 'sano' },
     { t: 127, type: 'walk', char: 'florinda', from: 420, to: 290, dur: 1.2, end: 'sano' },
-    { t: 127, type: 'walk', char: 'jirafales', from: 560, to: 400, dur: 1.2, end: 'normal' },
+    { t: 127, type: 'walk', char: 'jirafales', from: 560, to: 400, dur: 1.2, end: 'asustado' },
     { t: 128.3, type: 'face', char: 'jirafales', dir: 'right' },
     { t: 128.3, type: 'face', char: 'florinda', dir: 'right' },
     { t: 128.3, type: 'face', char: 'quico', dir: 'right' },
@@ -1040,12 +1040,12 @@ FB.SONG = {
     // la calavera aparece grande en el medio (todavía no hay caja) y late con cada sílaba
     { t: 179.6, type: 'text', text: '☠', size: 130, x: 640, y: 250, color: '#ffffff', dur: 1.5 },
     ...[
-      [181.08, 'PE', 470, 150],
-      [181.43, 'LI', 640, 175],
-      [181.78, 'GRO', 820, 200],
-    ].flatMap(([t, txt, x, sk], i) => [
+      [181.08, 'PE', 330, 545, 150], // separadas: LI arriba al medio, PE abajo a la izquierda, GRO abajo a la derecha
+      [181.43, 'LI', 640, 455, 175],
+      [181.78, 'GRO', 950, 545, 200],
+    ].flatMap(([t, txt, x, y, sk], i) => [
       { t, type: 'text', text: '☠', size: sk, x: 640, y: 260, color: i === 2 ? '#ff4040' : '#ffffff', dur: i === 2 ? 1.0 : 0.36 },
-      { t, type: 'text', text: txt, size: 78, x, y: 470, color: '#ff4040', dur: 1.8 - i * 0.35 },
+      { t, type: 'text', text: txt, size: 78, x, y, color: '#ff4040', dur: 1.8 - i * 0.35 },
       { t, type: 'bump', amount: 0.16 + i * 0.04 }, // mega zoom en cada sílaba
       { t, type: 'shake', power: 10 + i * 3, dur: 0.25 },
       { t, type: 'flash', dur: 0.15, color: '#ff1a1a', alpha: 0.35 },
@@ -1056,7 +1056,7 @@ FB.SONG = {
     { t: 179.3, type: 'flashSprite', char: 'ramon', dur: 0.4, shake: 10 },
     { t: 179.45, type: 'pose', char: 'ramon', state: 'grito', dur: 3.2 }, // "Esta calavera significa PE-LI-GRO" (después queda enojado)
     { t: 179.3, type: 'shake', power: 12, dur: 0.5 },
-    { t: 182.6, type: 'setState', char: 'jirafales', state: 'normal' },
+    { t: 182.6, type: 'setState', char: 'jirafales', state: 'asustado' },
     // 3:28.16 la música se pone chill: se apaga el zoom de cada beat y sólo salta en los golpes marcados
     { t: 208.16, type: 'bump', every: 0 },
     ...[209.96, 211.62, 213.31, 214.19, 214.51, 214.79, 215.08, 216.77, 218.45, 220.2, 222.03, 223.66, 225.31,
@@ -1079,8 +1079,8 @@ FB.SONG = {
     // ── 4:22 jugás con Don Ramón ──
     { t: 257.5, type: 'walk', char: 'ramon', from: 840, to: 400, dur: 4, end: 'curado' },
     { t: 260, type: 'setState', char: 'ramon', state: 'sano' },
-    { t: 257.5, type: 'face', char: 'jirafales', dir: 'left' },
-    { t: 257.5, type: 'walk', char: 'jirafales', from: 400, to: 110, dur: 2.5, end: 'normal' },
+    { t: 257.5, type: 'face', char: 'jirafales', dir: 'right' }, // se va atrás mirando a la derecha (sin darse vuelta)
+    { t: 257.5, type: 'walk', char: 'jirafales', from: 400, to: 110, dur: 2.5, end: 'asustado' },
     { t: 260.1, type: 'face', char: 'jirafales', dir: 'right' },
     { t: 261.9, type: 'swapPlayer', char: 'ramon' },
     { t: 262.2, type: 'walk', char: 'chilindrina', from: 1080, to: 720, dur: 1.5, end: 'corrupto' },
@@ -1111,7 +1111,7 @@ FB.SONG = {
     { t: 303.1, type: 'walk', char: 'florinda', from: 290, to: 230, dur: 1, end: 'sano' },
     { t: 303.1, type: 'walk', char: 'quico', from: 200, to: 100, dur: 1, end: 'sano' },
     { t: 303.1, type: 'face', char: 'jirafales', dir: 'right' },
-    { t: 303.1, type: 'walk', char: 'jirafales', from: 110, to: 370, dur: 1.5, end: 'normal' },
+    { t: 303.1, type: 'walk', char: 'jirafales', from: 110, to: 370, dur: 1.5, end: 'asustado' },
 
     // ── 5:07 "Qué bonita vecindad": recuerdo en sepia, Don Ramón cuenta cuando llegó el Chavo, se recupera vida ──
     { t: 305.67, type: 'filter', mode: 'sepia', dur: 1.5 },
