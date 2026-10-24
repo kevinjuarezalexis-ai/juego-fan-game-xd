@@ -460,7 +460,7 @@ FB.Stage = class Stage {
     // fondo más oscuro (solo el fondo: los personajes se ven igual)
     if (this.bgDark > 0.001) {
       ctx.save();
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      this.game.baseTransform(ctx);
       ctx.fillStyle = 'rgba(0,0,0,' + Math.min(0.9, this.bgDark) + ')';
       ctx.fillRect(0, 0, this.W, this.H);
       ctx.restore();
@@ -472,7 +472,7 @@ FB.Stage = class Stage {
       bv.a = Math.min(bv.alpha, (bv.a || 0) + 1 / 60 / (bv.fade || 0.4)); // fade de entrada
       // se dibuja en la pantalla (no en el mundo): siempre ocupa toda la vista, haya zoom o no
       ctx.save();
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      this.game.baseTransform(ctx);
       ctx.globalAlpha = bv.a;
       ctx.drawImage(bv.el, 0, 0, this.W, this.H); // el video ya es 16:9 como el juego
       ctx.restore();
@@ -504,7 +504,21 @@ FB.Stage = class Stage {
     const img = this.game.img(def.img);
     if (img) {
       const m = 24; // margen extra: el temblor no deja ver bordes negros
-      Engine2D.drawCover(ctx, img, -m, -m, this.W + m * 2, this.H + m * 2);
+      // el fondo se achica una sola vez al tamaño en que se dibuja (y a la resolución del canvas):
+      // así en cada cuadro se pega casi 1:1 en vez de reescalar la foto entera
+      const res = this.game.res || 1;
+      let c = img._fit;
+      if (!c || c._res !== res) {
+        c = document.createElement('canvas');
+        c.width = Math.round((this.W + m * 2) * res);
+        c.height = Math.round((this.H + m * 2) * res);
+        const x = c.getContext('2d', { alpha: false });
+        x.imageSmoothingQuality = 'high';
+        Engine2D.drawCover(x, img, 0, 0, c.width, c.height);
+        c._res = res;
+        img._fit = c;
+      }
+      ctx.drawImage(c, -m, -m, this.W + m * 2, this.H + m * 2);
       return;
     }
     // placeholder: patio genérico de vecindad
@@ -618,7 +632,20 @@ FB.Stage = class Stage {
     const dim = back && !a.ghost ? 0.3 : 0; // los de atrás, un poco más oscuros
     const tinte = a.whiteT > 0 || a.sil > 0.001 || libWhite > 0 || dim > 0 || inkSil > 0.001;
     const sprNow = this._spriteFor(def, a.tempState || a.state);
-    if (tinte && !a.ghost && sprNow && this.game.img(sprNow.src)) {
+    const cortado = sprNow && this.game.cuadro && this.game.cuadro(sprNow.src, 0);
+    if (cortado && (tinte || a.ghost)) {
+      // camino más rápido (cuadros ya cortados): lo que no cambia (oscurecido de los de atrás,
+      // celeste del fantasma) se "hornea" una vez en el cuadro; encima solo va lo que parpadea
+      const bake = [];
+      const tints = [];
+      const negro = Math.max(a.sil || 0, inkSil);
+      if (dim > 0 && negro <= dim) bake.push('rgba(0,0,0,' + dim + ')');
+      else if (Math.max(negro, dim) > 0.001) tints.push(['#000', Math.min(1, Math.max(negro, dim))]);
+      if (a.ghost && !ownGhost) bake.push('rgba(150,210,255,0.55)');
+      const white = Math.max(a.whiteT > 0 ? Math.min(1, (a.whiteT / a.whiteDur) * 1.3) : 0, libWhite);
+      if (white > 0) tints.push(['#fff', Math.min(1, white)]);
+      this._drawBody(ctx, a, def, t, tints, bake);
+    } else if (tinte && !a.ghost && sprNow && this.game.img(sprNow.src)) {
       // camino rápido: se dibuja el sprite y encima su silueta (blanca / negra) guardada en caché,
       // con transparencia. Antes se pasaba por un canvas aparte de 900×700 en cada cuadro
       // (los vecinos de atrás siempre, y todos al parpadear): eso era lo que trababa el celu.
@@ -680,16 +707,23 @@ FB.Stage = class Stage {
   }
 
   // silueta de un cuadro del sprite pintada de un color (se calcula una vez y queda guardada)
-  _silueta(img, idx, fw, color) {
-    const cache = img._sil || (img._sil = {});
+  // fr: cuadro ya cortado (game.cuadro) · si no hay, se corta de la tira (img, idx, fw)
+  _silueta(img, idx, fw, color, fr) {
+    const cache = fr ? fr.sil || (fr.sil = {}) : img._sil || (img._sil = {});
     const key = color + '|' + idx;
     let c = cache[key];
     if (!c) {
       c = document.createElement('canvas');
-      c.width = Math.ceil(fw);
-      c.height = img.height;
       const x = c.getContext('2d');
-      x.drawImage(img, idx * fw, 0, fw, img.height, 0, 0, fw, img.height);
+      if (fr) {
+        c.width = fr.c.width;
+        c.height = fr.c.height;
+        x.drawImage(fr.c, 0, 0);
+      } else {
+        c.width = Math.ceil(fw);
+        c.height = img.height;
+        x.drawImage(img, idx * fw, 0, fw, img.height, 0, 0, fw, img.height);
+      }
       x.globalCompositeOperation = 'source-in';
       x.fillStyle = color;
       x.fillRect(0, 0, c.width, c.height);
@@ -700,7 +734,28 @@ FB.Stage = class Stage {
 
   // cuerpo del personaje con el bop, parado en (0,0)
   // tints: [[color, alpha], ...] → siluetas encima (parpadeo blanco, oscurecido, silueta negra)
-  _drawBody(ctx, a, def, t, tints) {
+  // cuadro con capas de color fijas pintadas encima (source-atop), guardado en caché
+  _horneado(fr, capas) {
+    const key = capas.join('|');
+    const cache = fr.bake || (fr.bake = {});
+    let c = cache[key];
+    if (!c) {
+      c = document.createElement('canvas');
+      c.width = fr.c.width;
+      c.height = fr.c.height;
+      const x = c.getContext('2d');
+      x.drawImage(fr.c, 0, 0);
+      x.globalCompositeOperation = 'source-atop';
+      for (const col of capas) {
+        x.fillStyle = col;
+        x.fillRect(0, 0, c.width, c.height);
+      }
+      cache[key] = c;
+    }
+    return c;
+  }
+
+  _drawBody(ctx, a, def, t, tints, bake) {
     ctx.save();
     const sx = 1 + 0.035 * a.bop;
     const ph = a.id.length * 1.7; // fase fija por personaje
@@ -724,6 +779,26 @@ FB.Stage = class Stage {
       const nat = def.facing || 'right';
       const want = a.face || (a === this.player ? 'left' : 'right');
       if ((nat !== want) !== !!def.flip !== !!(spr && spr.mirror)) ctx.scale(-1, 1);
+      // cuadro ya cortado y achicado al cargar (mucho más liviano que dibujar desde la tira entera)
+      const fr = this.game.cuadro && this.game.cuadro(spr.src, idx);
+      if (fr) {
+        const k = h / fr.H;
+        const dx = -w / 2 + fr.x * k;
+        const dy = -h + fr.y * k;
+        const dw = fr.w * k;
+        const dh = fr.h * k;
+        ctx.drawImage(bake && bake.length ? this._horneado(fr, bake) : fr.c, dx, dy, dw, dh);
+        if (tints)
+          for (const [color, al] of tints) {
+            const sil = this._silueta(null, idx, 0, color, fr);
+            const ga = ctx.globalAlpha;
+            ctx.globalAlpha = ga * al;
+            ctx.drawImage(sil, dx, dy, dw, dh);
+            ctx.globalAlpha = ga;
+          }
+        ctx.restore();
+        return;
+      }
       ctx.drawImage(img, idx * fw, 0, fw, img.height, -w / 2, -h, w, h);
       if (tints)
         for (const [color, al] of tints) {
@@ -833,17 +908,27 @@ FB.Stage = class Stage {
 
   drawFx(ctx, t) {
     const T = this.tension;
-    if (!this._vignette) {
-      const g = ctx.createRadialGradient(this.W / 2, this.H / 2, this.H * 0.3, this.W / 2, this.H / 2, this.H * 0.95);
+    // la viñeta se pinta una sola vez en un canvas aparte y después solo se pega
+    // (calcular el degradado en toda la pantalla en cada cuadro era pesado en PCs/celus flojos)
+    const res = this.game.res || 1;
+    if (!this._vignette || this._vignette._res !== res) {
+      const c = document.createElement('canvas');
+      c.width = Math.round(this.W * res);
+      c.height = Math.round(this.H * res);
+      const x = c.getContext('2d');
+      x.scale(res, res);
+      const g = x.createRadialGradient(this.W / 2, this.H / 2, this.H * 0.3, this.W / 2, this.H / 2, this.H * 0.95);
       g.addColorStop(0, 'rgba(0,0,0,0)');
       g.addColorStop(1, 'rgba(0,0,0,0.85)');
-      this._vignette = g;
+      x.fillStyle = g;
+      x.fillRect(0, 0, this.W, this.H);
+      c._res = res;
+      this._vignette = c;
     }
     ctx.save();
     // viñeta: base (evento 'vignette', bordes oscuros todo el nivel) + lo que sume la tensión
     ctx.globalAlpha = Math.min(1, (this.vig ?? 0.35) + T * 0.55);
-    ctx.fillStyle = this._vignette;
-    ctx.fillRect(0, 0, this.W, this.H);
+    if (ctx.globalAlpha > 0.004) ctx.drawImage(this._vignette, 0, 0, this.W, this.H);
     ctx.restore();
     if (T > 0) {
       ctx.fillStyle = 'rgba(120,0,0,' + T * 0.12 + ')';

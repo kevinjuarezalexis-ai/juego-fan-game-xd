@@ -196,6 +196,7 @@
         // durante el juego, pausa y vuelve a la pausa al cerrar
         if (game.state === 'playing') game.pause();
         from = game.state === 'paused' ? 'pause' : 'menu';
+        calTxt(); // por si la calidad cambió sola
         UI.show('ajustes');
       };
       $('aj-cerrar').onclick = () => {

@@ -237,7 +237,7 @@ FB.Camera = class Camera {
   applyFilter(ctx) {
     if (!this.filterOn) return;
     ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.game.baseTransform(ctx);
     // en celu el modo 'saturation' sobre toda la pantalla es muy pesado: si el gris es suave
     // (filtro oscuro de todo el nivel) se saltea y se oscurece un poquito más en su lugar
     const lite = FB.lowPower && this.gray < 0.5;
@@ -251,7 +251,7 @@ FB.Camera = class Camera {
       // overlay de la imagen consigo misma = más contraste
       ctx.globalCompositeOperation = 'overlay';
       ctx.globalAlpha = Math.min(1, this.contrast);
-      ctx.drawImage(ctx.canvas, 0, 0);
+      ctx.drawImage(ctx.canvas, 0, 0, this.W, this.H);
     }
     if (this.sepia > 0.005) {
       ctx.globalCompositeOperation = 'multiply';

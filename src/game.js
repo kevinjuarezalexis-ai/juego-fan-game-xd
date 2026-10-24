@@ -15,6 +15,15 @@ window.FB = window.FB || {};
 // menos partículas, filtros más simples y sin el video de fondo. Pensado para celus y PCs flojas.
 FB.Calidad = {
   KEY: 'fiesta-calidad',
+  // ¿el jugador eligió la calidad a mano (o ya se ajustó sola)?
+  elegida() {
+    try {
+      const v = localStorage.getItem(this.KEY);
+      return v === 'alta' || v === 'baja';
+    } catch (e) {
+      return false;
+    }
+  },
   get() {
     let v = null;
     try {
@@ -54,9 +63,9 @@ FB.Game = class Game {
     this.W = 1280;
     this.H = 720;
     this.canvas = canvas;
-    canvas.width = this.W;
-    canvas.height = this.H;
-    this.ctx = canvas.getContext('2d');
+    // alpha:false → el navegador no tiene que mezclar el canvas con la página (más liviano)
+    this.ctx = canvas.getContext('2d', { alpha: false });
+    this.aplicarResolucion();
     this.song = FB.SONG;
     // los eventos se procesan en orden: se ordenan por tiempo (estable)
     this.song.events.sort((x, y) => x.t - y.t);
@@ -150,7 +159,10 @@ FB.Game = class Game {
     await Promise.all([
       ...list.map((src) =>
         Engine2D.loadImage(FB.Calidad.src(src))
-          .then((img) => (this.images[src] = img))
+          .then((img) => {
+            this.images[src] = img;
+            this.cortarHoja(src, img);
+          })
           .catch(() => {}) // sin arte todavía → placeholder
           .finally(tick),
       ),
@@ -175,7 +187,9 @@ FB.Game = class Game {
       const spr = tareas.shift();
       if (!spr) return;
       const img = this.img(spr.src);
-      if (img) st._silueta(img, spr.frame, img.width / (spr.cols || 1), '#fff');
+      const fr = this.cuadro(spr.src, spr.frame);
+      if (fr) st._silueta(null, spr.frame, 0, '#fff', fr);
+      else if (img) st._silueta(img, spr.frame, img.width / (spr.cols || 1), '#fff');
       setTimeout(paso, 60);
     };
     setTimeout(paso, 500);
@@ -185,10 +199,14 @@ FB.Game = class Game {
   setCalidad(v) {
     FB.Calidad.save(v);
     FB.Calidad.aplicar();
+    this.aplicarResolucion();
     for (const src of Object.keys(this.images)) {
       if (!/_sheet\.png$/.test(src)) continue;
       Engine2D.loadImage(FB.Calidad.src(src))
-        .then((img) => (this.images[src] = img))
+        .then((img) => {
+          this.images[src] = img;
+          this.cortarHoja(src, img);
+        })
         .catch(() => {});
     }
     if (v === 'baja' && this.stage && this.stage.setBgVideo) this.stage.setBgVideo(null);
@@ -196,6 +214,83 @@ FB.Game = class Game {
 
   img(src) {
     return src ? this.images[src] || null : null;
+  }
+
+  // ── cuadros de los personajes ──
+  // Las tiras de poses son enormes (hasta 7934×900) y antes cada personaje se dibujaba
+  // achicando su pose desde la tira entera en cada cuadro: era casi todo el costo de dibujar
+  // (y en celus las tiras de más de 4096 px van por el camino lento).
+  // Al cargar, cada pose se corta en un canvas propio, sin los bordes transparentes y
+  // achicada al tamaño en que se ve en pantalla (con margen para el zoom de la cámara).
+  cuadro(src, idx) {
+    const h = this._cuadros && this._cuadros[src];
+    return h ? h[idx] || null : null;
+  }
+
+  cortarHoja(src, img) {
+    if (!this._hojaInfo) {
+      // por cada tira: cuántas columnas tiene y la altura más grande con la que se dibuja
+      this._hojaInfo = {};
+      for (const id in FB.CHARACTERS) {
+        const def = FB.CHARACTERS[id];
+        for (const st in def.sprites || {}) {
+          const s = def.sprites[st];
+          if (!s || typeof s === 'string' || !s.cols) continue;
+          const inf = this._hojaInfo[s.src] || (this._hojaInfo[s.src] = { cols: s.cols, h: 0 });
+          inf.h = Math.max(inf.h, def.height);
+        }
+      }
+    }
+    const inf = this._hojaInfo[src];
+    if (!inf || !img || !img.width) return;
+    this._cuadros = this._cuadros || {};
+    try {
+      // margen para el zoom: en alta casi el doble (se ve nítido hasta con los zooms grandes)
+      const K = FB.Calidad.get() === 'baja' ? 1.35 : 2;
+      const fw = img.width / inf.cols;
+      const s = Math.min(1, (inf.h * K) / img.height);
+      const W = Math.max(1, Math.round(fw * s));
+      const H = Math.max(1, Math.round(img.height * s));
+      const tmp = document.createElement('canvas');
+      tmp.width = W;
+      tmp.height = H;
+      const tx = tmp.getContext('2d', { willReadFrequently: true });
+      tx.imageSmoothingQuality = 'high';
+      const out = [];
+      for (let i = 0; i < inf.cols; i++) {
+        tx.clearRect(0, 0, W, H);
+        tx.drawImage(img, i * fw, 0, fw, img.height, 0, 0, W, H);
+        // recorte: caja de lo que no es transparente
+        const d = tx.getImageData(0, 0, W, H).data;
+        let x0 = W, y0 = H, x1 = -1, y1 = -1;
+        for (let y = 0; y < H; y++) {
+          const row = y * W * 4;
+          for (let x = 0; x < W; x++) {
+            if (d[row + x * 4 + 3] > 2) {
+              if (x < x0) x0 = x;
+              if (x > x1) x1 = x;
+              if (y < y0) y0 = y;
+              y1 = y;
+            }
+          }
+        }
+        if (x1 < 0) (x0 = 0), (y0 = 0), (x1 = 0), (y1 = 0); // cuadro vacío
+        const cw = x1 - x0 + 1;
+        const ch = y1 - y0 + 1;
+        const c = document.createElement('canvas');
+        c.width = cw;
+        c.height = ch;
+        c.getContext('2d').drawImage(tmp, x0, y0, cw, ch, 0, 0, cw, ch);
+        out.push({ c, x: x0, y: y0, w: cw, h: ch, W, H });
+      }
+      this._cuadros[src] = out;
+      // la tira original ya no hace falta: se suelta para que el navegador libere memoria
+      // (queda un objeto chiquito para que los chequeos de "¿hay imagen?" sigan andando)
+      this.images[src] = { width: img.width, height: img.height, cortada: true };
+    } catch (e) {
+      // si algo falla (ej. imagen sin permiso de lectura) se sigue dibujando desde la tira
+      delete this._cuadros[src];
+    }
   }
 
   // ── flujo ──
@@ -757,8 +852,33 @@ FB.Game = class Game {
   }
 
   // ── loop ──
+  // calidad automática: si nadie eligió la calidad y en los primeros segundos de juego
+  // la PC no llega a ~42 fps, pasa sola a baja (y queda guardado; se puede cambiar en Opciones)
+  autoCalidad() {
+    if (this._autoCalOk || this.state !== 'playing' || this.testMode) return;
+    if (FB.Calidad.get() === 'baja' || FB.Calidad.elegida()) return void (this._autoCalOk = true);
+    const now = performance.now();
+    const m = this._autoCal || (this._autoCal = { t0: now, n: 0 });
+    m.n++;
+    const el = (now - m.t0) / 1000;
+    if (el < 2) return void (m.n = 0); // los primeros 2 s no cuentan (carga, videos, etc.)
+    if (el < 8) return;
+    this._autoCalOk = true;
+    const fps = m.n / (el - 2);
+    if (fps >= 42) return;
+    this.setCalidad('baja');
+    const box = document.getElementById('stage-box') || document.body;
+    const d = document.createElement('div');
+    d.className = 'logro-toast';
+    d.innerHTML = '<span><small>Calidad baja activada</small><b>Para que vaya más fluido (cambiala en Opciones)</b></span>';
+    box.appendChild(d);
+    setTimeout(() => d.classList.add('out'), 4200);
+    setTimeout(() => d.remove(), 4700);
+  }
+
   update(dt) {
     this.realTime += dt;
+    this.autoCalidad();
     Engine2D.Particles.update(dt * 1000);
     this.fadeIn = Math.max(0, (this.fadeIn || 0) - dt);
     if (this.state === 'intro' && this.intro) {
@@ -832,11 +952,31 @@ FB.Game = class Game {
     if (this.mechanic) this.mechanic.onBeat(b, time);
   }
 
+  // resolución interna del canvas: en calidad baja se dibuja a 3/4 (960×540) y el navegador
+  // lo estira a la pantalla. Todo el juego sigue pensando en 1280×720 (this.W × this.H).
+  aplicarResolucion() {
+    const r = FB.Calidad.get() === 'baja' ? 0.75 : 1;
+    this.res = r;
+    const w = Math.round(this.W * r);
+    const h = Math.round(this.H * r);
+    if (this.canvas.width !== w) this.canvas.width = w;
+    if (this.canvas.height !== h) this.canvas.height = h;
+    // estirado suave en baja (pixelado se vería en escalones)
+    this.canvas.style.imageRendering = r < 1 ? 'auto' : '';
+  }
+
+  // vuelve a la transformación base (pantalla de 1280×720), respetando la resolución
+  baseTransform(ctx) {
+    const r = this.res || 1;
+    ctx.setTransform(r, 0, 0, r, 0, 0);
+  }
+
   draw() {
     const ctx = this.ctx;
     const time = this.state === 'menu' || this.state === 'intro' ? this.realTime : this.conductor.time;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, this.W, this.H);
+    this.baseTransform(ctx);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, this.W, this.H);
 
     // capa del escenario (cámara: zoom, movimiento, temblor, inclinación)
     const cam = this.camera;
